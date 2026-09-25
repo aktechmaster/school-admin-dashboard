@@ -21,3 +21,5 @@ function renderUsersTable() {
         </tr>
     `).join('');
 }
+
+
