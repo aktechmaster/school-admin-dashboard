@@ -1,11 +1,10 @@
 // js/modules/kelas.js
 
 /**
- * Mengambil konfig bidang (fields) form untuk Kelas.
+ * Mengambil konfigurasi bidang form untuk Kelas.
  * Memuat daftar Guru secara dinamis dari localData.Guru.
  */
 function getKelasFormFields() {
-    // Ambil daftar guru dari localData untuk dijadikan opsi dropdown
     const guruList = localData.Guru || [];
     const guruOptions = guruList.map(g => ({
         value: g.id_guru,
@@ -18,7 +17,8 @@ function getKelasFormFields() {
             label: 'ID Kelas', 
             type: 'text', 
             placeholder: 'Contoh: KLS-1A atau K1-ABU', 
-            required: true 
+            required: true,
+            primaryKey: true
         },
         { 
             name: 'nama_kelas', 
@@ -73,7 +73,6 @@ function renderKelasTable() {
     }
 
     tbody.innerHTML = dataKelas.map(row => {
-        // Relasi ID Wali Kelas ke Nama Guru
         let waliKelasDisplay = '-';
         if (row.id_wali_kelas) {
             const guru = (localData.Guru || []).find(g => g.id_guru === row.id_wali_kelas);
