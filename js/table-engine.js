@@ -1,11 +1,17 @@
 // Engine CRUD Dynamic & Pengurusan Form
 let crudModalInstance;
 
+// PROTEKSI 1: Pastikan localData terdefinisi agar tidak crash saat pertama diload
+window.localData = window.localData || {};
+
 /**
  * Mengambil Schema Table secara Dinamis
- * Membaca relational data (Guru, Kelas, Mapel) dari localData saat modal dibuka
+ * Membaca relational data (Guru, Kelas, Mapel) secara aman
  */
 function getTableSchema(table) {
+    // PROTEKSI 2: Amankan variabel dari ReferenceError jika dipanggil terlalu cepat
+    const safeData = typeof localData !== 'undefined' ? localData : window.localData;
+
     const schemas = {
         Users: [
             { name: 'id_user', label: 'ID User', type: 'text', primaryKey: true },
@@ -17,7 +23,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Guru (Opsional) --' },
-                    ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+                    ...(safeData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
                 ] 
             },
             { name: 'role', label: 'Role', type: 'select', options: ['Admin', 'Kepsek', 'Guru', 'WaliKelas'] },
@@ -50,7 +56,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Kelas --' },
-                    ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
+                    ...(safeData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
                 ] 
             },
             { name: 'nama_ayah', label: 'Nama Ayah', type: 'text' },
@@ -70,16 +76,16 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Wali Kelas --' },
-                    ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+                    ...(safeData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
                 ] 
             }
         ],
         Mapel: [
-    { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true, placeholder: 'Contoh: MP-001 atau MPL-MTK' },
-    { name: 'kode_mapel', label: 'Kode Mapel', type: 'text', placeholder: 'Contoh: MTK / PAI' },
-    { name: 'nama_mapel', label: 'Nama Mata Pelajaran', type: 'text', required: true, placeholder: 'Contoh: Matematika' },
-    { name: 'kategori', label: 'Kategori', type: 'select', options: ['Umum', 'Diniyah', 'Muatan Lokal', 'Ekstrakurikuler'] }
-],
+            { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true, placeholder: 'Contoh: MP-001 atau MPL-MTK' },
+            { name: 'kode_mapel', label: 'Kode Mapel', type: 'text', placeholder: 'Contoh: MTK / PAI' },
+            { name: 'nama_mapel', label: 'Nama Mata Pelajaran', type: 'text', required: true, placeholder: 'Contoh: Matematika' },
+            { name: 'kategori', label: 'Kategori', type: 'select', options: ['Umum', 'Diniyah', 'Muatan Lokal', 'Ekstrakurikuler'] }
+        ],
         Jadwal: [
             { name: 'id_jadwal', label: 'ID Jadwal', type: 'text', primaryKey: true },
             { name: 'hari', label: 'Hari', type: 'select', options: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] },
@@ -90,7 +96,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Kelas --' },
-                    ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
+                    ...(safeData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
                 ] 
             },
             { 
@@ -99,7 +105,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Mapel --' },
-                    ...(localData.Mapel || []).map(m => ({ value: m.id_mapel, label: `${m.nama_mapel} (${m.id_mapel})` }))
+                    ...(safeData.Mapel || []).map(m => ({ value: m.id_mapel, label: `${m.nama_mapel} (${m.id_mapel})` }))
                 ] 
             },
             { 
@@ -108,7 +114,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Guru --' },
-                    ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+                    ...(safeData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
                 ] 
             },
             { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
@@ -125,9 +131,9 @@ function openModal(table, data = null) {
     document.getElementById('modalTitle').innerText = (data ? 'Edit Data ' : 'Tambah Data ') + table;
     
     const fieldsContainer = document.getElementById('formFields');
+    if (!fieldsContainer) return; // Mencegah error jika kontainer hilang
     fieldsContainer.innerHTML = '';
     
-    // Panggil schema dinamis
     const schema = getTableSchema(table);
     
     schema.forEach(field => {
@@ -136,7 +142,6 @@ function openModal(table, data = null) {
         
         let fieldHtml = '';
         if (field.type === 'select') {
-            // Mendukung array string biasa ['L', 'P'] DAN array objek [{value, label}]
             const opts = (field.options || []).map(o => {
                 const optVal = typeof o === 'object' ? o.value : o;
                 const optLabel = typeof o === 'object' ? o.label : o;
@@ -169,7 +174,6 @@ function openModal(table, data = null) {
         fieldsContainer.insertAdjacentHTML('beforeend', fieldHtml);
     });
     
-    // Inisialisasi modal bootstrap jika belum ada
     if (!crudModalInstance) {
         const modalEl = document.getElementById('crudModal');
         if (modalEl) crudModalInstance = new bootstrap.Modal(modalEl);
@@ -184,7 +188,8 @@ function editRow(table, id) {
     if (!pkField) return;
 
     const pkName = pkField.name;
-    const item = (localData[table] || []).find(r => String(r[pkName] || r.id) === String(id));
+    const safeData = typeof localData !== 'undefined' ? localData : window.localData;
+    const item = (safeData[table] || []).find(r => String(r[pkName] || r.id) === String(id));
     if (item) {
         openModal(table, item);
     }
@@ -196,13 +201,9 @@ async function submitDynamicForm() {
     const form = document.getElementById('dynamicForm');
     const formData = new FormData(form);
     
-    const payload = {
-        action: action,
-        table: table,
-        data: {}
-    };
-
+    const payload = { action: action, table: table, data: {} };
     const schema = getTableSchema(table);
+    
     schema.forEach(field => {
         if (field.type === 'boolean') {
             const el = form.querySelector(`[name="${field.name}"]`);
@@ -215,7 +216,7 @@ async function submitDynamicForm() {
     Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
     try {
-        const response = await fetch(GAS_URL, {
+        const response = await fetch(typeof GAS_URL !== 'undefined' ? GAS_URL : '', {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
@@ -253,13 +254,9 @@ async function deleteRow(table, id) {
     if (confirm.isConfirmed) {
         Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         try {
-            const payload = {
-                action: 'delete',
-                table: table,
-                data: { [pkName]: id }
-            };
+            const payload = { action: 'delete', table: table, data: { [pkName]: id } };
 
-            const response = await fetch(GAS_URL, {
+            const response = await fetch(typeof GAS_URL !== 'undefined' ? GAS_URL : '', {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
@@ -276,4 +273,80 @@ async function deleteRow(table, id) {
             Swal.fire('Gagal Hapus', err.message, 'error');
         }
     }
+}
+
+/**
+ * =========================================================================
+ * FUNGSI RENDER TABEL (YANG SEBELUMNYA HILANG)
+ * Bertugas menggambar tabel Bootstrap ke layar berdasarkan Schema dan Data
+ * =========================================================================
+ */
+function renderDynamicTable(table, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return; // Lewati jika div tabel tidak ada di halaman
+
+    const safeData = typeof localData !== 'undefined' ? localData : window.localData;
+    const data = safeData[table] || [];
+    const schema = getTableSchema(table);
+
+    if (data.length === 0) {
+        container.innerHTML = `<div class="alert alert-warning mt-3">Belum ada data untuk ${table}.</div>`;
+        return;
+    }
+
+    let html = `
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th width="5%" class="text-center">No</th>`;
+    
+    // Render Header dari Schema
+    schema.forEach(field => {
+        if (field.type !== 'password') {
+            html += `<th>${field.label}</th>`;
+        }
+    });
+    
+    html += `       <th width="15%" class="text-center"><i class="fas fa-cogs"></i> Aksi</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    
+    // Render Baris Data
+    data.forEach((row, index) => {
+        html += `<tr><td class="text-center">${index + 1}</td>`;
+        const pkField = schema.find(f => f.primaryKey);
+        const pkValue = pkField ? row[pkField.name] : '';
+
+        schema.forEach(field => {
+            if (field.type !== 'password') {
+                let val = row[field.name];
+                if (val === undefined || val === null || val === '') val = '-';
+                
+                // Ubah status boolean menjadi badge warna
+                if (field.type === 'boolean') {
+                    val = (val === true || val === 'TRUE' || val == 1 || val === '1') 
+                        ? '<span class="badge bg-success">Ya</span>' 
+                        : '<span class="badge bg-secondary">Tidak</span>';
+                }
+                html += `<td>${val}</td>`;
+            }
+        });
+
+        // Tombol Edit & Hapus
+        html += `
+            <td class="text-center">
+                <button class="btn btn-sm btn-warning mb-1" onclick="editRow('${table}', '${pkValue}')" title="Edit"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn btn-sm btn-danger mb-1" onclick="deleteRow('${table}', '${pkValue}')" title="Hapus"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    </div>`;
+
+    container.innerHTML = html;
 }
