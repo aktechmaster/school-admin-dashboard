@@ -1,9 +1,13 @@
-// Logik Utama Aplikasi & Router Navigasi
+// Logika Utama Aplikasi & Router Navigasi
 // js/app.js
+
+// Deklarasi variabel modal global
+let crudModalInstance = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('crudModal');
     
-    // Pengecekan aman: hanya inisialisasi jika library bootstrap tersedia
+    // Pengecekan aman: inisialisasi Bootstrap Modal
     if (modalEl && typeof bootstrap !== 'undefined') {
         crudModalInstance = new bootstrap.Modal(modalEl);
     } else {
@@ -13,34 +17,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const gasInput = document.getElementById('gas-url-input');
     const displayUrl = document.getElementById('display-api-url');
     
-    if (gasInput) gasInput.value = GAS_URL;
-    if (displayUrl) displayUrl.innerText = GAS_URL;
+    if (gasInput && typeof GAS_URL !== 'undefined') gasInput.value = GAS_URL;
+    if (displayUrl && typeof GAS_URL !== 'undefined') displayUrl.innerText = GAS_URL;
 
+    // Muat seluruh data master pertama kali
     loadAllMasterData();
 });
 
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('active');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('active');
 }
 
 function saveGasUrl() {
     const url = document.getElementById('gas-url-input').value.trim();
-    if (!url) return Swal.fire('Ralat', 'URL tidak boleh kosong', 'error');
+    if (!url) return Swal.fire('Gagal', 'URL tidak boleh kosong', 'error');
     
     localStorage.setItem('SDIT_GAS_URL', url);
-    GAS_URL = url;
-    document.getElementById('display-api-url').innerText = url;
-    Swal.fire('Berjaya', 'URL Web App GAS berjaya dikemas kini!', 'success');
+    if (typeof GAS_URL !== 'undefined') GAS_URL = url;
+    
+    const displayUrl = document.getElementById('display-api-url');
+    if (displayUrl) displayUrl.innerText = url;
+    
+    Swal.fire('Berhasil', 'URL Web App GAS berhasil diperbarui!', 'success');
     loadAllMasterData();
 }
 
 function showSection(sectionId, element) {
+    // Sembunyikan semua section & hapus status aktif menu
     document.querySelectorAll('.content-section').forEach(el => el.classList.add('d-none'));
-    document.getElementById('sec-' + sectionId).classList.remove('d-none');
-    
     document.querySelectorAll('#sidebar .nav-link').forEach(el => el.classList.remove('active'));
+    
+    // Tampilkan section pilihan & aktifkan nav link
+    const targetSec = document.getElementById('sec-' + sectionId);
+    if (targetSec) targetSec.classList.remove('d-none');
     if (element) element.classList.add('active');
 
+    // Ubah judul halaman pada Navbar Top
     const titles = {
         dashboard: 'Dashboard Overview',
         users: 'Master Users',
@@ -52,14 +65,36 @@ function showSection(sectionId, element) {
         settings: 'Pengaturan Koneksi API'
     };
     document.getElementById('page-title').innerText = titles[sectionId] || 'Dashboard Admin';
+
+    // Memastikan tabel dirender ulang saat section dibuka
+    switch (sectionId) {
+        case 'users':
+            if (typeof renderUsersTable === 'function') renderUsersTable();
+            break;
+        case 'guru':
+            if (typeof renderGuruTable === 'function') renderGuruTable();
+            break;
+        case 'siswa':
+            if (typeof renderSiswaTable === 'function') renderSiswaTable();
+            break;
+        case 'kelas':
+            if (typeof renderKelasTable === 'function') renderKelasTable();
+            break;
+        case 'mapel':
+            if (typeof renderMapelTable === 'function') renderMapelTable();
+            break;
+        case 'jadwal':
+            if (typeof renderJadwalTable === 'function') renderJadwalTable();
+            break;
+    }
 }
 
 async function loadAllMasterData() {
-    if (!GAS_URL) return;
+    if (typeof GAS_URL === 'undefined' || !GAS_URL) return;
     
     Swal.fire({ 
-        title: 'Memuatkan Data...', 
-        text: 'Mengambil data daripada Google Sheets', 
+        title: 'Memuat Data...', 
+        text: 'Mengambil data dari Google Sheets', 
         allowOutsideClick: false, 
         didOpen: () => Swal.showLoading() 
     });
@@ -73,11 +108,11 @@ async function loadAllMasterData() {
             renderAllModules();
             Swal.close();
         } else {
-            throw new Error(result.message || 'Gagal memuatkan data');
+            throw new Error(result.message || 'Gagal memuat data');
         }
     } catch (error) {
         console.error(error);
-        Swal.fire('Gagal Memuatkan Data', error.message || 'Sila semak semula sambungan atau URL Web App GAS anda.', 'error');
+        Swal.fire('Gagal Memuat Data', error.message || 'Silakan periksa kembali koneksi atau URL Web App GAS Anda.', 'error');
     }
 }
 
