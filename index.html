@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
-    <!-- JS Bootstrap & SweetAlert2 (Cloudflare CDN) -->
+    <!-- JS Bootstrap & SweetAlert2 (Cloudflare CDN - Path URL Sudah Benar) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.8/sweetalert2.all.min.js"></script>
 
@@ -138,56 +138,114 @@
 
                 <!-- Section: Users -->
                 <div id="sec-users" class="content-section d-none">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Data Master Users</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Users</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Users')"><i class="fas fa-plus me-1"></i>Tambah User</button>
                     </div>
-                    <div id="container-users" class="bg-white p-3 rounded shadow-sm"></div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-users">
+                            <thead>
+                                <tr>
+                                    <th>ID User</th><th>Username</th><th>ID Guru</th><th>Role</th><th>Status</th>
+                                    <th>Wali Kelas</th><th>Wakur</th><th>T2Q</th><th>BPI</th><th>Ekstra</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Section: Guru -->
                 <div id="sec-guru" class="content-section d-none">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Data Master Guru</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Guru</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Guru')"><i class="fas fa-plus me-1"></i>Tambah Guru</button>
                     </div>
-                    <div id="container-guru" class="bg-white p-3 rounded shadow-sm"></div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-guru">
+                            <thead>
+                                <tr>
+                                    <th>ID Guru</th><th>NIP/NIK</th><th>Nama Lengkap</th><th>JK</th>
+                                    <th>No HP</th><th>Email</th><th>Jabatan</th><th>Status</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Section: Siswa -->
                 <div id="sec-siswa" class="content-section d-none">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Data Master Siswa</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Siswa</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Siswa')"><i class="fas fa-plus me-1"></i>Tambah Siswa</button>
                     </div>
-                    <div id="container-siswa" class="bg-white p-3 rounded shadow-sm"></div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-siswa">
+                            <thead>
+                                <tr>
+                                    <th>ID Siswa</th><th>NISN</th><th>NIS</th><th>Nama Siswa</th><th>JK</th>
+                                    <th>Kelas</th><th>Ayah</th><th>Ibu</th><th>No HP Ortu</th><th>Status</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Section: Kelas -->
                 <div id="sec-kelas" class="content-section d-none">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Data Master Kelas</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Kelas</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Kelas')"><i class="fas fa-plus me-1"></i>Tambah Kelas</button>
                     </div>
-                    <div id="container-kelas" class="bg-white p-3 rounded shadow-sm"></div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-kelas">
+                            <thead>
+                                <tr>
+                                    <th>ID Kelas</th><th>Nama Kelas</th><th>Tingkat</th><th>Wali Kelas</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Section: Mapel -->
                 <div id="sec-mapel" class="content-section d-none">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Data Master Mapel</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Mapel</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Mapel')"><i class="fas fa-plus me-1"></i>Tambah Mapel</button>
                     </div>
-                    <div id="container-mapel" class="bg-white p-3 rounded shadow-sm"></div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-mapel">
+                            <thead>
+                                <tr>
+                                    <th>ID Mapel</th><th>Kode</th><th>Nama Mata Pelajaran</th><th>Kategori</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Section: Jadwal -->
                 <div id="sec-jadwal" class="content-section d-none">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Data Master Jadwal</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Jadwal</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Jadwal')"><i class="fas fa-plus me-1"></i>Tambah Jadwal</button>
                     </div>
-                    <div id="container-jadwal" class="bg-white p-3 rounded shadow-sm"></div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-jadwal">
+                            <thead>
+                                <tr>
+                                    <th>ID Jadwal</th><th>Hari</th><th>Jam Ke</th><th>Kelas</th>
+                                    <th>Mapel</th><th>Guru</th><th>Tahun Ajaran</th><th>Semester</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Section: Settings -->
