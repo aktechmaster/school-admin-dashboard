@@ -1,5 +1,5 @@
 // Konfigurasi Utama & State Data
-let GAS_URL = localStorage.getItem('SDIT_GAS_URL') || 'https://script.google.com/macros/s/AKfycbwkapFCSh949dImZF-gw959mmFvQ05GL7Fkf-RRXsbZMp0AvAG2KYuadbeBjqFH55M_/exec';
+let GAS_URL = localStorage.getItem('SDIT_GAS_URL') || 'https://script.google.com/macros/s/AKfycbyOZZYLHzfbE4Y_irbsPMquvqrLi0cIBM0IB-UJpOSIkjv7YVEmILR-xNIUa2Ufm-G9/exec';
 
 let localData = {
     Users: [],
