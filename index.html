@@ -1,770 +1,291 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - SDIT Al-Kautsar</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>Dashboard Admin SDIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- SweetAlert2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root {
-            --sidebar-width: 250px;
-            --primary-color: #1b5e20; /* Hijau Khas SDIT */
-            --accent-color: #4caf50;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-        }
-        /* Sidebar Styling */
-        #sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #212529;
-            color: #fff;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-        #sidebar .brand-title {
-            padding: 1.2rem 1rem;
-            font-weight: bold;
-            font-size: 1.1rem;
-            background-color: var(--primary-color);
-            text-align: center;
-        }
-        #sidebar .nav-link {
-            color: #c2c7d0;
-            padding: 0.8rem 1.2rem;
-            border-left: 4px solid transparent;
-        }
-        #sidebar .nav-link:hover, #sidebar .nav-link.active {
-            color: #fff;
-            background-color: rgba(255,255,255,0.1);
-            border-left-color: var(--accent-color);
-        }
-        #sidebar .nav-link i {
-            margin-right: 10px;
-            width: 20px;
-        }
-        /* Main Content */
-        #main-content {
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-        }
-        /* Card & KPI Box */
-        .kpi-card {
-            border-radius: 8px;
-            color: #fff;
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .kpi-card .icon {
-            position: absolute;
-            right: 15px;
-            bottom: 10px;
-            font-size: 3.5rem;
-            opacity: 0.2;
-        }
-        .bg-siswa { background: linear-gradient(135deg, #17a2b8, #117a8b); }
-        .bg-guru { background: linear-gradient(135deg, #28a745, #1e7e34); }
-        .bg-kelas { background: linear-gradient(135deg, #ffc107, #d39e00); color: #212529 !important; }
-        .bg-mapel { background: linear-gradient(135deg, #dc3545, #bd2130); }
-
-        .table-responsive {
-            background: #fff;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        @media (max-width: 768px) {
-            #sidebar { margin-left: calc(-1 * var(--sidebar-width)); }
-            #sidebar.active { margin-left: 0; }
-            #main-content { margin-left: 0; }
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        #sidebar { min-width: 250px; max-width: 250px; min-height: 100vh; transition: all 0.3s; }
+        #sidebar.active { margin-left: -250px; }
+        .nav-link { color: rgba(255,255,255,.8); margin-bottom: 5px; }
+        .nav-link:hover, .nav-link.active { color: #fff; background-color: rgba(255,255,255,.1); border-radius: 5px; }
+        .main-content { width: 100%; min-height: 100vh; }
     </style>
 </head>
 <body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="bg-dark p-3">
+            <h4 class="text-white mb-4"><i class="fas fa-school me-2"></i>SDIT Admin</h4>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showSection('dashboard', this)">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('users', this)">
+                        <i class="fas fa-users-cog me-2"></i>Master Users
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('guru', this)">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>Master Guru
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('siswa', this)">
+                        <i class="fas fa-user-graduate me-2"></i>Master Siswa
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('kelas', this)">
+                        <i class="fas fa-door-open me-2"></i>Master Kelas
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('mapel', this)">
+                        <i class="fas fa-book me-2"></i>Master Mapel
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('jadwal', this)">
+                        <i class="fas fa-calendar-alt me-2"></i>Master Jadwal
+                    </a>
+                </li>
+                <li class="mt-3 border-top pt-3">
+                    <a href="#" class="nav-link text-warning" onclick="showSection('settings', this)">
+                        <i class="fas fa-cog me-2"></i>Pengaturan API
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-    <!-- Sidebar Navigasi -->
-    <nav id="sidebar">
-        <div class="brand-title">
-            <i class="fas fa-school me-2"></i>SDIT Al-Kautsar
-        </div>
-        <div class="px-3 py-2 text-muted small">MENU MASTER DATA</div>
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link active" href="#" onclick="showSection('dashboard', this)">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard KPI
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showSection('users', this)">
-                    <i class="fas fa-users-cog"></i> Master Users
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showSection('guru', this)">
-                    <i class="fas fa-chalkboard-teacher"></i> Master Guru
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showSection('siswa', this)">
-                    <i class="fas fa-user-graduate"></i> Master Siswa
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showSection('kelas', this)">
-                    <i class="fas fa-door-open"></i> Master Kelas
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showSection('mapel', this)">
-                    <i class="fas fa-book"></i> Master Mapel
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showSection('jadwal', this)">
-                    <i class="fas fa-calendar-alt"></i> Master Jadwal
-                </a>
-            </li>
-            <li class="nav-item mt-3">
-                <a class="nav-link text-warning" href="#" onclick="showSection('settings', this)">
-                    <i class="fas fa-cogs"></i> Pengaturan GAS API
-                </a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- Content Area -->
-    <div id="main-content">
-        <!-- Top Navbar -->
-        <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-secondary d-md-none me-2" onclick="toggleSidebar()">
+        <!-- Main Content -->
+        <div class="main-content d-flex flex-column">
+            <!-- Top Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4">
+                <button type="button" id="sidebarCollapse" class="btn btn-outline-secondary" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h4 class="mb-0 fw-bold text-dark" id="page-title">Dashboard Overview</h4>
-            </div>
-            <div>
-                <span class="badge bg-success py-2 px-3"><i class="fas fa-user-shield me-1"></i> Admin Panel</span>
-            </div>
-        </div>
+                <h5 class="ms-3 mb-0" id="page-title">Dashboard Overview</h5>
+                <button class="btn btn-sm btn-outline-primary ms-auto" onclick="loadAllMasterData()">
+                    <i class="fas fa-sync-alt me-1"></i> Refresh Data
+                </button>
+            </nav>
 
-        <!-- SECTION: DASHBOARD KPI -->
-        <div id="sec-dashboard" class="content-section">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="kpi-card bg-siswa">
-                        <h6 class="text-uppercase">Total Siswa</h6>
-                        <h2 id="kpi-siswa" class="fw-bold">0</h2>
-                        <i class="fas fa-user-graduate icon"></i>
+            <!-- Dynamic Content Area -->
+            <div class="p-4 flex-grow-1">
+                <!-- Section: Dashboard -->
+                <div id="sec-dashboard" class="content-section">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Total Siswa</h6>
+                                        <h2 class="mb-0 mt-2" id="kpi-siswa">0</h2>
+                                    </div>
+                                    <i class="fas fa-user-graduate fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Total Guru</h6>
+                                        <h2 class="mb-0 mt-2" id="kpi-guru">0</h2>
+                                    </div>
+                                    <i class="fas fa-chalkboard-teacher fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Total Kelas</h6>
+                                        <h2 class="mb-0 mt-2" id="kpi-kelas">0</h2>
+                                    </div>
+                                    <i class="fas fa-door-open fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Total Mapel</h6>
+                                        <h2 class="mb-0 mt-2" id="kpi-mapel">0</h2>
+                                    </div>
+                                    <i class="fas fa-book fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="kpi-card bg-guru">
-                        <h6 class="text-uppercase">Total Guru</h6>
-                        <h2 id="kpi-guru" class="fw-bold">0</h2>
-                        <i class="fas fa-chalkboard-teacher icon"></i>
+
+                <!-- Section: Users -->
+                <div id="sec-users" class="content-section d-none">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Users</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('Users')"><i class="fas fa-plus me-1"></i>Tambah User</button>
+                    </div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-users">
+                            <thead>
+                                <tr>
+                                    <th>ID User</th><th>Username</th><th>ID Guru</th><th>Role</th><th>Status</th>
+                                    <th>Wali Kelas</th><th>Wakur</th><th>T2Q</th><th>BPI</th><th>Ekstra</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="kpi-card bg-kelas">
-                        <h6 class="text-uppercase">Total Kelas</h6>
-                        <h2 id="kpi-kelas" class="fw-bold">0</h2>
-                        <i class="fas fa-door-open icon"></i>
+
+                <!-- Section: Guru -->
+                <div id="sec-guru" class="content-section d-none">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Guru</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('Guru')"><i class="fas fa-plus me-1"></i>Tambah Guru</button>
+                    </div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-guru">
+                            <thead>
+                                <tr>
+                                    <th>ID Guru</th><th>NIP/NIK</th><th>Nama Lengkap</th><th>JK</th>
+                                    <th>No HP</th><th>Email</th><th>Jabatan</th><th>Status</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="kpi-card bg-mapel">
-                        <h6 class="text-uppercase">Total Mapel</h6>
-                        <h2 id="kpi-mapel" class="fw-bold">0</h2>
-                        <i class="fas fa-book icon"></i>
+
+                <!-- Section: Siswa -->
+                <div id="sec-siswa" class="content-section d-none">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Siswa</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('Siswa')"><i class="fas fa-plus me-1"></i>Tambah Siswa</button>
+                    </div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-siswa">
+                            <thead>
+                                <tr>
+                                    <th>ID Siswa</th><th>NISN</th><th>NIS</th><th>Nama Siswa</th><th>JK</th>
+                                    <th>Kelas</th><th>Ayah</th><th>Ibu</th><th>No HP Ortu</th><th>Status</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-            
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h5><i class="fas fa-info-circle text-primary me-2"></i>Status Koneksi API</h5>
-                    <p class="mb-1">URL API Apps Script Saat Ini:</p>
-                    <code id="display-api-url" class="d-block p-2 bg-light rounded text-break">Belum Dikonfigurasi</code>
-                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="loadAllMasterData()">
-                        <i class="fas fa-sync-alt me-1"></i> Synchronize Data
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <!-- SECTION: MASTER USERS -->
-        <div id="sec-users" class="content-section d-none">
-            <div class="d-flex justify-content-between mb-3">
-                <h5>Data Users</h5>
-                <button class="btn btn-primary btn-sm" onclick="openModal('Users')"><i class="fas fa-plus me-1"></i> Tambah User</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle" id="table-users">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID User</th><th>Username</th><th>ID Guru</th><th>Role</th>
-                            <th>Status Active</th><th>Wali Kelas</th><th>Wakur</th><th>T2Q</th><th>BPI</th><th>Ekstra</th><th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody><!-- Dynamic Content --></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SECTION: MASTER GURU -->
-        <div id="sec-guru" class="content-section d-none">
-            <div class="d-flex justify-content-between mb-3">
-                <h5>Data Guru</h5>
-                <button class="btn btn-primary btn-sm" onclick="openModal('Guru')"><i class="fas fa-plus me-1"></i> Tambah Guru</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle" id="table-guru">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Guru</th><th>NIP/NIK</th><th>Nama Lengkap</th><th>JK</th><th>No HP</th><th>Email</th><th>Jabatan</th><th>Status</th><th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody><!-- Dynamic Content --></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SECTION: MASTER SISWA -->
-        <div id="sec-siswa" class="content-section d-none">
-            <div class="d-flex justify-content-between mb-3">
-                <h5>Data Siswa</h5>
-                <button class="btn btn-primary btn-sm" onclick="openModal('Siswa')"><i class="fas fa-plus me-1"></i> Tambah Siswa</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle" id="table-siswa">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Siswa</th><th>NISN</th><th>NIS</th><th>Nama Siswa</th><th>JK</th><th>ID Kelas</th><th>Nama Ayah</th><th>Nama Ibu</th><th>No HP Ortu</th><th>Status</th><th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody><!-- Dynamic Content --></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SECTION: MASTER KELAS -->
-        <div id="sec-kelas" class="content-section d-none">
-            <div class="d-flex justify-content-between mb-3">
-                <h5>Data Kelas</h5>
-                <button class="btn btn-primary btn-sm" onclick="openModal('Kelas')"><i class="fas fa-plus me-1"></i> Tambah Kelas</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle" id="table-kelas">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Kelas</th><th>Nama Kelas</th><th>Tingkat</th><th>ID Wali Kelas</th><th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody><!-- Dynamic Content --></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SECTION: MASTER MAPEL -->
-        <div id="sec-mapel" class="content-section d-none">
-            <div class="d-flex justify-content-between mb-3">
-                <h5>Data Mata Pelajaran</h5>
-                <button class="btn btn-primary btn-sm" onclick="openModal('Mapel')"><i class="fas fa-plus me-1"></i> Tambah Mapel</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle" id="table-mapel">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Mapel</th><th>Kode Mapel</th><th>Nama Mapel</th><th>Kategori</th><th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody><!-- Dynamic Content --></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SECTION: MASTER JADWAL -->
-        <div id="sec-jadwal" class="content-section d-none">
-            <div class="d-flex justify-content-between mb-3">
-                <h5>Data Jadwal Pelajaran</h5>
-                <button class="btn btn-primary btn-sm" onclick="openModal('Jadwal')"><i class="fas fa-plus me-1"></i> Tambah Jadwal</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle" id="table-jadwal">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Jadwal</th><th>Hari</th><th>Jam Ke</th><th>ID Kelas</th><th>ID Mapel</th><th>ID Guru</th><th>Tahun Ajaran</th><th>Semester</th><th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody><!-- Dynamic Content --></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SECTION: PENGATURAN -->
-        <div id="sec-settings" class="content-section d-none">
-            <div class="card col-md-8 mx-auto shadow-sm">
-                <div class="card-header bg-warning fw-bold"><i class="fas fa-plug me-2"></i>Konfigurasi API Google Apps Script</div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">URL Web App Google Apps Script Deployment</label>
-                        <input type="url" id="gas-url-input" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
-                        <div class="form-text">Masukkan Web App URL bertipe 'Exec' yang dipublikasikan dari Apps Script (Access: Anyone).</div>
+                <!-- Section: Kelas -->
+                <div id="sec-kelas" class="content-section d-none">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Kelas</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('Kelas')"><i class="fas fa-plus me-1"></i>Tambah Kelas</button>
                     </div>
-                    <button class="btn btn-success" onclick="saveGasUrl()"><i class="fas fa-save me-1"></i> Simpan URL</button>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-kelas">
+                            <thead>
+                                <tr>
+                                    <th>ID Kelas</th><th>Nama Kelas</th><th>Tingkat</th><th>Wali Kelas</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section: Mapel -->
+                <div id="sec-mapel" class="content-section d-none">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Mapel</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('Mapel')"><i class="fas fa-plus me-1"></i>Tambah Mapel</button>
+                    </div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-mapel">
+                            <thead>
+                                <tr>
+                                    <th>ID Mapel</th><th>Kode</th><th>Nama Mata Pelajaran</th><th>Kategori</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section: Jadwal -->
+                <div id="sec-jadwal" class="content-section d-none">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Data Master Jadwal</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('Jadwal')"><i class="fas fa-plus me-1"></i>Tambah Jadwal</button>
+                    </div>
+                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-jadwal">
+                            <thead>
+                                <tr>
+                                    <th>ID Jadwal</th><th>Hari</th><th>Jam Ke</th><th>Kelas</th>
+                                    <th>Mapel</th><th>Guru</th><th>Tahun Ajaran</th><th>Semester</th><th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section: Settings -->
+                <div id="sec-settings" class="content-section d-none">
+                    <div class="card p-4 max-w-600">
+                        <h5>Pengaturan API Google Apps Script</h5>
+                        <p class="text-muted small">URL berikut digunakan sebagai endpoint utama data master.</p>
+                        <div class="mb-3">
+                            <label class="form-label">URL Web App GAS</label>
+                            <input type="text" id="gas-url-input" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">URL Terpasang: <span id="display-api-url" class="fw-bold"></span></small>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveGasUrl()"><i class="fas fa-save me-1"></i> Simpan URL Baru</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL GENERIK DYNAMIC CRUD -->
+    <!-- Modal Dynamic CRUD -->
     <div class="modal fade" id="crudModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Form Data</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="dynamicForm">
-                        <input type="hidden" id="formAction" value="create">
-                        <input type="hidden" id="formTable" value="">
-                        <div id="formFields" class="row g-3">
-                            <!-- Dynamic Input Fields will be inserted here -->
-                        </div>
+                        <input type="hidden" id="formTable">
+                        <input type="hidden" id="formAction">
+                        <div class="row g-3" id="formFields"></div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" onclick="submitDynamicForm()"><i class="fas fa-save me-1"></i> Simpan Data</button>
+                    <button type="button" class="btn btn-primary" onclick="submitDynamicForm()">Simpan Data</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JS Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        // CONFIG & STATE
-        let GAS_URL = localStorage.getItem('SDIT_GAS_URL') || '';
-        let localData = { Users: [], Guru: [], Siswa: [], Kelas: [], Mapel: [], Jadwal: [] };
-        let crudModalInstance;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            crudModalInstance = new bootstrap.Modal(document.getElementById('crudModal'));
-            if (GAS_URL) {
-                document.getElementById('gas-url-input').value = GAS_URL;
-                document.getElementById('display-api-url').innerText = GAS_URL;
-                loadAllMasterData();
-            } else {
-                Swal.fire('Konfigurasi API Required', 'Harap masukkan URL Web App Google Apps Script pada menu Pengaturan.', 'warning');
-                showSection('settings', document.querySelector('.nav-link.text-warning'));
-            }
-        });
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
-
-        function saveGasUrl() {
-            const url = document.getElementById('gas-url-input').value.trim();
-            if(!url) return Swal.fire('Error', 'URL tidak boleh kosong', 'error');
-            localStorage.setItem('SDIT_GAS_URL', url);
-            GAS_URL = url;
-            document.getElementById('display-api-url').innerText = url;
-            Swal.fire('Berhasil', 'URL Web App GAS berhasil disimpan!', 'success');
-            loadAllMasterData();
-        }
-
-        function showSection(sectionId, element) {
-            document.querySelectorAll('.content-section').forEach(el => el.classList.add('d-none'));
-            document.getElementById('sec-' + sectionId).classList.remove('d-none');
-            
-            document.querySelectorAll('#sidebar .nav-link').forEach(el => el.classList.remove('active'));
-            if(element) element.classList.add('active');
-
-            const titles = {
-                dashboard: 'Dashboard Overview',
-                users: 'Master Users',
-                guru: 'Master Guru',
-                siswa: 'Master Siswa',
-                kelas: 'Master Kelas',
-                mapel: 'Master Mapel',
-                jadwal: 'Master Jadwal Pelajaran',
-                settings: 'Pengaturan Koneksi API'
-            };
-            document.getElementById('page-title').innerText = titles[sectionId] || 'Dashboard Admin';
-        }
-
-        // ================= FETCH & RENDER API DATA =================
-        async function loadAllMasterData() {
-            if (!GAS_URL) return;
-            Swal.fire({ title: 'Memuat Data...', text: 'Mengambil data dari Google Sheets', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            try {
-                const response = await fetch(`${GAS_URL}?action=readAllMaster`);
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    localData = result.data;
-                    updateDashboardKPI();
-                    renderAllTables();
-                    Swal.close();
-                } else {
-                    throw new Error(result.message || 'Gagal memuat data');
-                }
-            } catch (error) {
-                console.error(error);
-                Swal.fire('Gagal Memuat Data', error.message || 'Periksa kembali CORS / URL Web App GAS Anda.', 'error');
-            }
-        }
-
-        function updateDashboardKPI() {
-            document.getElementById('kpi-siswa').innerText = (localData.Siswa || []).length;
-            document.getElementById('kpi-guru').innerText = (localData.Guru || []).length;
-            document.getElementById('kpi-kelas').innerText = (localData.Kelas || []).length;
-            document.getElementById('kpi-mapel').innerText = (localData.Mapel || []).length;
-        }
-
-        function renderAllTables() {
-            renderUsersTable();
-            renderGuruTable();
-            renderSiswaTable();
-            renderKelasTable();
-            renderMapelTable();
-            renderJadwalTable();
-        }
-
-        function renderUsersTable() {
-            const tbody = document.querySelector('#table-users tbody');
-            tbody.innerHTML = (localData.Users || []).map(row => `
-                <tr>
-                    <td><b>${row.id_user || ''}</b></td>
-                    <td>${row.username || ''}</td>
-                    <td>${row.id_guru || '-'}</td>
-                    <td><span class="badge bg-info">${row.role || ''}</span></td>
-                    <td>${row.status_aktif ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>'}</td>
-                    <td>${row.is_wali_kelas ? 'Ya' : 'Tidak'}</td>
-                    <td>${row.is_wakur ? 'Ya' : 'Tidak'}</td>
-                    <td>${row.is_t2q ? 'Ya' : 'Tidak'}</td>
-                    <td>${row.is_bpi ? 'Ya' : 'Tidak'}</td>
-                    <td>${row.is_ekstra ? 'Ya' : 'Tidak'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Users', '${row.id_user}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Users', '${row.id_user}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderGuruTable() {
-            const tbody = document.querySelector('#table-guru tbody');
-            tbody.innerHTML = (localData.Guru || []).map(row => `
-                <tr>
-                    <td><b>${row.id_guru || ''}</b></td>
-                    <td>${row.nip_nik || '-'}</td>
-                    <td>${row.nama_lengkap || ''}</td>
-                    <td>${row.jenis_kelamin || ''}</td>
-                    <td>${row.no_hp || ''}</td>
-                    <td>${row.email || ''}</td>
-                    <td>${row.jabatan || ''}</td>
-                    <td><span class="badge bg-secondary">${row.status_karyawan || ''}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Guru', '${row.id_guru}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Guru', '${row.id_guru}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderSiswaTable() {
-            const tbody = document.querySelector('#table-siswa tbody');
-            tbody.innerHTML = (localData.Siswa || []).map(row => `
-                <tr>
-                    <td><b>${row.id_siswa || ''}</b></td>
-                    <td>${row.nisn || '-'}</td>
-                    <td>${row.nis || '-'}</td>
-                    <td>${row.nama_siswa || ''}</td>
-                    <td>${row.jenis_kelamin || ''}</td>
-                    <td>${row.id_kelas || ''}</td>
-                    <td>${row.nama_ayah || ''}</td>
-                    <td>${row.nama_ibu || ''}</td>
-                    <td>${row.no_hp_ortu || ''}</td>
-                    <td><span class="badge bg-primary">${row.status_siswa || 'Aktif'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Siswa', '${row.id_siswa}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Siswa', '${row.id_siswa}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderKelasTable() {
-            const tbody = document.querySelector('#table-kelas tbody');
-            tbody.innerHTML = (localData.Kelas || []).map(row => `
-                <tr>
-                    <td><b>${row.id_kelas || ''}</b></td>
-                    <td>${row.nama_kelas || ''}</td>
-                    <td>Tingkat ${row.tingkat || ''}</td>
-                    <td>${row.id_wali_kelas || '-'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Kelas', '${row.id_kelas}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Kelas', '${row.id_kelas}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderMapelTable() {
-            const tbody = document.querySelector('#table-mapel tbody');
-            tbody.innerHTML = (localData.Mapel || []).map(row => `
-                <tr>
-                    <td><b>${row.id_mapel || ''}</b></td>
-                    <td>${row.kode_mapel || ''}</td>
-                    <td>${row.nama_mapel || ''}</td>
-                    <td><span class="badge bg-info text-dark">${row.kategori || 'Umum'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Mapel', '${row.id_mapel}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Mapel', '${row.id_mapel}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderJadwalTable() {
-            const tbody = document.querySelector('#table-jadwal tbody');
-            tbody.innerHTML = (localData.Jadwal || []).map(row => `
-                <tr>
-                    <td><b>${row.id_jadwal || ''}</b></td>
-                    <td>${row.hari || ''}</td>
-                    <td>Jam Ke-${row.jam_ke || ''}</td>
-                    <td>${row.id_kelas || ''}</td>
-                    <td>${row.id_mapel || ''}</td>
-                    <td>${row.id_guru || ''}</td>
-                    <td>${row.tahun_ajaran || ''}</td>
-                    <td>Semester ${row.semester || ''}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Jadwal', '${row.id_jadwal}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Jadwal', '${row.id_jadwal}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // ================= DYNAMIC FORM GENERATOR =================
-        const TABLE_SCHEMAS = {
-            Users: [
-                { name: 'id_user', label: 'ID User', type: 'text', primaryKey: true },
-                { name: 'username', label: 'Username', type: 'text', required: true },
-                { name: 'password_hash', label: 'Password / Hash', type: 'password' },
-                { name: 'id_guru', label: 'ID Guru', type: 'text' },
-                { name: 'role', label: 'Role', type: 'select', options: ['Admin', 'Kepsek', 'Guru', 'WaliKelas'] },
-                { name: 'status_aktif', label: 'Status Aktif', type: 'boolean' },
-                { name: 'is_wali_kelas', label: 'Is Wali Kelas', type: 'boolean' },
-                { name: 'is_wakur', label: 'Is Wakur', type: 'boolean' },
-                { name: 'is_t2q', label: 'Is T2Q', type: 'boolean' },
-                { name: 'is_bpi', label: 'Is BPI', type: 'boolean' },
-                { name: 'is_ekstra', label: 'Is Ekstra', type: 'boolean' }
-            ],
-            Guru: [
-                { name: 'id_guru', label: 'ID Guru', type: 'text', primaryKey: true },
-                { name: 'nip_nik', label: 'NIP / NIK', type: 'text' },
-                { name: 'nama_lengkap', label: 'Nama Lengkap', type: 'text', required: true },
-                { name: 'jenis_kelamin', label: 'Jenis Kelamin', type: 'select', options: ['L', 'P'] },
-                { name: 'no_hp', label: 'No. HP / WhatsApp', type: 'text' },
-                { name: 'email', label: 'Email', type: 'email' },
-                { name: 'jabatan', label: 'Jabatan', type: 'text' },
-                { name: 'status_karyawan', label: 'Status Karyawan', type: 'select', options: ['Tetap', 'Kontrak', 'Honorer'] }
-            ],
-            Siswa: [
-                { name: 'id_siswa', label: 'ID Siswa', type: 'text', primaryKey: true },
-                { name: 'nisn', label: 'NISN', type: 'text' },
-                { name: 'nis', label: 'NIS', type: 'text' },
-                { name: 'nama_siswa', label: 'Nama Siswa', type: 'text', required: true },
-                { name: 'jenis_kelamin', label: 'Jenis Kelamin', type: 'select', options: ['L', 'P'] },
-                { name: 'id_kelas', label: 'ID Kelas', type: 'text' },
-                { name: 'nama_ayah', label: 'Nama Ayah', type: 'text' },
-                { name: 'pekerjaan_ayah', label: 'Pekerjaan Ayah', type: 'text' },
-                { name: 'nama_ibu', label: 'Nama Ibu', type: 'text' },
-                { name: 'pekerjaan_ibu', label: 'Pekerjaan Ibu', type: 'text' },
-                { name: 'no_hp_ortu', label: 'No HP Orang Tua', type: 'text' },
-                { name: 'status_siswa', label: 'Status Siswa', type: 'select', options: ['Aktif', 'Lulus', 'Pindah', 'Keluar'] }
-            ],
-            Kelas: [
-                { name: 'id_kelas', label: 'ID Kelas', type: 'text', primaryKey: true },
-                { name: 'nama_kelas', label: 'Nama Kelas', type: 'text', required: true },
-                { name: 'tingkat', label: 'Tingkat (1-6)', type: 'number' },
-                { name: 'id_wali_kelas', label: 'ID Wali Kelas', type: 'text' }
-            ],
-            Mapel: [
-                { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true },
-                { name: 'kode_mapel', label: 'Kode Mapel', type: 'text' },
-                { name: 'nama_mapel', label: 'Nama Mata Pelajaran', type: 'text', required: true },
-                { name: 'kategori', label: 'Kategori', type: 'select', options: ['Umum', 'Diniyah', 'Muatan Lokal', 'Ekstrakurikuler'] }
-            ],
-            Jadwal: [
-                { name: 'id_jadwal', label: 'ID Jadwal', type: 'text', primaryKey: true },
-                { name: 'hari', label: 'Hari', type: 'select', options: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] },
-                { name: 'jam_ke', label: 'Jam Ke', type: 'number' },
-                { name: 'id_kelas', label: 'ID Kelas', type: 'text' },
-                { name: 'id_mapel', label: 'ID Mapel', type: 'text' },
-                { name: 'id_guru', label: 'ID Guru', type: 'text' },
-                { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
-                { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
-            ]
-        };
-
-        function openModal(table, data = null) {
-            document.getElementById('formTable').value = table;
-            document.getElementById('formAction').value = data ? 'update' : 'create';
-            document.getElementById('modalTitle').innerText = (data ? 'Edit Data ' : 'Tambah Data ') + table;
-            
-            const fieldsContainer = document.getElementById('formFields');
-            fieldsContainer.innerHTML = '';
-            
-            const schema = TABLE_SCHEMAS[table] || [];
-            
-            schema.forEach(field => {
-                const val = data ? (data[field.name] !== undefined ? data[field.name] : '') : '';
-                const colSize = field.type === 'boolean' ? 'col-md-4' : 'col-md-6';
-                
-                let fieldHtml = '';
-                if (field.type === 'select') {
-                    const opts = field.options.map(o => `<option value="${o}" ${val == o ? 'selected' : ''}>${o}</option>`).join('');
-                    fieldHtml = `
-                        <div class="${colSize}">
-                            <label class="form-label">${field.label}</label>
-                            <select class="form-select" name="${field.name}">${opts}</select>
-                        </div>`;
-                } else if (field.type === 'boolean') {
-                    const isChecked = val === true || val === 'TRUE' || val === 1 || val === '1';
-                    fieldHtml = `
-                        <div class="${colSize} d-flex align-items-center mt-4">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="${field.name}" ${isChecked ? 'checked' : ''}>
-                                <label class="form-check-label">${field.label}</label>
-                            </div>
-                        </div>`;
-                } else {
-                    const readOnly = (data && field.primaryKey) ? 'readonly' : '';
-                    fieldHtml = `
-                        <div class="${colSize}">
-                            <label class="form-label">${field.label}</label>
-                            <input type="${field.type}" class="form-control" name="${field.name}" value="${val}" ${readOnly} ${field.required ? 'required' : ''} placeholder="${field.placeholder || ''}">
-                        </div>`;
-                }
-                fieldsContainer.insertAdjacentHTML('beforeend', fieldHtml);
-            });
-            
-            crudModalInstance.show();
-        }
-
-        function editRow(table, id) {
-            const pkName = TABLE_SCHEMAS[table].find(f => f.primaryKey).name;
-            const item = (localData[table] || []).find(r => r[pkName] == id);
-            if (item) {
-                openModal(table, item);
-            }
-        }
-
-        // ================= CRUD ACTIONS (POST TO GAS) =================
-        async function submitDynamicForm() {
-            const table = document.getElementById('formTable').value;
-            const action = document.getElementById('formAction').value;
-            const form = document.getElementById('dynamicForm');
-            const formData = new FormData(form);
-            
-            const payload = {
-                action: action,
-                table: table,
-                data: {}
-            };
-
-            const schema = TABLE_SCHEMAS[table];
-            schema.forEach(field => {
-                if (field.type === 'boolean') {
-                    payload.data[field.name] = form.querySelector(`[name="${field.name}"]`).checked;
-                } else {
-                    payload.data[field.name] = formData.get(field.name) || '';
-                }
-            });
-
-            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            try {
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Cors-safe Apps Script header
-                    body: JSON.stringify(payload)
-                });
-                const res = await response.json();
-
-                if (res.status === 'success') {
-                    crudModalInstance.hide();
-                    Swal.fire('Berhasil!', res.message || 'Data berhasil disimpan.', 'success');
-                    loadAllMasterData();
-                } else {
-                    throw new Error(res.message || 'Gagal menyimpan data');
-                }
-            } catch (err) {
-                Swal.fire('Gagal Menyimpan', err.message, 'error');
-            }
-        }
-
-        async function deleteRow(table, id) {
-            const pkName = TABLE_SCHEMAS[table].find(f => f.primaryKey).name;
-            const confirm = await Swal.fire({
-                title: 'Hapus Data?',
-                text: `Apakah Anda yakin ingin menghapus data dengan ${pkName}: ${id}?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Hapus!'
-            });
-
-            if (confirm.isConfirmed) {
-                Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                try {
-                    const payload = {
-                        action: 'delete',
-                        table: table,
-                        data: { [pkName]: id }
-                    };
-
-                    const response = await fetch(GAS_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify(payload)
-                    });
-                    const res = await response.json();
-
-                    if (res.status === 'success') {
-                        Swal.fire('Terhapus!', res.message || 'Data berhasil dihapus.', 'success');
-                        loadAllMasterData();
-                    } else {
-                        throw new Error(res.message || 'Gagal menghapus data');
-                    }
-                } catch (err) {
-                    Swal.fire('Gagal Hapus', err.message, 'error');
-                }
-            }
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
