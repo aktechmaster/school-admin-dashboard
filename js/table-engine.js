@@ -75,11 +75,11 @@ function getTableSchema(table) {
             }
         ],
         Mapel: [
-            { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true },
-            { name: 'kode_mapel', label: 'Kode Mapel', type: 'text' },
-            { name: 'nama_mapel', label: 'Nama Mata Pelajaran', type: 'text', required: true },
-            { name: 'kategori', label: 'Kategori', type: 'select', options: ['Umum', 'Diniyah', 'Muatan Lokal', 'Ekstrakurikuler'] }
-        ],
+    { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true, placeholder: 'Contoh: MP-001 atau MPL-MTK' },
+    { name: 'kode_mapel', label: 'Kode Mapel', type: 'text', placeholder: 'Contoh: MTK / PAI' },
+    { name: 'nama_mapel', label: 'Nama Mata Pelajaran', type: 'text', required: true, placeholder: 'Contoh: Matematika' },
+    { name: 'kategori', label: 'Kategori', type: 'select', options: ['Umum', 'Diniyah', 'Muatan Lokal', 'Ekstrakurikuler'] }
+],
         Jadwal: [
             { name: 'id_jadwal', label: 'ID Jadwal', type: 'text', primaryKey: true },
             { name: 'hari', label: 'Hari', type: 'select', options: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] },
