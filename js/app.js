@@ -1,8 +1,13 @@
 // Logik Utama Aplikasi & Router Navigasi
+// js/app.js
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('crudModal');
-    if (modalEl) {
+    
+    // Pengecekan aman: hanya inisialisasi jika library bootstrap tersedia
+    if (modalEl && typeof bootstrap !== 'undefined') {
         crudModalInstance = new bootstrap.Modal(modalEl);
+    } else {
+        console.warn('Bootstrap JS belum siap atau gagal dimuat dari CDN.');
     }
 
     const gasInput = document.getElementById('gas-url-input');
