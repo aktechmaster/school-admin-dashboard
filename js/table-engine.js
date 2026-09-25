@@ -1,6 +1,30 @@
 // Engine CRUD Dynamic, Filtering, Search, Paginasi & Pengurusan Form
 let crudModalInstance;
 let tableStates = {};
+let searchDebounceTimer = null;
+
+/**
+ * Helper Aman membaca localData
+ */
+function getLocalArray(key) {
+    if (typeof localData !== 'undefined' && localData && Array.isArray(localData[key])) {
+        return localData[key];
+    }
+    return [];
+}
+
+/**
+ * Helper Escaping String untuk Atribut/HTML
+ */
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
 /**
  * Mendapatkan atau membuat state pencarian, filter, dan paginasi per tabel
@@ -41,7 +65,7 @@ function getTableFilters(table) {
             { 
                 field: 'id_kelas', 
                 label: 'Semua Kelas', 
-                options: (localData.Kelas || []).map(k => ({ value: k.id_kelas, label: k.nama_kelas })) 
+                options: getLocalArray('Kelas').map(k => ({ value: k.id_kelas, label: k.nama_kelas })) 
             },
             { field: 'jenis_kelamin', label: 'Semua JK', options: ['L', 'P'] },
             { field: 'status_siswa', label: 'Semua Status Siswa', options: ['Aktif', 'Lulus', 'Pindah', 'Keluar'] }
@@ -51,7 +75,7 @@ function getTableFilters(table) {
             { 
                 field: 'id_wali_kelas', 
                 label: 'Semua Wali Kelas', 
-                options: (localData.Guru || []).map(g => ({ value: g.id_guru, label: g.nama_lengkap })) 
+                options: getLocalArray('Guru').map(g => ({ value: g.id_guru, label: g.nama_lengkap })) 
             }
         ],
         Mapel: [
@@ -62,12 +86,12 @@ function getTableFilters(table) {
             { 
                 field: 'id_kelas', 
                 label: 'Semua Kelas', 
-                options: (localData.Kelas || []).map(k => ({ value: k.id_kelas, label: k.nama_kelas })) 
+                options: getLocalArray('Kelas').map(k => ({ value: k.id_kelas, label: k.nama_kelas })) 
             },
             { 
                 field: 'id_guru', 
                 label: 'Semua Guru Pengajar', 
-                options: (localData.Guru || []).map(g => ({ value: g.id_guru, label: g.nama_lengkap })) 
+                options: getLocalArray('Guru').map(g => ({ value: g.id_guru, label: g.nama_lengkap })) 
             },
             { field: 'semester', label: 'Semua Semester', options: ['Ganjil', 'Genap'] }
         ]
@@ -78,7 +102,6 @@ function getTableFilters(table) {
 
 /**
  * Mengambil Schema Table secara Dinamis
- * Membaca relational data (Guru, Kelas, Mapel) dari localData saat modal dibuka
  */
 function getTableSchema(table) {
     const schemas = {
@@ -92,7 +115,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Guru (Opsional) --' },
-                    ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+                    ...getLocalArray('Guru').map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
                 ] 
             },
             { name: 'role', label: 'Role', type: 'select', options: ['Admin', 'Kepsek', 'Guru', 'WaliKelas'] },
@@ -125,7 +148,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Kelas --' },
-                    ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
+                    ...getLocalArray('Kelas').map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
                 ] 
             },
             { name: 'nama_ayah', label: 'Nama Ayah', type: 'text' },
@@ -145,12 +168,12 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Wali Kelas --' },
-                    ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+                    ...getLocalArray('Guru').map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
                 ] 
             }
         ],
         Mapel: [
-            { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true, placeholder: 'Contoh: MP-001 atau MPL-MTK' },
+            { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true, placeholder: 'Contoh: MP-001' },
             { name: 'kode_mapel', label: 'Kode Mapel', type: 'text', placeholder: 'Contoh: MTK / PAI' },
             { name: 'nama_mapel', label: 'Nama Mata Pelajaran', type: 'text', required: true, placeholder: 'Contoh: Matematika' },
             { name: 'kategori', label: 'Kategori', type: 'select', options: ['Umum', 'Diniyah', 'Muatan Lokal', 'Ekstrakurikuler'] }
@@ -165,7 +188,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Kelas --' },
-                    ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
+                    ...getLocalArray('Kelas').map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
                 ] 
             },
             { 
@@ -174,7 +197,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Mapel --' },
-                    ...(localData.Mapel || []).map(m => ({ value: m.id_mapel, label: `${m.nama_mapel} (${m.id_mapel})` }))
+                    ...getLocalArray('Mapel').map(m => ({ value: m.id_mapel, label: `${m.nama_mapel} (${m.id_mapel})` }))
                 ] 
             },
             { 
@@ -183,7 +206,7 @@ function getTableSchema(table) {
                 type: 'select', 
                 options: [
                     { value: '', label: '-- Pilih Guru --' },
-                    ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+                    ...getLocalArray('Guru').map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
                 ] 
             },
             { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
@@ -195,10 +218,10 @@ function getTableSchema(table) {
 }
 
 /**
- * Filter Pipeline: Memproses pencarian & filter aktif dari localData
+ * Filter Pipeline
  */
 function getFilteredData(table) {
-    let rawData = localData[table] || [];
+    let rawData = getLocalArray(table);
     const state = getTableState(table);
 
     // 1. Filter Pencarian Global
@@ -225,7 +248,7 @@ function getFilteredData(table) {
 }
 
 /**
- * Render Toolbar Control (Search Input, Dropdown Filters, Page Size)
+ * Render Toolbar Control
  */
 function renderTableControls(table) {
     const filters = getTableFilters(table);
@@ -234,12 +257,12 @@ function renderTableControls(table) {
     let filtersHTML = '';
     if (filters.length > 0) {
         filtersHTML = filters.map(f => {
-            let optionsHTML = `<option value="">${f.label}</option>`;
+            let optionsHTML = `<option value="">${escapeHtml(f.label)}</option>`;
             (f.options || []).forEach(opt => {
                 const optVal = typeof opt === 'object' ? opt.value : opt;
                 const optText = typeof opt === 'object' ? opt.label : opt;
                 const selected = String(state.filters[f.field]) === String(optVal) ? 'selected' : '';
-                optionsHTML += `<option value="${optVal}" ${selected}>${optText}</option>`;
+                optionsHTML += `<option value="${escapeHtml(optVal)}" ${selected}>${escapeHtml(optText)}</option>`;
             });
 
             return `
@@ -262,8 +285,8 @@ function renderTableControls(table) {
                     <input type="text" 
                            class="form-control table-search-input" 
                            data-table="${table}" 
-                           placeholder="Cari data ${table}..." 
-                           value="${state.search || ''}">
+                           placeholder="Cari data ${escapeHtml(table)}..." 
+                           value="${escapeHtml(state.search || '')}">
                 </div>
             </div>
             <div class="col-12 col-md-8 d-flex flex-wrap gap-2 justify-content-md-end align-items-center">
@@ -284,11 +307,8 @@ function renderTableControls(table) {
 /**
  * Render Paginasi Bootstrap 5
  */
-function renderPaginationControls(table, totalItems) {
+function renderPaginationControls(table, totalItems, totalPages) {
     const state = getTableState(table);
-    const totalPages = Math.ceil(totalItems / state.pageSize) || 1;
-
-    if (state.currentPage > totalPages) state.currentPage = totalPages;
 
     const startItem = totalItems === 0 ? 0 : (state.currentPage - 1) * state.pageSize + 1;
     const endItem = Math.min(state.currentPage * state.pageSize, totalItems);
@@ -338,7 +358,7 @@ function renderPaginationControls(table, totalItems) {
 }
 
 /**
- * Helper untuk memformat tampilan sel tabel berdasarkan tipe schema
+ * Helper untuk memformat tampilan sel tabel
  */
 function formatCellValue(schemaField, rawVal) {
     if (rawVal === undefined || rawVal === null || rawVal === '') return '-';
@@ -360,15 +380,15 @@ function formatCellValue(schemaField, rawVal) {
             return String(optVal) === String(rawVal);
         });
         if (matchedOpt && typeof matchedOpt === 'object') {
-            return matchedOpt.label;
+            return escapeHtml(matchedOpt.label);
         }
     }
 
-    return rawVal;
+    return escapeHtml(rawVal);
 }
 
 /**
- * Render Tabel Dinamis Lengkap (Search, Filter, Tabel, Aksi, & Paginasi)
+ * Render Tabel Dinamis Lengkap
  */
 function renderDynamicTable(table, containerId) {
     const container = document.getElementById(containerId);
@@ -377,11 +397,24 @@ function renderDynamicTable(table, containerId) {
     const schema = getTableSchema(table);
     if (!schema || schema.length === 0) return;
 
+    // Cek elemen mana yang sedang difokuskan sebelum DOM dirender ulang
+    const activeEl = document.activeElement;
+    const isFocusedSearch = activeEl && activeEl.classList.contains('table-search-input') && activeEl.dataset.table === table;
+    const cursorStart = isFocusedSearch ? activeEl.selectionStart : null;
+    const cursorEnd = isFocusedSearch ? activeEl.selectionEnd : null;
+
     const pkField = schema.find(f => f.primaryKey);
     const pkName = pkField ? pkField.name : 'id';
 
     const filteredData = getFilteredData(table);
     const state = getTableState(table);
+
+    // Kalkulasi Paginasi Presisi sebelum memotong data
+    const totalItems = filteredData.length;
+    const totalPages = Math.ceil(totalItems / state.pageSize) || 1;
+    
+    if (state.currentPage > totalPages) state.currentPage = totalPages;
+    if (state.currentPage < 1) state.currentPage = 1;
 
     const startIndex = (state.currentPage - 1) * state.pageSize;
     const paginatedData = filteredData.slice(startIndex, startIndex + state.pageSize);
@@ -393,7 +426,7 @@ function renderDynamicTable(table, containerId) {
     html += `<div class="table-responsive"><table class="table table-hover table-striped align-middle border">`;
     html += `<thead class="table-light"><tr><th width="50">No</th>`;
     schema.forEach(field => {
-        html += `<th>${field.label}</th>`;
+        html += `<th>${escapeHtml(field.label)}</th>`;
     });
     html += `<th width="120" class="text-center">Aksi</th></tr></thead>`;
 
@@ -412,10 +445,10 @@ function renderDynamicTable(table, containerId) {
 
             html += `
                 <td class="text-center">
-                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('${table}', '${pkVal}')" title="Edit">
+                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('${escapeHtml(table)}', '${escapeHtml(pkVal)}')" title="Edit">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('${table}', '${pkVal}')" title="Hapus">
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('${escapeHtml(table)}', '${escapeHtml(pkVal)}')" title="Hapus">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </td>
@@ -426,9 +459,20 @@ function renderDynamicTable(table, containerId) {
     html += `</tbody></table></div>`;
 
     // 3. Render Controls Paginasi
-    html += renderPaginationControls(table, filteredData.length);
+    html += renderPaginationControls(table, totalItems, totalPages);
 
     container.innerHTML = html;
+
+    // Kembalikan fokus kursor jika pengguna sedang mengetik di input search
+    if (isFocusedSearch) {
+        const searchInput = container.querySelector(`.table-search-input[data-table="${table}"]`);
+        if (searchInput) {
+            searchInput.focus();
+            if (cursorStart !== null && cursorEnd !== null) {
+                searchInput.setSelectionRange(cursorStart, cursorEnd);
+            }
+        }
+    }
 }
 
 /**
@@ -463,12 +507,12 @@ function openModal(table, data = null) {
                 const optVal = typeof o === 'object' ? o.value : o;
                 const optLabel = typeof o === 'object' ? o.label : o;
                 const selected = String(val) === String(optVal) ? 'selected' : '';
-                return `<option value="${optVal}" ${selected}>${optLabel}</option>`;
+                return `<option value="${escapeHtml(optVal)}" ${selected}>${escapeHtml(optLabel)}</option>`;
             }).join('');
 
             fieldHtml = `
                 <div class="${colSize}">
-                    <label class="form-label fw-bold">${field.label}</label>
+                    <label class="form-label fw-bold">${escapeHtml(field.label)}</label>
                     <select class="form-select" name="${field.name}">${opts}</select>
                 </div>`;
         } else if (field.type === 'boolean') {
@@ -477,15 +521,15 @@ function openModal(table, data = null) {
                 <div class="${colSize} d-flex align-items-center mt-4">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="${field.name}" ${isChecked ? 'checked' : ''}>
-                        <label class="form-check-label fw-bold">${field.label}</label>
+                        <label class="form-check-label fw-bold">${escapeHtml(field.label)}</label>
                     </div>
                 </div>`;
         } else {
             const readOnly = (data && field.primaryKey) ? 'readonly' : '';
             fieldHtml = `
                 <div class="${colSize}">
-                    <label class="form-label fw-bold">${field.label}</label>
-                    <input type="${field.type}" class="form-control" name="${field.name}" value="${val}" ${readOnly} ${field.required ? 'required' : ''} placeholder="${field.placeholder || ''}">
+                    <label class="form-label fw-bold">${escapeHtml(field.label)}</label>
+                    <input type="${field.type}" class="form-control" name="${field.name}" value="${escapeHtml(val)}" ${readOnly} ${field.required ? 'required' : ''} placeholder="${escapeHtml(field.placeholder || '')}">
                 </div>`;
         }
         fieldsContainer.insertAdjacentHTML('beforeend', fieldHtml);
@@ -505,7 +549,7 @@ function editRow(table, id) {
     if (!pkField) return;
 
     const pkName = pkField.name;
-    const item = (localData[table] || []).find(r => String(r[pkName] || r.id) === String(id));
+    const item = getLocalArray(table).find(r => String(r[pkName] || r.id) === String(id));
     if (item) {
         openModal(table, item);
     }
@@ -599,14 +643,18 @@ async function deleteRow(table, id) {
     }
 }
 
-// Global Event Delegation (Menjaga fokus input & sinkronisasi UI saat typing/filtering)
+// Global Event Delegation dengan Debounce & Autofocus Retention
 document.addEventListener('input', function (e) {
     if (e.target.classList.contains('table-search-input')) {
-        const table = e.target.dataset.table;
-        const state = getTableState(table);
-        state.search = e.target.value;
-        state.currentPage = 1;
-        renderDynamicTable(table, `container-${table}`);
+        const target = e.target;
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+            const table = target.dataset.table;
+            const state = getTableState(table);
+            state.search = target.value;
+            state.currentPage = 1;
+            renderDynamicTable(table, `container-${table}`);
+        }, 200); // Debounce 200ms
     }
 });
 
