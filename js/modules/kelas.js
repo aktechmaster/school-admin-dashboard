@@ -1,10 +1,67 @@
+// js/modules/kelas.js
+
+/**
+ * Mengambil konfig bidang (fields) form untuk Kelas.
+ * Memuat daftar Guru secara dinamis dari localData.Guru.
+ */
+function getKelasFormFields() {
+    // Ambil daftar guru dari localData untuk dijadikan opsi dropdown
+    const guruList = localData.Guru || [];
+    const guruOptions = guruList.map(g => ({
+        value: g.id_guru,
+        label: `${g.nama_lengkap} (${g.id_guru})`
+    }));
+
+    return [
+        { 
+            name: 'id_kelas', 
+            label: 'ID Kelas', 
+            type: 'text', 
+            placeholder: 'Contoh: KLS-1A atau K1-ABU', 
+            required: true 
+        },
+        { 
+            name: 'nama_kelas', 
+            label: 'Nama Kelas', 
+            type: 'text', 
+            placeholder: 'Contoh: 1 Abu Bakar', 
+            required: true 
+        },
+        { 
+            name: 'tingkat', 
+            label: 'Tingkat (1-6)', 
+            type: 'select', 
+            options: [
+                { value: '1', label: 'Tingkat 1' },
+                { value: '2', label: 'Tingkat 2' },
+                { value: '3', label: 'Tingkat 3' },
+                { value: '4', label: 'Tingkat 4' },
+                { value: '5', label: 'Tingkat 5' },
+                { value: '6', label: 'Tingkat 6' }
+            ],
+            required: true 
+        },
+        { 
+            name: 'id_wali_kelas', 
+            label: 'Wali Kelas', 
+            type: 'select', 
+            options: [
+                { value: '', label: '-- Pilih Wali Kelas --' },
+                ...guruOptions
+            ] 
+        }
+    ];
+}
+
+/**
+ * Render Tabel Master Kelas
+ */
 function renderKelasTable() {
     const tbody = document.querySelector('#table-kelas tbody');
     if (!tbody) return;
 
     const dataKelas = localData.Kelas || [];
 
-    // 1. Penanganan data kosong
     if (dataKelas.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -16,7 +73,7 @@ function renderKelasTable() {
     }
 
     tbody.innerHTML = dataKelas.map(row => {
-        // 2. Relasi ID Wali Kelas -> Nama Guru
+        // Relasi ID Wali Kelas ke Nama Guru
         let waliKelasDisplay = '-';
         if (row.id_wali_kelas) {
             const guru = (localData.Guru || []).find(g => g.id_guru === row.id_wali_kelas);
