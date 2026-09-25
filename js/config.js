@@ -9,3 +9,17 @@ let localData = {
     Mapel: [],
     Jadwal: []
 };
+// Penampung state pencarian, filter, & paginasi per tabel
+const tableStates = {};
+
+function getTableState(tableName) {
+    if (!tableStates[tableName]) {
+        tableStates[tableName] = {
+            search: '',
+            filters: {},
+            currentPage: 1,
+            pageSize: 10
+        };
+    }
+    return tableStates[tableName];
+}
