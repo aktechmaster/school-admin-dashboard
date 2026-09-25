@@ -1,5 +1,9 @@
 // Logik Utama Aplikasi & Router Navigasi
 // js/app.js
+
+// Ambil URL tersimpan di localStorage atau gunakan variabel global awal
+let GAS_URL = localStorage.getItem('SDIT_GAS_URL') || (typeof GAS_URL !== 'undefined' ? GAS_URL : '');
+
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('crudModal');
     
@@ -10,13 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Bootstrap JS belum siap atau gagal dimuat dari CDN.');
     }
 
+    // Pastikan GAS_URL diambil dari localStorage jika ada
+    const savedUrl = localStorage.getItem('SDIT_GAS_URL');
+    if (savedUrl) {
+        GAS_URL = savedUrl;
+    }
+
     const gasInput = document.getElementById('gas-url-input');
     const displayUrl = document.getElementById('display-api-url');
     
     if (gasInput) gasInput.value = GAS_URL;
     if (displayUrl) displayUrl.innerText = GAS_URL;
 
-    loadAllMasterData();
+    if (GAS_URL) {
+        loadAllMasterData();
+    } else {
+        Swal.fire('Perhatian', 'URL Web App GAS belum diatur. Sila atur di menu Pengaturan.', 'warning');
+    }
 });
 
 function toggleSidebar() {
@@ -66,6 +80,11 @@ async function loadAllMasterData() {
     
     try {
         const response = await fetch(`${GAS_URL}?action=readAllMaster`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP Error Status: ${response.status} (URL Web App GAS tidak sah atau telah mati)`);
+        }
+
         const result = await response.json();
         
         if (result.status === 'success') {
