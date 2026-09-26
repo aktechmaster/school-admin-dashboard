@@ -82,6 +82,9 @@ async function loadAllMasterData() {
 }
 
 function renderAllModules() {
+    // Hapus elemen kontrol lama agar diregenerasi dengan opsi filter terbaru saat data master direload
+    document.querySelectorAll('[id^="controls-"]').forEach(el => el.remove());
+
     if (typeof updateDashboardKPI === 'function') updateDashboardKPI();
     if (typeof renderUsersTable === 'function') renderUsersTable();
     if (typeof renderGuruTable === 'function') renderGuruTable();
