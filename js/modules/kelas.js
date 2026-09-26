@@ -1,9 +1,3 @@
-// js/modules/kelas.js
-
-/**
- * Mengambil konfigurasi bidang form untuk Kelas.
- * Memuat daftar Guru secara dinamis dari localData.Guru.
- */
 function getKelasFormFields() {
     const guruList = localData.Guru || [];
     const guruOptions = guruList.map(g => ({
@@ -53,26 +47,23 @@ function getKelasFormFields() {
     ];
 }
 
-/**
- * Render Tabel Master Kelas
- */
 function renderKelasTable() {
     const tbody = document.querySelector('#table-kelas tbody');
     if (!tbody) return;
 
-    const dataKelas = localData.Kelas || [];
+    renderTableControls('Kelas', [
+        { field: 'tingkat', label: 'Tingkat', options: ['1', '2', '3', '4', '5', '6'] }
+    ], renderKelasTable);
 
-    if (dataKelas.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" class="text-center text-muted py-3">
-                    <i class="fas fa-info-circle me-1"></i> Belum ada data kelas.
-                </td>
-            </tr>`;
+    const info = getFilteredAndPaginatedData('Kelas');
+
+    if (info.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3"><i class="fas fa-info-circle me-1"></i> Belum ada data kelas.</td></tr>`;
+        renderPaginationControls('Kelas', info, renderKelasTable);
         return;
     }
 
-    tbody.innerHTML = dataKelas.map(row => {
+    tbody.innerHTML = info.data.map(row => {
         let waliKelasDisplay = '-';
         if (row.id_wali_kelas) {
             const guru = (localData.Guru || []).find(g => g.id_guru === row.id_wali_kelas);
@@ -98,4 +89,6 @@ function renderKelasTable() {
             </tr>
         `;
     }).join('');
+
+    renderPaginationControls('Kelas', info, renderKelasTable);
 }
