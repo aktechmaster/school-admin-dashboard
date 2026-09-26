@@ -2,24 +2,21 @@ function renderGuruTable() {
     const tbody = document.querySelector('#table-guru tbody');
     if (!tbody) return;
 
-    const dataGuru = localData.Guru || [];
+    renderTableControls('Guru', [
+        { field: 'jenis_kelamin', label: 'JK', options: [{ value: 'L', label: 'Laki-laki' }, { value: 'P', label: 'Perempuan' }] },
+        { field: 'status_karyawan', label: 'Status', options: ['Tetap', 'Kontrak', 'Honorer'] }
+    ], renderGuruTable);
 
-    // Jika data kosong, tampilkan pesan keterangan
-    if (dataGuru.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="9" class="text-center text-muted py-3">
-                    <i class="fas fa-info-circle me-1"></i> Belum ada data guru.
-                </td>
-            </tr>`;
+    const info = getFilteredAndPaginatedData('Guru');
+
+    if (info.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted py-3"><i class="fas fa-info-circle me-1"></i> Data guru tidak ditemukan.</td></tr>`;
+        renderPaginationControls('Guru', info, renderGuruTable);
         return;
     }
 
-    tbody.innerHTML = dataGuru.map(row => {
-        // Badge untuk jenis kelamin
+    tbody.innerHTML = info.data.map(row => {
         const jkBadge = row.jenis_kelamin === 'L' ? 'bg-primary' : (row.jenis_kelamin === 'P' ? 'bg-danger' : 'bg-secondary');
-        
-        // Badge untuk status karyawan
         const statusBadge = row.status_karyawan === 'Tetap' ? 'bg-success' : 'bg-info text-dark';
 
         return `
@@ -43,4 +40,6 @@ function renderGuruTable() {
             </tr>
         `;
     }).join('');
+
+    renderPaginationControls('Guru', info, renderGuruTable);
 }
