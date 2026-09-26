@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dashboard Admin SDIT</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            /* Latar belakang gradient penuh sesuai referensi */
+            background: linear-gradient(135deg, #172033 0%, #0d121d 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        
+        .login-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            overflow: hidden;
+            width: 100%;
+            max-width: 380px;
+        }
+        
+        .login-header {
+            background-color: #1a73e8; /* Biru manis */
+            color: #ffffff;
+            padding: 16px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .login-body {
+            padding: 30px 25px;
+        }
+        
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .input-group-text {
+            background-color: #f0f4f8;
+            border: 1px solid #f0f4f8;
+            border-right: none;
+            color: #475569;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        
+        .form-control {
+            background-color: #f0f4f8;
+            border: 1px solid #f0f4f8;
+            border-left: none;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            box-shadow: none;
+        }
+        
+        .form-control:focus {
+            background-color: #fff;
+            border-color: #1a73e8;
+            box-shadow: none;
+        }
+        
+        /* Efek fokus yang menyambung dengan ikon */
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control {
+            background-color: #fff;
+            border-color: #1a73e8;
+        }
+        
+        .btn-login {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            margin-top: 10px;
+            transition: 0.2s;
+            border: none;
+        }
+        
+        .btn-login:hover {
+            background-color: #1557b0;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="login-header">
+            <i class="fas fa-door-open me-2"></i> Login Admin SDIT
+        </div>
+        <div class="login-body">
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <!-- ID disesuaikan agar auth.js bisa membacanya -->
+                        <input type="text" class="form-control" id="login-username" placeholder="Masukkan username..." required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <!-- ID disesuaikan agar auth.js bisa membacanya -->
+                        <input type="password" class="form-control" id="login-password" placeholder="Masukkan password..." required>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-login" onclick="processLogin()">
+                    <i class="fas fa-sign-in-alt me-2"></i> Masuk Aplikasi
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.8/sweetalert2.all.min.js"></script>
+    <!-- Pastikan file auth Anda dihubungkan di sini untuk mengeksekusi fungsi processLogin() -->
+    <script src="js/auth.js"></script>
+</body>
+</html>
