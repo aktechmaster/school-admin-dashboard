@@ -343,12 +343,16 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
     if (!tableEl) return;
 
     let controlsEl = document.getElementById(`controls-${table.toLowerCase()}`);
-    if (!controlsEl) {
-        controlsEl = document.createElement('div');
-        controlsEl.id = `controls-${table.toLowerCase()}`;
-        controlsEl.className = 'row g-2 mb-3 align-items-center';
-        tableEl.parentNode.insertBefore(controlsEl, tableEl);
-    }
+    
+    // JIKA CONTROLS SUDAH ADA DI DOM:
+    // Hentikan eksekusi agar tidak meng-overwrite innerHTML.
+    // Hal ini menjaga elemen input tetap utuh sehingga kursor/fokus ketikan tidak hilang.
+    if (controlsEl) return;
+
+    controlsEl = document.createElement('div');
+    controlsEl.id = `controls-${table.toLowerCase()}`;
+    controlsEl.className = 'row g-2 mb-3 align-items-center';
+    tableEl.parentNode.insertBefore(controlsEl, tableEl);
 
     const state = tableState[table];
 
