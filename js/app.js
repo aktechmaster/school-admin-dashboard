@@ -1,5 +1,8 @@
 // Logik Utama Aplikasi & Router Navigasi
 // js/app.js
+
+let crudModalInstance = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('crudModal');
     
@@ -16,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gasInput) gasInput.value = GAS_URL;
     if (displayUrl) displayUrl.innerText = GAS_URL;
 
+    // Memuat data master dari server lalu menginisialisasi sesi login
     loadAllMasterData();
 });
 
@@ -36,10 +40,16 @@ function saveGasUrl() {
 
 function showSection(sectionId, element) {
     document.querySelectorAll('.content-section').forEach(el => el.classList.add('d-none'));
-    document.getElementById('sec-' + sectionId).classList.remove('d-none');
+    const targetSection = document.getElementById('sec-' + sectionId);
+    if (targetSection) targetSection.classList.remove('d-none');
     
     document.querySelectorAll('#sidebar .nav-link').forEach(el => el.classList.remove('active'));
-    if (element) element.classList.add('active');
+    if (element) {
+        element.classList.add('active');
+    } else {
+        const activeNav = document.querySelector(`#sidebar [onclick*="'${sectionId}'"]`);
+        if (activeNav) activeNav.classList.add('active');
+    }
 
     const titles = {
         dashboard: 'Dashboard Overview',
@@ -51,7 +61,8 @@ function showSection(sectionId, element) {
         jadwal: 'Master Jadwal Pelajaran',
         settings: 'Pengaturan Koneksi API'
     };
-    document.getElementById('page-title').innerText = titles[sectionId] || 'Dashboard Admin';
+    const titleEl = document.getElementById('page-title');
+    if (titleEl) titleEl.innerText = titles[sectionId] || 'Dashboard Admin';
 }
 
 async function loadAllMasterData() {
@@ -71,6 +82,11 @@ async function loadAllMasterData() {
         if (result.status === 'success') {
             localData = result.data;
             renderAllModules();
+            
+            // Inisialisasi Sesi Login & Hak Akses setelah data siap
+            if (typeof initSession === 'function') {
+                initSession();
+            }
             Swal.close();
         } else {
             throw new Error(result.message || 'Gagal memuatkan data');
@@ -92,4 +108,9 @@ function renderAllModules() {
     if (typeof renderKelasTable === 'function') renderKelasTable();
     if (typeof renderMapelTable === 'function') renderMapelTable();
     if (typeof renderJadwalTable === 'function') renderJadwalTable();
+
+    // Terapkan batasan hak akses role pengguna pada komponen yang di-render
+    if (typeof applyRolePermissions === 'function') {
+        applyRolePermissions();
+    }
 }
