@@ -1,9 +1,18 @@
 // Engine CRUD Dynamic & Pengurusan Form
 let crudModalInstance;
 
+// State Global untuk Filter, Search, dan Pagination per Tabel
+let tableState = {
+    Users: { search: '', filter: {}, page: 1, limit: 10 },
+    Guru: { search: '', filter: {}, page: 1, limit: 10 },
+    Siswa: { search: '', filter: {}, page: 1, limit: 10 },
+    Kelas: { search: '', filter: {}, page: 1, limit: 10 },
+    Mapel: { search: '', filter: {}, page: 1, limit: 10 },
+    Jadwal: { search: '', filter: {}, page: 1, limit: 10 }
+};
+
 /**
  * Mengambil Schema Table secara Dinamis
- * Membaca relational data (Guru, Kelas, Mapel) dari localData saat modal dibuka
  */
 function getTableSchema(table) {
     const schemas = {
@@ -75,11 +84,11 @@ function getTableSchema(table) {
             }
         ],
         Mapel: [
-    { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true, placeholder: 'Contoh: MP-001 atau MPL-MTK' },
-    { name: 'kode_mapel', label: 'Kode Mapel', type: 'text', placeholder: 'Contoh: MTK / PAI' },
-    { name: 'nama_mapel', label: 'Nama Mata Pelajaran', type: 'text', required: true, placeholder: 'Contoh: Matematika' },
-    { name: 'kategori', label: 'Kategori', type: 'select', options: ['Umum', 'Diniyah', 'Muatan Lokal', 'Ekstrakurikuler'] }
-],
+            { name: 'id_mapel', label: 'ID Mapel', type: 'text', primaryKey: true, placeholder: 'Contoh: MP-001 atau MPL-MTK' },
+            { name: 'kode_mapel', label: 'Kode Mapel', type: 'text', placeholder: 'Contoh: MTK / PAI' },
+            { name: 'nama_mapel', label: 'Nama Mata Pelajaran', type: 'text', required: true, placeholder: 'Contoh: Matematika' },
+            { name: 'kategori', label: 'Kategori', type: 'select', options: ['Umum', 'Diniyah', 'Muatan Lokal', 'Ekstrakurikuler'] }
+        ],
         Jadwal: [
             { name: 'id_jadwal', label: 'ID Jadwal', type: 'text', primaryKey: true },
             { name: 'hari', label: 'Hari', type: 'select', options: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] },
@@ -127,7 +136,6 @@ function openModal(table, data = null) {
     const fieldsContainer = document.getElementById('formFields');
     fieldsContainer.innerHTML = '';
     
-    // Panggil schema dinamis
     const schema = getTableSchema(table);
     
     schema.forEach(field => {
@@ -136,7 +144,6 @@ function openModal(table, data = null) {
         
         let fieldHtml = '';
         if (field.type === 'select') {
-            // Mendukung array string biasa ['L', 'P'] DAN array objek [{value, label}]
             const opts = (field.options || []).map(o => {
                 const optVal = typeof o === 'object' ? o.value : o;
                 const optLabel = typeof o === 'object' ? o.label : o;
@@ -169,7 +176,6 @@ function openModal(table, data = null) {
         fieldsContainer.insertAdjacentHTML('beforeend', fieldHtml);
     });
     
-    // Inisialisasi modal bootstrap jika belum ada
     if (!crudModalInstance) {
         const modalEl = document.getElementById('crudModal');
         if (modalEl) crudModalInstance = new bootstrap.Modal(modalEl);
@@ -276,4 +282,189 @@ async function deleteRow(table, id) {
             Swal.fire('Gagal Hapus', err.message, 'error');
         }
     }
+}
+
+/* ==========================================================================
+   ENGINE SEARCH, FILTER & PAGINATION ENGINE
+   ========================================================================== */
+
+/**
+ * Memproses data localData[table] berdasarkan parameter pencarian, filter, dan pagination
+ */
+function getFilteredAndPaginatedData(table) {
+    if (!tableState[table]) {
+        tableState[table] = { search: '', filter: {}, page: 1, limit: 10 };
+    }
+    const state = tableState[table];
+    let data = [...(localData[table] || [])];
+
+    // 1. Pencarian Real-time Global
+    if (state.search) {
+        const q = state.search.toLowerCase();
+        data = data.filter(item => {
+            return Object.values(item).some(val => 
+                val !== null && val !== undefined && String(val).toLowerCase().includes(q)
+            );
+        });
+    }
+
+    // 2. Filter Dropdown Spesifik
+    Object.keys(state.filter).forEach(key => {
+        const filterVal = state.filter[key];
+        if (filterVal !== undefined && filterVal !== null && filterVal !== '') {
+            data = data.filter(item => String(item[key]) === String(filterVal));
+        }
+    });
+
+    const totalItems = data.length;
+    const totalPages = Math.ceil(totalItems / state.limit) || 1;
+
+    if (state.page > totalPages) state.page = 1;
+
+    const start = (state.page - 1) * state.limit;
+    const paginatedData = data.slice(start, start + state.limit);
+
+    return {
+        data: paginatedData,
+        totalItems,
+        totalPages,
+        currentPage: state.page,
+        limit: state.limit,
+        startIndex: totalItems > 0 ? start + 1 : 0,
+        endIndex: Math.min(start + state.limit, totalItems)
+    };
+}
+
+/**
+ * Menyuntikkan Komponen Filter & Input Pencarian di atas Tabel
+ */
+function renderTableControls(table, filterConfigs = [], renderCallback) {
+    const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
+    if (!tableEl) return;
+
+    let controlsEl = document.getElementById(`controls-${table.toLowerCase()}`);
+    if (!controlsEl) {
+        controlsEl = document.createElement('div');
+        controlsEl.id = `controls-${table.toLowerCase()}`;
+        controlsEl.className = 'row g-2 mb-3 align-items-center';
+        tableEl.parentNode.insertBefore(controlsEl, tableEl);
+    }
+
+    const state = tableState[table];
+
+    // Buat HTML Dropdown Filter
+    const filterHtml = filterConfigs.map(cfg => {
+        const optsHtml = cfg.options.map(opt => {
+            const val = typeof opt === 'object' ? opt.value : opt;
+            const label = typeof opt === 'object' ? opt.label : opt;
+            const selected = String(state.filter[cfg.field] || '') === String(val) ? 'selected' : '';
+            return `<option value="${val}" ${selected}>${label}</option>`;
+        }).join('');
+
+        return `
+            <div class="col-md-3 col-6">
+                <select class="form-select form-select-sm" onchange="updateTableFilter('${table}', '${cfg.field}', this.value, ${renderCallback.name})">
+                    <option value="">-- All ${cfg.label} --</option>
+                    ${optsHtml}
+                </select>
+            </div>
+        `;
+    }).join('');
+
+    controlsEl.innerHTML = `
+        <div class="col-md-4">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" placeholder="Cari data ${table}..." value="${state.search}" oninput="updateTableSearch('${table}', this.value, ${renderCallback.name})">
+            </div>
+        </div>
+        ${filterHtml}
+        <div class="col-md-2 col-6 ms-auto">
+            <select class="form-select form-select-sm" onchange="updateTableLimit('${table}', this.value, ${renderCallback.name})">
+                <option value="5" ${state.limit == 5 ? 'selected' : ''}>5 data/hal</option>
+                <option value="10" ${state.limit == 10 ? 'selected' : ''}>10 data/hal</option>
+                <option value="25" ${state.limit == 25 ? 'selected' : ''}>25 data/hal</option>
+                <option value="50" ${state.limit == 50 ? 'selected' : ''}>50 data/hal</option>
+            </select>
+        </div>
+    `;
+}
+
+/**
+ * Menyuntikkan Komponen Pagination di bawah Tabel
+ */
+function renderPaginationControls(table, info, renderCallback) {
+    const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
+    if (!tableEl) return;
+
+    let pagEl = document.getElementById(`pagination-${table.toLowerCase()}`);
+    if (!pagEl) {
+        pagEl = document.createElement('div');
+        pagEl.id = `pagination-${table.toLowerCase()}`;
+        pagEl.className = 'd-flex justify-content-between align-items-center mt-3 flex-wrap gap-2';
+        tableEl.parentNode.insertBefore(pagEl, tableEl.nextSibling);
+    }
+
+    let buttonsHtml = '';
+    const maxPage = info.totalPages;
+    const curPage = info.currentPage;
+
+    buttonsHtml += `
+        <li class="page-item ${curPage === 1 ? 'disabled' : ''}">
+            <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${curPage - 1}, ${renderCallback.name})">Prev</button>
+        </li>
+    `;
+
+    for (let i = 1; i <= maxPage; i++) {
+        if (i === 1 || i === maxPage || (i >= curPage - 1 && i <= curPage + 1)) {
+            buttonsHtml += `
+                <li class="page-item ${i === curPage ? 'active' : ''}">
+                    <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${i}, ${renderCallback.name})">${i}</button>
+                </li>
+            `;
+        } else if (i === curPage - 2 || i === curPage + 2) {
+            buttonsHtml += `<li class="page-item disabled"><span class="page-link page-link-sm">...</span></li>`;
+        }
+    }
+
+    buttonsHtml += `
+        <li class="page-item ${curPage === maxPage || maxPage === 0 ? 'disabled' : ''}">
+            <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${curPage + 1}, ${renderCallback.name})">Next</button>
+        </li>
+    `;
+
+    pagEl.innerHTML = `
+        <div class="small text-muted">
+            Menampilkan <b>${info.startIndex}</b> - <b>${info.endIndex}</b> dari <b>${info.totalItems}</b> data
+        </div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                ${buttonsHtml}
+            </ul>
+        </nav>
+    `;
+}
+
+// Handler event pencarian, filter, dan pagination
+function updateTableSearch(table, val, callback) {
+    tableState[table].search = val;
+    tableState[table].page = 1;
+    if (typeof callback === 'function') callback();
+}
+
+function updateTableFilter(table, field, val, callback) {
+    tableState[table].filter[field] = val;
+    tableState[table].page = 1;
+    if (typeof callback === 'function') callback();
+}
+
+function updateTableLimit(table, val, callback) {
+    tableState[table].limit = parseInt(val, 10);
+    tableState[table].page = 1;
+    if (typeof callback === 'function') callback();
+}
+
+function changeTablePage(table, newPage, callback) {
+    tableState[table].page = newPage;
+    if (typeof callback === 'function') callback();
 }
