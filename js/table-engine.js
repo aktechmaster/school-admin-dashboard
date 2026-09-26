@@ -472,3 +472,21 @@ function changeTablePage(table, newPage, callback) {
     tableState[table].page = newPage;
     if (typeof callback === 'function') callback();
 }
+
+/**
+ * Pembantu Pembatasan Tombol Aksi berdasarkan Role
+ */
+function renderActionButtons(tableName, primaryKeyValue) {
+    if (!currentUser || currentUser.role !== 'Admin') {
+        return `<span class="badge bg-light text-muted"><i class="fas fa-lock me-1"></i>Read Only</span>`;
+    }
+
+    return `
+        <button class="btn btn-sm btn-outline-warning me-1" title="Edit Data" onclick="editRow('${tableName}', '${primaryKeyValue}')">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" title="Hapus Data" onclick="deleteRow('${tableName}', '${primaryKeyValue}')">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+}
