@@ -74,10 +74,15 @@ async function loadAllMasterData() {
     });
     
     try {
-        const response = await fetch(`${GAS_URL}?action=readAllMaster`);
+        // PERBAIKAN: Tambahkan timestamp (&t=...) dan mode redirect
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${GAS_URL}?action=readAllMaster&t=${timestamp}`, {
+            method: 'GET',
+            redirect: 'follow' // Wajib untuk melewati server perantara Google
+        });
         
         if (!response.ok) {
-            throw new Error(`HTTP Error Status: ${response.status} (URL Web App GAS tidak sah/mati)`);
+            throw new Error(`HTTP Error Status: ${response.status}`);
         }
 
         const result = await response.json();
@@ -87,11 +92,18 @@ async function loadAllMasterData() {
             renderAllModules();
             Swal.close();
         } else {
-            throw new Error(result.message || 'Gagal memuatkan data');
+            throw new Error(result.message || 'Gagal memuatkan data dari server');
         }
     } catch (error) {
-        console.error(error);
-        Swal.fire('Gagal Memuatkan Data', error.message || 'Sila semak semula sambungan atau URL Web App GAS anda.', 'error');
+        console.error("Detail Error:", error);
+        
+        // Pesan error diubah agar lebih mudah diidentifikasi penyebabnya
+        let pesanError = error.message;
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+             pesanError = 'Terblokir oleh CORS. Jika Anda memakai akun Google Sekolah (Workspace), server melarang akses publik. Gunakan akun @gmail.com biasa.';
+        }
+        
+        Swal.fire('Gagal Memuatkan Data', pesanError, 'error');
     }
 }
 
