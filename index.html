@@ -21,117 +21,29 @@
         .nav-link:hover, .nav-link.active { color: #fff; background-color: rgba(255,255,255,.1); border-radius: 5px; }
         .main-content { width: 100%; min-height: 100vh; }
 
-        /* 1. Latar Belakang Gambar Sekolah */
-        #loginModal {
-            /* Ganti URL di bawah dengan link gambar sekolah Anda sendiri jika ada */
-            background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop'); 
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            /* position: relative !important; --> TELAH DIHAPUS */
-        }
+        /* Membuat Overlay Login Menutup Penuh Seluruh Layar */
+#loginModal {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+}
 
-        /* 2. Lapisan Gelap & Blur (Overlay) agar kotak login tetap menonjol */
-        #loginModal::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.55); /* Tingkat kegelapan */
-            backdrop-filter: blur(5px); /* Efek blur kekinian */
-            z-index: 0;
-        }
+#loginModal .modal-dialog {
+    max-width: 420px;
+}
 
-        #loginModal .modal-dialog {
-            max-width: 420px;
-            position: relative;
-            z-index: 1; /* Memastikan kotak login berada di atas efek gelap */
-        }
+#loginModal .modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+    overflow: hidden;
+}
 
-        /* 3. Mempercantik Kotak Login (Lebih Melengkung & Modern) */
-        #loginModal .modal-content {
-            border: none;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
-            background-color: rgba(255, 255, 255, 0.95); /* Putih bersih dengan sedikit transparansi */
-            overflow: hidden;
-        }
-
-        #loginModal .modal-header {
-            padding: 24px 24px 16px 24px;
-            border-bottom: none;
-        }
-
-        #loginModal .modal-body {
-            padding: 16px 32px 32px 32px;
-        }
-
-        /* 4. Mempercantik Kolom Input dan Tombol */
-        #loginModal .form-control, 
-        #loginModal .input-group-text {
-            border-radius: 10px;
-            padding: 12px;
-        }
-
-        #loginModal .input-group-text {
-            background-color: #f8f9fa;
-            border-right: none;
-        }
-
-        #loginModal .form-control {
-            border-left: none;
-        }
-
-        #loginModal .form-control:focus {
-            box-shadow: none;
-            border-color: #dee2e6;
-        }
-
-        #loginModal button[type="submit"] {
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 16px;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-        }
-
-        #loginModal button[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(13, 110, 253, 0.4);
-        }
-
-        .modal-backdrop {
-            display: none !important;
-        }
+/* Menghilangkan latar berbayang bawaan bootstrap */
+.modal-backdrop {
+    display: none !important;
+}
     </style>
 </head>
 <body>
-
-    <!-- MODAL LOGIN (Ditambah semula ke dalam kod) -->
-    <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="loginModalLabel">Login Admin SDIT</h5>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="username" class="form-label fw-semibold">Username</label>
-                            <input type="text" class="form-control" id="username" placeholder="Masukkan username" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="password" class="form-label fw-semibold">Password</label>
-                            <input type="password" class="form-control" id="password" placeholder="Masukkan password" required>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary text-white fw-bold">Masuk</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="d-flex">
         <!-- Sidebar -->
         <nav id="sidebar" class="bg-dark p-3">
@@ -429,13 +341,5 @@
 
     <!-- 3. App Controller Utama -->
     <script src="js/app.js"></script>
-    
-    <!-- 4. Skrip untuk memaparkan Login Modal secara automatik -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-            loginModal.show();
-        });
-    </script>
 </body>
 </html>
