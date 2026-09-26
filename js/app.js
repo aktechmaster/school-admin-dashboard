@@ -1,7 +1,7 @@
 // Logik Utama Aplikasi & Router Navigasi
 // js/app.js
 
-let crudModalInstance = null;
+crudModalInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('crudModal');
