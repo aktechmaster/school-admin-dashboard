@@ -1,8 +1,23 @@
 function renderSiswaTable() {
     const tbody = document.querySelector('#table-siswa tbody');
     if (!tbody) return;
-    
-    tbody.innerHTML = (localData.Siswa || []).map(row => `
+
+    const kelasOptions = (localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas}` }));
+
+    renderTableControls('Siswa', [
+        { field: 'id_kelas', label: 'Kelas', options: kelasOptions },
+        { field: 'status_siswa', label: 'Status', options: ['Aktif', 'Lulus', 'Pindah', 'Keluar'] }
+    ], renderSiswaTable);
+
+    const info = getFilteredAndPaginatedData('Siswa');
+
+    if (info.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted py-3"><i class="fas fa-info-circle me-1"></i> Data siswa tidak ditemukan.</td></tr>`;
+        renderPaginationControls('Siswa', info, renderSiswaTable);
+        return;
+    }
+
+    tbody.innerHTML = info.data.map(row => `
         <tr>
             <td><b>${row.id_siswa || ''}</b></td>
             <td>${row.nisn || '-'}</td>
@@ -20,4 +35,6 @@ function renderSiswaTable() {
             </td>
         </tr>
     `).join('');
+
+    renderPaginationControls('Siswa', info, renderSiswaTable);
 }
