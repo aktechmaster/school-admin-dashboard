@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
-    <!-- JS Bootstrap & SweetAlert2 (Cloudflare CDN - Path URL Sudah Benar) -->
+    <!-- JS Bootstrap & SweetAlert2 (Cloudflare CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.8/sweetalert2.all.min.js"></script>
 
@@ -74,25 +74,29 @@
         <!-- Main Content -->
         <div class="main-content d-flex flex-column">
             <!-- Top Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4">
-                <button type="button" id="sidebarCollapse" class="btn btn-outline-secondary" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h5 class="ms-3 mb-0" id="page-title">Dashboard Overview</h5>
-                <button class="btn btn-sm btn-outline-primary ms-auto" onclick="loadAllMasterData()">
-                    <i class="fas fa-sync-alt me-1"></i> Refresh Data
-                </button>
-            </nav>
-
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                <div class="text-end d-none d-md-block">
-                <div id="user-profile-name" class="fw-bold">User</div>
-                <small id="user-profile-role" class="text-muted">Role</small>
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button type="button" id="sidebarCollapse" class="btn btn-outline-secondary" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h5 class="ms-3 mb-0" id="page-title">Dashboard Overview</h5>
                 </div>
-                <button class="btn btn-outline-danger btn-sm" onclick="logout()" title="Keluar Aplikasi">
-            <i class="fas fa-sign-out-alt me-1"></i> Logout
-    </button>
-</div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadAllMasterData()">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh Data
+                    </button>
+
+                    <div class="text-end d-none d-md-block border-start ps-3">
+                        <div id="user-profile-name" class="fw-bold">User</div>
+                        <small id="user-profile-role" class="text-muted">Role</small>
+                    </div>
+
+                    <button class="btn btn-outline-danger btn-sm" onclick="logout()" title="Keluar Aplikasi">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </button>
+                </div>
+            </nav>
 
             <!-- Dynamic Content Area -->
             <div class="p-4 flex-grow-1">
