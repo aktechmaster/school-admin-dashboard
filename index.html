@@ -20,6 +20,27 @@
         .nav-link { color: rgba(255,255,255,.8); margin-bottom: 5px; }
         .nav-link:hover, .nav-link.active { color: #fff; background-color: rgba(255,255,255,.1); border-radius: 5px; }
         .main-content { width: 100%; min-height: 100vh; }
+
+        /* Membuat Overlay Login Menutup Penuh Seluruh Layar */
+#loginModal {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+}
+
+#loginModal .modal-dialog {
+    max-width: 420px;
+}
+
+#loginModal .modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+    overflow: hidden;
+}
+
+/* Menghilangkan latar berbayang bawaan bootstrap */
+.modal-backdrop {
+    display: none !important;
+}
     </style>
 </head>
 <body>
