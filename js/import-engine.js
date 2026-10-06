@@ -24,12 +24,13 @@ const IMPORT_SCHEMAS = {
             nisn: String(getExcelVal(row, 'NISN')),
             nis: String(getExcelVal(row, 'NIS')),
             nama_siswa: getExcelVal(row, 'Nama Siswa'),
-            jk: getExcelVal(row, 'JK') || 'L',
-            kelas: getExcelVal(row, 'Kelas'),
-            ayah: getExcelVal(row, 'Ayah'),
-            ibu: getExcelVal(row, 'Ibu'),
+            // Mengubah key agar sesuai dengan kolom database (jenis_kelamin, id_kelas, nama_ayah, nama_ibu, status_siswa)
+            jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
+            id_kelas: getExcelVal(row, 'Kelas') || getExcelVal(row, 'ID Kelas'),
+            nama_ayah: getExcelVal(row, 'Ayah') || getExcelVal(row, 'Nama Ayah'),
+            nama_ibu: getExcelVal(row, 'Ibu') || getExcelVal(row, 'Nama Ibu'),
             no_hp_ortu: String(getExcelVal(row, 'No HP Ortu')),
-            status: getExcelVal(row, 'Status') || 'Aktif'
+            status_siswa: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Siswa') || 'Aktif'
         })
     },
     Guru: {
