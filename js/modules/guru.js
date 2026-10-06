@@ -20,26 +20,30 @@ function renderGuruTable() {
     }
 
     tbody.innerHTML = info.data.map(row => {
-        const jkBadge = row.jenis_kelamin === 'L' ? 'bg-primary' : (row.jenis_kelamin === 'P' ? 'bg-danger' : 'bg-secondary');
-        const statusBadge = row.status_karyawan === 'Tetap' ? 'bg-success' : 'bg-info text-dark';
+    // Membaca nilai dengan fallback alternatif key
+    const jk = row.jenis_kelamin || row.jk || row.JK || '-';
+    const status = row.status_karyawan || row.status || row.Status || '-';
 
-        return `
-            <tr>
-                <td><b>${row.id_guru || '-'}</b></td>
-                <td>${row.nip_nik || '-'}</td>
-                <td>${row.nama_lengkap || '-'}</td>
-                <td><span class="badge ${jkBadge}">${row.jenis_kelamin || '-'}</span></td>
-                <td>${row.no_hp || '-'}</td>
-                <td>${row.email || '-'}</td>
-                <td>${row.jabatan || '-'}</td>
-                <td><span class="badge ${statusBadge}">${row.status_karyawan || '-'}</span></td>
-                <td>${renderActionButtons('Guru', row.id_guru)}</td>
-            </tr>
-        `;
-    }).join('');
+    // Penentuan warna badge berdasarkan variabel fallback
+    const jkBadge = jk === 'L' ? 'bg-primary' : (jk === 'P' ? 'bg-danger' : 'bg-secondary');
+    const statusBadge = status === 'Tetap' ? 'bg-success' : (status === '-' ? 'bg-secondary' : 'bg-info text-dark');
 
-    renderPaginationControls('Guru', info, renderGuruTable);
-}
+    return `
+        <tr>
+            <td><b>${row.id_guru || '-'}</b></td>
+            <td>${row.nip_nik || '-'}</td>
+            <td>${row.nama_lengkap || '-'}</td>
+            <td><span class="badge ${jkBadge}">${jk}</span></td>
+            <td>${row.no_hp || '-'}</td>
+            <td>${row.email || '-'}</td>
+            <td>${row.jabatan || '-'}</td>
+            <td><span class="badge ${statusBadge}">${status}</span></td>
+            <td>${renderActionButtons('Guru', row.id_guru)}</td>
+        </tr>
+    `;
+}).join('');
+
+renderPaginationControls('Guru', info, renderGuruTable);
 
 /**
  * Custom Export Excel Khusus Data Guru
