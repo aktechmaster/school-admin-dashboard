@@ -22,10 +22,10 @@
         .login-container { 
             min-height: 100vh; 
         }
+        
         /* Bagian Kiri: Background Image & Branding */
         .bg-image {
-            /* Anda bisa mengganti URL ini dengan foto sekolah Anda yang sebenarnya */
-            background-image: url('https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'); 
+            background-image: url('background.jpg'); 
             background-size: cover;
             background-position: center;
             position: relative;
@@ -48,23 +48,16 @@
             width: 100%;
             margin: auto;
         }
-        .brand-icon {
-            width: 70px;
-            height: 70px;
-            background: #0d6efd;
-            background: linear-gradient(135deg, #0d6efd, #0043a8);
-            color: white;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            margin: 0 auto 1.5rem;
-            box-shadow: 0 10px 20px rgba(13, 110, 253, 0.3);
-            transform: rotate(-5deg);
+        
+        /* Styling Logo SDIT */
+        .brand-logo-wrapper {
+            margin-bottom: 1.5rem;
         }
-        .brand-icon i {
-            transform: rotate(5deg);
+        .brand-logo-img {
+            max-height: 90px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
         }
         
         /* Styling Input Form */
@@ -126,7 +119,7 @@
     <div class="container-fluid p-0">
         <div class="row g-0 login-container">
             
-            <!-- Kolom Kiri: Banner Image (Hanya tampil di layar menengah ke atas) -->
+            <!-- Kolom Kiri: Banner Background -->
             <div class="col-md-6 col-lg-7 d-none d-md-flex bg-image">
                 <div class="bg-overlay"></div>
                 <div class="bg-content d-flex flex-column justify-content-center align-items-center text-white p-5 w-100 text-center">
@@ -138,9 +131,10 @@
             <!-- Kolom Kanan: Form Login -->
             <div class="col-md-6 col-lg-5 d-flex align-items-center bg-white position-relative shadow-lg">
                 <div class="login-form-wrapper">
-                    <div class="text-center mb-5">
-                        <div class="brand-icon">
-                            <i class="fas fa-graduation-cap"></i>
+                    <div class="text-center mb-4">
+                        <!-- Logo Sekolah -->
+                        <div class="brand-logo-wrapper">
+                            <img src="logosit.png" alt="Logo SDIT" class="brand-logo-img">
                         </div>
                         <h3 class="fw-bold text-dark mb-1">Selamat Datang</h3>
                         <p class="text-muted small">Silakan masuk ke akun Anda untuk melanjutkan</p>
