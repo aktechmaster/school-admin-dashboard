@@ -4,17 +4,20 @@
 crudModalInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. CEK SESI TERLEBIH DAHULU SEBELUM MELAKUKAN APAPUN
+    // 1. CEK DAN SET SESI TERLEBIH DAHULU
     const savedUser = localStorage.getItem('SDIT_USER_SESSION');
     if (!savedUser) {
         window.location.replace('login.html'); // Lempar ke login jika tidak ada sesi
-        return; // Hentikan eksekusi script selanjutnya
+        return;
     }
 
-    // 2. Jika sudah ada sesi (sudah login), lanjutkan inisialisasi aplikasi
+    // Set variabel currentUser lebih awal
+    if (typeof initSession === 'function') {
+        initSession();
+    }
+
+    // 2. Inisialisasi Modal Bootstrap
     const modalEl = document.getElementById('crudModal');
-    
-    // Pengecekan aman: hanya inisialisasi jika library bootstrap tersedia
     if (modalEl && typeof bootstrap !== 'undefined') {
         crudModalInstance = new bootstrap.Modal(modalEl);
     } else {
@@ -89,12 +92,15 @@ async function loadAllMasterData() {
         
         if (result.status === 'success') {
             localData = result.data;
-            renderAllModules();
-            
-            // Inisialisasi Sesi Login & Hak Akses setelah data siap
+
+            // Pastikan sesi aktif sebelum modul di-render
             if (typeof initSession === 'function') {
                 initSession();
             }
+
+            // Render semua tabel dengan konteks currentUser yang sudah terisi
+            renderAllModules();
+            
             Swal.close();
         } else {
             throw new Error(result.message || 'Gagal memuatkan data');
