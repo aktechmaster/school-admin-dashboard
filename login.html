@@ -8,48 +8,182 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
-        body { background-color: #f4f6f9; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-card { max-width: 400px; width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #f4f6f9;
+            overflow-x: hidden;
+        }
+        .login-container { 
+            min-height: 100vh; 
+        }
+        /* Bagian Kiri: Background Image & Branding */
+        .bg-image {
+            /* Anda bisa mengganti URL ini dengan foto sekolah Anda yang sebenarnya */
+            background-image: url('https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'); 
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .bg-overlay {
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.85), rgba(4, 45, 108, 0.7));
+            z-index: 1;
+        }
+        .bg-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Bagian Kanan: Form Login */
+        .login-form-wrapper {
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
+            margin: auto;
+        }
+        .brand-icon {
+            width: 70px;
+            height: 70px;
+            background: #0d6efd;
+            background: linear-gradient(135deg, #0d6efd, #0043a8);
+            color: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 20px rgba(13, 110, 253, 0.3);
+            transform: rotate(-5deg);
+        }
+        .brand-icon i {
+            transform: rotate(5deg);
+        }
+        
+        /* Styling Input Form */
+        .form-label {
+            font-weight: 500;
+            color: #333;
+            font-size: 0.95rem;
+        }
+        .input-group {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border-radius: 10px;
+        }
+        .input-group-text {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-right: none;
+            color: #a0aec0;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+        .form-control {
+            border: 1px solid #e2e8f0;
+            border-left: none;
+            padding: 0.8rem 1rem;
+            background-color: #fff;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            font-size: 0.95rem;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #0d6efd;
+        }
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control {
+            border-color: #0d6efd;
+            color: #0d6efd;
+        }
+        
+        /* Styling Button */
+        .btn-login {
+            padding: 0.85rem;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            border: none;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+        }
     </style>
 </head>
 <body>
 
-    <div class="card login-card border-0">
-        <div class="card-header bg-primary text-white text-center py-3">
-            <h4 class="mb-0"><i class="fas fa-school me-2"></i>Sistem Admin SDIT</h4>
-        </div>
-        <div class="card-body p-4">
-            <h5 class="text-center mb-4 text-muted">Silakan Login</h5>
-            <form id="loginForm" onsubmit="processLogin(event)">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Username</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" class="form-control" id="loginUsername" placeholder="Masukkan username" required autocomplete="username">
+    <div class="container-fluid p-0">
+        <div class="row g-0 login-container">
+            
+            <!-- Kolom Kiri: Banner Image (Hanya tampil di layar menengah ke atas) -->
+            <div class="col-md-6 col-lg-7 d-none d-md-flex bg-image">
+                <div class="bg-overlay"></div>
+                <div class="bg-content d-flex flex-column justify-content-center align-items-center text-white p-5 w-100 text-center">
+                    <h1 class="fw-bold mb-3 display-5">Sistem Informasi SDIT</h1>
+                    <p class="lead fw-light" style="max-width: 80%;">Platform digital terpadu untuk administrasi, pemantauan data akademik, dan manajemen sekolah yang lebih transparan dan efisien.</p>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan: Form Login -->
+            <div class="col-md-6 col-lg-5 d-flex align-items-center bg-white position-relative shadow-lg">
+                <div class="login-form-wrapper">
+                    <div class="text-center mb-5">
+                        <div class="brand-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-1">Selamat Datang</h3>
+                        <p class="text-muted small">Silakan masuk ke akun Anda untuk melanjutkan</p>
+                    </div>
+
+                    <form id="loginForm" onsubmit="processLogin(event)">
+                        <div class="mb-4">
+                            <label class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="loginUsername" placeholder="Ketik username Anda" required autocomplete="username">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="loginPassword" placeholder="Ketik password Anda" required autocomplete="current-password">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-login w-100 mt-3">
+                            Masuk Aplikasi <i class="fas fa-sign-in-alt ms-2"></i>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-5">
+                        <p class="text-muted" style="font-size: 0.8rem;">
+                            &copy; 2026 Admin SDIT. All rights reserved.<br>
+                            <em>Versi 1.0.0</em>
+                        </p>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" class="form-control" id="loginPassword" placeholder="Masukkan password" required autocomplete="current-password">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mt-3">
-                    <i class="fas fa-sign-in-alt me-2"></i>Masuk Aplikasi
-                </button>
-            </form>
+            </div>
+
         </div>
     </div>
 
-    <!-- Script Wajib -->
+    <!-- Script Koneksi -->
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Cek apakah user sudah login, jika iya lempar ke dashboard
         document.addEventListener('DOMContentLoaded', () => {
             initLoginPage();
         });
