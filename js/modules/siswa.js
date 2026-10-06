@@ -21,31 +21,40 @@ function renderSiswaTable() {
         return;
     }
 
-    // Map data ID Kelas ke Nama Kelas untuk tampilan tabel yang lebih human-readable
+    // Map data ID Kelas ke Nama Kelas untuk tampilan tabel
     const mapKelas = {};
     (localData.Kelas || []).forEach(k => { mapKelas[k.id_kelas] = k.nama_kelas; });
 
-    tbody.innerHTML = info.data.map(row => `
-        <tr>
-            <td><b>${row.id_siswa || ''}</b></td>
-            <td>${row.nisn || '-'}</td>
-            <td>${row.nis || '-'}</td>
-            <td>${row.nama_siswa || ''}</td>
-            <td>${row.jenis_kelamin || ''}</td>
-            <td>${mapKelas[row.id_kelas] || row.id_kelas || '-'}</td>
-            <td>${row.nama_ayah || ''}</td>
-            <td>${row.nama_ibu || ''}</td>
-            <td>${row.no_hp_ortu || ''}</td>
-            <td><span class="badge bg-primary">${row.status_siswa || 'Aktif'}</span></td>
-            <td>${renderActionButtons('Siswa', row.id_siswa)}</td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = info.data.map(row => {
+        // Pengecekan fallback serbaguna (Membaca format DB & format impor Excel)
+        const jk = row.jenis_kelamin || row.jk || row.JK || '-';
+        const kelas = mapKelas[row.id_kelas] || row.kelas || row.Kelas || row.id_kelas || '-';
+        const ayah = row.nama_ayah || row.ayah || row.Ayah || '-';
+        const ibu = row.nama_ibu || row.ibu || row.Ibu || '-';
+        const status = row.status_siswa || row.status || row.Status || 'Aktif';
+
+        return `
+            <tr>
+                <td><b>${row.id_siswa || ''}</b></td>
+                <td>${row.nisn || '-'}</td>
+                <td>${row.nis || '-'}</td>
+                <td>${row.nama_siswa || ''}</td>
+                <td>${jk}</td>
+                <td>${kelas}</td>
+                <td>${ayah}</td>
+                <td>${ibu}</td>
+                <td>${row.no_hp_ortu || row['No HP Ortu'] || '-'}</td>
+                <td><span class="badge bg-primary">${status}</span></td>
+                <td>${renderActionButtons('Siswa', row.id_siswa)}</td>
+            </tr>
+        `;
+    }).join('');
 
     renderPaginationControls('Siswa', info, renderSiswaTable);
 }
 
 /**
- * Custom Export Excel Khusus Data Siswa (Merapikan Format Header & Nama Kelas)
+ * Custom Export Excel Khusus Data Siswa
  */
 function exportSiswaExcel() {
     const data = localData.Siswa || [];
@@ -62,12 +71,12 @@ function exportSiswaExcel() {
         'NISN': item.nisn || '-',
         'NIS': item.nis || '-',
         'Nama Siswa': item.nama_siswa || '',
-        'L/P': item.jenis_kelamin || '',
-        'Kelas': mapKelas[item.id_kelas] || item.id_kelas || '-',
-        'Nama Ayah': item.nama_ayah || '-',
-        'Nama Ibu': item.nama_ibu || '-',
-        'No. HP Ortu': item.no_hp_ortu || '-',
-        'Status': item.status_siswa || 'Aktif'
+        'L/P': item.jenis_kelamin || item.jk || item.JK || '-',
+        'Kelas': mapKelas[item.id_kelas] || item.kelas || item.Kelas || item.id_kelas || '-',
+        'Nama Ayah': item.nama_ayah || item.ayah || item.Ayah || '-',
+        'Nama Ibu': item.nama_ibu || item.ibu || item.Ibu || '-',
+        'No. HP Ortu': item.no_hp_ortu || item['No HP Ortu'] || '-',
+        'Status': item.status_siswa || item.status || item.Status || 'Aktif'
     }));
 
     exportToExcel(formattedData, 'Data_Master_Siswa', 'Siswa');
