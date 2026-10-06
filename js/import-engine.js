@@ -4,60 +4,77 @@
 
 const IMPORT_SCHEMAS = {
     Siswa: {
-        headers: ['NIS', 'NISN', 'Nama Lengkap', 'Jenis Kelamin', 'ID Kelas', 'Status'],
+        headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Ibu', 'No HP Ortu', 'Status'],
         map: (row) => ({
-            nis: String(row['NIS'] || ''),
+            id_siswa: String(row['ID Siswa'] || ''),
             nisn: String(row['NISN'] || ''),
-            nama_lengkap: row['Nama Lengkap'] || '',
-            jenis_kelamin: row['Jenis Kelamin'] || 'L',
-            id_kelas: row['ID Kelas'] || '',
-            status_aktif: String(row['Status'] || 'Aktif').toLowerCase() === 'aktif'
+            nis: String(row['NIS'] || ''),
+            nama_siswa: row['Nama Siswa'] || '',
+            jk: row['JK'] || 'L',
+            kelas: row['Kelas'] || '',
+            ayah: row['Ayah'] || '',
+            ibu: row['Ibu'] || '',
+            no_hp_ortu: String(row['No HP Ortu'] || ''),
+            status: row['Status'] || 'Aktif'
         })
     },
     Guru: {
-        headers: ['NIP', 'Nama Lengkap', 'Jenis Kelamin', 'Status'],
+        headers: ['ID Guru', 'NIP/NIK', 'Nama Lengkap', 'JK', 'No HP', 'Email', 'Jabatan', 'Status'],
         map: (row) => ({
-            nip: String(row['NIP'] || ''),
+            id_guru: String(row['ID Guru'] || ''),
+            nip_nik: String(row['NIP/NIK'] || '-'),
             nama_lengkap: row['Nama Lengkap'] || '',
-            jenis_kelamin: row['Jenis Kelamin'] || 'L',
-            status_aktif: String(row['Status'] || 'Aktif').toLowerCase() === 'aktif'
+            jk: row['JK'] || 'L',
+            no_hp: String(row['No HP'] || ''),
+            email: row['Email'] || '',
+            jabatan: row['Jabatan'] || '',
+            status: row['Status'] || 'Tetap'
+        })
+    },
+    Users: {
+        headers: ['ID User', 'Username', 'ID Guru', 'Role', 'Status', 'Wali Kelas', 'Wakur', 'T2Q', 'BPI', 'Ekstra'],
+        map: (row) => ({
+            id_user: String(row['ID User'] || ''),
+            username: row['Username'] || '',
+            id_guru: row['ID Guru'] || '',
+            role: row['Role'] || 'Guru',
+            status: row['Status'] || 'Aktif',
+            wali_kelas: row['Wali Kelas'] || 'Tidak',
+            wakur: row['Wakur'] || 'Tidak',
+            t2q: row['T2Q'] || 'Tidak',
+            bpi: row['BPI'] || 'Tidak',
+            ekstra: row['Ekstra'] || 'Tidak'
+        })
+    },
+    Kelas: {
+        headers: ['ID Kelas', 'Nama Kelas', 'Tingkat', 'Wali Kelas'],
+        map: (row) => ({
+            id_kelas: String(row['ID Kelas'] || ''),
+            nama_kelas: row['Nama Kelas'] || '',
+            tingkat: row['Tingkat'] || '',
+            wali_kelas: row['Wali Kelas'] || ''
         })
     },
     Mapel: {
-        headers: ['Kode Mapel', 'Nama Mata Pelajaran', 'Kategori'],
+        headers: ['ID Mapel', 'Kode', 'Nama Mata Pelajaran', 'Kategori'],
         map: (row) => ({
-            kode_mapel: row['Kode Mapel'] || '',
+            id_mapel: String(row['ID Mapel'] || ''),
+            kode: row['Kode'] || '',
             nama_mapel: row['Nama Mata Pelajaran'] || '',
             kategori: row['Kategori'] || 'Umum'
         })
     },
-    Kelas: {
-        headers: ['Nama Kelas', 'Tingkat', 'ID Wali Kelas'],
-        map: (row) => ({
-            nama_kelas: row['Nama Kelas'] || '',
-            tingkat: row['Tingkat'] || '',
-            id_guru_wali: row['ID Wali Kelas'] || ''
-        })
-    },
-    Users: {
-        headers: ['Username', 'Password', 'Role', 'ID Guru', 'Status'],
-        map: (row) => ({
-            username: row['Username'] || '',
-            password_hash: row['Password'] || '123456',
-            role: row['Role'] || 'Guru',
-            id_guru: row['ID Guru'] || '',
-            status_aktif: String(row['Status'] || 'Aktif').toLowerCase() === 'aktif'
-        })
-    },
     Jadwal: {
-        headers: ['Hari', 'ID Kelas', 'ID Mapel', 'ID Guru', 'Jam Mulai', 'Jam Selesai'],
+        headers: ['ID Jadwal', 'Hari', 'Jam Ke', 'Kelas', 'Mapel', 'Guru', 'Tahun Ajaran', 'Semester'],
         map: (row) => ({
+            id_jadwal: String(row['ID Jadwal'] || ''),
             hari: row['Hari'] || '',
-            id_kelas: row['ID Kelas'] || '',
-            id_mapel: row['ID Mapel'] || '',
-            id_guru: row['ID Guru'] || '',
-            jam_mulai: row['Jam Mulai'] || '',
-            jam_selesai: row['Jam Selesai'] || ''
+            jam_ke: row['Jam Ke'] || '',
+            kelas: row['Kelas'] || '',
+            mapel: row['Mapel'] || '',
+            guru: row['Guru'] || '',
+            tahun_ajaran: row['Tahun Ajaran'] || '',
+            semester: row['Semester'] || ''
         })
     }
 };
