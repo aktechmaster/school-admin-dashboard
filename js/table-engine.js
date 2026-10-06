@@ -336,7 +336,7 @@ function getFilteredAndPaginatedData(table) {
 }
 
 /**
- * Menyuntikkan Komponen Filter & Input Pencarian di atas Tabel
+ * Menyuntikkan Komponen Filter, Input Pencarian, & Tombol Ekspor di atas Tabel
  */
 function renderTableControls(table, filterConfigs = [], renderCallback) {
     const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
@@ -376,7 +376,7 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
     }).join('');
 
     controlsEl.innerHTML = `
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="input-group input-group-sm">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
                 <input type="text" class="form-control" placeholder="Cari data ${table}..." value="${state.search}" oninput="updateTableSearch('${table}', this.value, ${renderCallback.name})">
@@ -390,6 +390,14 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
                 <option value="25" ${state.limit == 25 ? 'selected' : ''}>25 data/hal</option>
                 <option value="50" ${state.limit == 50 ? 'selected' : ''}>50 data/hal</option>
             </select>
+        </div>
+        <div class="col-auto d-flex gap-1">
+            <button type="button" class="btn btn-outline-success btn-sm" title="Export Excel" onclick="handleTableExportExcel('${table}')">
+                <i class="fas fa-file-excel me-1"></i> Excel
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" title="Export PDF" onclick="handleTableExportPDF('${table}')">
+                <i class="fas fa-file-pdf me-1"></i> PDF
+            </button>
         </div>
     `;
 }
@@ -489,4 +497,32 @@ function renderActionButtons(tableName, primaryKeyValue) {
             <i class="fas fa-trash"></i>
         </button>
     `;
+}
+
+/* ==========================================================================
+   ENGINE EXPORT HANDLER PER TABEL
+   ========================================================================== */
+
+function handleTableExportExcel(table) {
+    const data = localData[table] || [];
+    if (!data || data.length === 0) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire('Info', `Tidak ada data ${table} untuk diekspor.`, 'info');
+        }
+        return;
+    }
+    if (typeof exportToExcel === 'function') {
+        exportToExcel(data, `Data_Master_${table}`, table);
+    } else {
+        console.error('Fungsi exportToExcel tidak ditemukan. Pastikan export-engine.js sudah dimuat.');
+    }
+}
+
+function handleTableExportPDF(table) {
+    const tableId = `table-${table.toLowerCase()}`;
+    if (typeof exportTableToPDF === 'function') {
+        exportTableToPDF(tableId, `Laporan Master Data ${table}`);
+    } else {
+        console.error('Fungsi exportTableToPDF tidak ditemukan. Pastikan export-engine.js sudah dimuat.');
+    }
 }
