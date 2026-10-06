@@ -1,3 +1,7 @@
+// ==========================================
+// MODUL MASTER GURU
+// ==========================================
+
 function renderGuruTable() {
     const tbody = document.querySelector('#table-guru tbody');
     if (!tbody) return;
@@ -29,17 +33,41 @@ function renderGuruTable() {
                 <td>${row.email || '-'}</td>
                 <td>${row.jabatan || '-'}</td>
                 <td><span class="badge ${statusBadge}">${row.status_karyawan || '-'}</span></td>
-                <td>
-                    <button class="btn btn-sm btn-outline-warning me-1" title="Edit Data" onclick="editRow('Guru', '${row.id_guru}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Hapus Data" onclick="deleteRow('Guru', '${row.id_guru}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
+                <td>${renderActionButtons('Guru', row.id_guru)}</td>
             </tr>
         `;
     }).join('');
 
     renderPaginationControls('Guru', info, renderGuruTable);
+}
+
+/**
+ * Custom Export Excel Khusus Data Guru
+ */
+function exportGuruExcel() {
+    const data = localData.Guru || [];
+    if (data.length === 0) {
+        return Swal.fire('Info', 'Tidak ada data guru untuk diekspor.', 'info');
+    }
+
+    const formattedData = data.map((item, index) => ({
+        'No': index + 1,
+        'ID Guru': item.id_guru || '-',
+        'NIP / NIK': item.nip_nik || '-',
+        'Nama Lengkap': item.nama_lengkap || '-',
+        'L/P': item.jenis_kelamin || '-',
+        'No. HP': item.no_hp || '-',
+        'Email': item.email || '-',
+        'Jabatan': item.jabatan || '-',
+        'Status Karyawan': item.status_karyawan || '-'
+    }));
+
+    exportToExcel(formattedData, 'Data_Master_Guru', 'Guru');
+}
+
+/**
+ * Custom Export PDF Khusus Data Guru
+ */
+function exportGuruPDF() {
+    exportTableToPDF('table-guru', 'Laporan Data Guru SDIT');
 }
