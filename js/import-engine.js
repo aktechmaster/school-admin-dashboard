@@ -6,16 +6,16 @@ const IMPORT_SCHEMAS = {
     Siswa: {
         headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Ibu', 'No HP Ortu', 'Status'],
         map: (row) => ({
-            id_siswa: String(row['ID Siswa'] || ''),
-            nisn: String(row['NISN'] || ''),
-            nis: String(row['NIS'] || ''),
-            nama_siswa: row['Nama Siswa'] || '',
-            jk: row['JK'] || 'L',
-            kelas: row['Kelas'] || '',
-            ayah: row['Ayah'] || '',
-            ibu: row['Ibu'] || '',
-            no_hp_ortu: String(row['No HP Ortu'] || ''),
-            status: row['Status'] || 'Aktif'
+            id_siswa: String(getExcelVal(row, 'ID Siswa')),
+            nisn: String(getExcelVal(row, 'NISN')),
+            nis: String(getExcelVal(row, 'NIS')),
+            nama_siswa: getExcelVal(row, 'Nama Siswa'),
+            jk: getExcelVal(row, 'JK') || 'L',
+            kelas: getExcelVal(row, 'Kelas'),
+            ayah: getExcelVal(row, 'Ayah'),
+            ibu: getExcelVal(row, 'Ibu'),
+            no_hp_ortu: String(getExcelVal(row, 'No HP Ortu')),
+            status: getExcelVal(row, 'Status') || 'Aktif'
         })
     },
     Guru: {
