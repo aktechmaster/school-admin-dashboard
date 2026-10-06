@@ -1,3 +1,10 @@
+// ==========================================
+// MODUL MASTER KELAS
+// ==========================================
+
+/**
+ * Mengambil Struktur Skema Form Khusus Kelas
+ */
 function getKelasFormFields() {
     const guruList = localData.Guru || [];
     const guruOptions = guruList.map(g => ({
@@ -47,6 +54,9 @@ function getKelasFormFields() {
     ];
 }
 
+/**
+ * Render Tabel Data Kelas dengan Filter, Pagination, & Proteksi Hak Akses
+ */
 function renderKelasTable() {
     const tbody = document.querySelector('#table-kelas tbody');
     if (!tbody) return;
@@ -78,17 +88,40 @@ function renderKelasTable() {
                 <td>${row.nama_kelas || '-'}</td>
                 <td><span class="badge bg-secondary">Tingkat ${row.tingkat || '-'}</span></td>
                 <td>${waliKelasDisplay}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-warning me-1" title="Edit Data" onclick="editRow('Kelas', '${row.id_kelas}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Hapus Data" onclick="deleteRow('Kelas', '${row.id_kelas}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
+                <td>${renderActionButtons('Kelas', row.id_kelas)}</td>
             </tr>
         `;
     }).join('');
 
     renderPaginationControls('Kelas', info, renderKelasTable);
+}
+
+/**
+ * Custom Export Excel Khusus Data Kelas (Lookup Wali Kelas)
+ */
+function exportKelasExcel() {
+    const data = localData.Kelas || [];
+    if (data.length === 0) {
+        return Swal.fire('Info', 'Tidak ada data kelas untuk diekspor.', 'info');
+    }
+
+    const mapGuru = {};
+    (localData.Guru || []).forEach(g => { mapGuru[g.id_guru] = g.nama_lengkap; });
+
+    const formattedData = data.map((item, index) => ({
+        'No': index + 1,
+        'ID Kelas': item.id_kelas || '-',
+        'Nama Kelas': item.nama_kelas || '-',
+        'Tingkat': item.tingkat || '-',
+        'Wali Kelas': mapGuru[item.id_wali_kelas] || item.id_wali_kelas || '-'
+    }));
+
+    exportToExcel(formattedData, 'Data_Master_Kelas', 'Kelas');
+}
+
+/**
+ * Custom Export PDF Khusus Data Kelas
+ */
+function exportKelasPDF() {
+    exportTableToPDF('table-kelas', 'Laporan Data Kelas SDIT');
 }
