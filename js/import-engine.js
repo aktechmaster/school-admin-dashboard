@@ -40,11 +40,12 @@ const IMPORT_SCHEMAS = {
             id_guru: String(getExcelVal(row, 'ID Guru')),
             nip_nik: String(getExcelVal(row, 'NIP/NIK')),
             nama_lengkap: getExcelVal(row, 'Nama Lengkap'),
-            jk: getExcelVal(row, 'JK') || 'L',
+            // Sesuaikan key agar persis sama dengan nama kolom di Google Sheets
+            jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
             no_hp: String(getExcelVal(row, 'No HP')),
             email: getExcelVal(row, 'Email'),
             jabatan: getExcelVal(row, 'Jabatan'),
-            status: getExcelVal(row, 'Status') || 'Tetap'
+            status_karyawan: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Karyawan') || 'Tetap'
         })
     },
     Users: {
