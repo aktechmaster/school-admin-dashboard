@@ -336,7 +336,7 @@ function getFilteredAndPaginatedData(table) {
 }
 
 /**
- * Menyuntikkan Komponen Filter, Input Pencarian, & Tombol Ekspor di atas Tabel
+ * Menyuntikkan Komponen Filter, Input Pencarian, Tombol Impor & Ekspor di atas Tabel
  */
 function renderTableControls(table, filterConfigs = [], renderCallback) {
     const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
@@ -392,6 +392,9 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
             </select>
         </div>
         <div class="col-auto d-flex gap-1">
+            <button type="button" class="btn btn-outline-primary btn-sm" title="Impor Excel" onclick="handleTableImportExcel('${table}')">
+                <i class="fas fa-file-import me-1"></i> Impor
+            </button>
             <button type="button" class="btn btn-outline-success btn-sm" title="Export Excel" onclick="handleTableExportExcel('${table}')">
                 <i class="fas fa-file-excel me-1"></i> Excel
             </button>
@@ -500,8 +503,22 @@ function renderActionButtons(tableName, primaryKeyValue) {
 }
 
 /* ==========================================================================
-   ENGINE EXPORT HANDLER PER TABEL
+   ENGINE IMPORT & EXPORT HANDLER PER TABEL
    ========================================================================== */
+
+function handleTableImportExcel(table) {
+    if (typeof openImportModal === 'function') {
+        openImportModal(table);
+    } else if (typeof triggerImportExcel === 'function') {
+        triggerImportExcel(table);
+    } else {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire('Info', `Fungsi import untuk tabel ${table} belum terhubung di import-engine.js.`, 'info');
+        } else {
+            alert(`Fungsi import untuk tabel ${table} belum terhubung.`);
+        }
+    }
+}
 
 function handleTableExportExcel(table) {
     const data = localData[table] || [];
