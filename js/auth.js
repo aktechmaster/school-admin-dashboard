@@ -2,7 +2,7 @@
 let currentUser = null;
 
 /**
- * Inisialisasi Sesi saat Aplikasi Pertama Dimuat
+ * Inisialisasi Sesi saat Aplikasi (Dashboard) Pertama Dimuat
  */
 function initSession() {
     const savedUser = localStorage.getItem('SDIT_USER_SESSION');
@@ -11,41 +11,27 @@ function initSession() {
             currentUser = JSON.parse(savedUser);
             renderUserProfile();
             applyRolePermissions();
-            hideLoginModal();
         } catch (e) {
             logout();
         }
     } else {
-        showLoginModal();
+        // Jika tidak ada sesi di dashboard, tendang ke halaman login
+        window.location.replace('login.html');
     }
 }
 
 /**
- * Menampilkan Modal / Overlay Login
+ * Inisialisasi khusus untuk halaman Login (mencegah user login lagi jika sudah login)
  */
-function showLoginModal() {
-    let modalEl = document.getElementById('loginModal');
-    if (!modalEl) {
-        injectLoginModalDOM();
-        modalEl = document.getElementById('loginModal');
-    }
-    const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl, { backdrop: 'static', keyboard: false });
-    bsModal.show();
-}
-
-/**
- * Menyembunyikan Modal Login
- */
-function hideLoginModal() {
-    const modalEl = document.getElementById('loginModal');
-    if (modalEl) {
-        const bsModal = bootstrap.Modal.getInstance(modalEl);
-        if (bsModal) bsModal.hide();
+function initLoginPage() {
+    const savedUser = localStorage.getItem('SDIT_USER_SESSION');
+    if (savedUser) {
+        window.location.replace('index.html'); // Langsung ke dashboard
     }
 }
 
 /**
- * Proses Login Pengguna
+ * Proses Login Pengguna (Dieksekusi dari login.html)
  */
 async function processLogin(event) {
     if (event) event.preventDefault();
@@ -59,7 +45,7 @@ async function processLogin(event) {
 
     Swal.fire({ title: 'Verifikasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-    // Pastikan localData.Users sudah terisi
+    // Ambil data users dari GAS jika belum ada
     if (!localData.Users || localData.Users.length === 0) {
         try {
             const response = await fetch(`${GAS_URL}?action=readAllMaster`);
@@ -72,7 +58,7 @@ async function processLogin(event) {
         }
     }
 
-    // Pencarian user berdasarkan username dan password/hash
+    // Pencarian user
     const user = (localData.Users || []).find(u => 
         String(u.username).toLowerCase() === usernameInput.toLowerCase() && 
         String(u.password_hash) === passwordInput
@@ -86,7 +72,6 @@ async function processLogin(event) {
         return Swal.fire('Akun Nonaktif', 'Akun Anda telah dinonaktifkan. Hubungi Administrator.', 'error');
     }
 
-    // Dapatkan data profil Guru terkait jika ada
     let detailGuru = null;
     if (user.id_guru) {
         detailGuru = (localData.Guru || []).find(g => String(g.id_guru) === String(user.id_guru));
@@ -105,18 +90,18 @@ async function processLogin(event) {
         is_ekstra: Boolean(user.is_ekstra)
     };
 
+    // Simpan sesi
     localStorage.setItem('SDIT_USER_SESSION', JSON.stringify(currentUser));
     
-    renderUserProfile();
-    applyRolePermissions();
-    hideLoginModal();
-
     Swal.fire({
         icon: 'success',
         title: 'Login Berhasil',
         text: `Selamat datang, ${currentUser.nama_lengkap}!`,
         timer: 1500,
         showConfirmButton: false
+    }).then(() => {
+        // Alihkan ke Dashboard setelah login sukses
+        window.location.replace('index.html');
     });
 }
 
@@ -126,7 +111,7 @@ async function processLogin(event) {
 function logout() {
     Swal.fire({
         title: 'Keluar Aplikasi?',
-        text: 'Anda harus login kembali untuk mengakses dashboard.',
+        text: 'Anda akan dialihkan ke halaman login.',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Ya, Logout',
@@ -135,7 +120,8 @@ function logout() {
         if (res.isConfirmed) {
             localStorage.removeItem('SDIT_USER_SESSION');
             currentUser = null;
-            location.reload();
+            // Tendang ke halaman login
+            window.location.replace('login.html');
         }
     });
 }
@@ -148,9 +134,8 @@ function applyRolePermissions() {
 
     const role = currentUser.role;
 
-    // Pemetaan ID Menu Navigasi di Sidebar
     const menuMap = {
-        dashboard: true, // Semua role bisa melihat dashboard
+        dashboard: true,
         users: role === 'Admin',
         guru: ['Admin', 'Kepsek'].includes(role),
         siswa: ['Admin', 'Kepsek', 'WaliKelas'].includes(role) || currentUser.is_wali_kelas,
@@ -160,7 +145,6 @@ function applyRolePermissions() {
         settings: role === 'Admin'
     };
 
-    // Toggle Tampilan Menu di Sidebar
     Object.keys(menuMap).forEach(sectionKey => {
         const navEl = document.querySelector(`[onclick*="'${sectionKey}'"]`);
         if (navEl) {
@@ -173,7 +157,6 @@ function applyRolePermissions() {
         }
     });
 
-    // Sembunyikan Tombol "Tambah Data" untuk Non-Admin
     const addButtons = document.querySelectorAll('button[onclick^="openModal"]');
     addButtons.forEach(btn => {
         if (role === 'Admin') {
@@ -183,7 +166,6 @@ function applyRolePermissions() {
         }
     });
 
-    // Jika pengguna dialihkan ke halaman yang tidak diizinkan, kembalikan ke Dashboard
     const currentActiveSection = document.querySelector('.content-section:not(.d-none)');
     if (currentActiveSection) {
         const activeId = currentActiveSection.id.replace('sec-', '');
@@ -204,42 +186,4 @@ function renderUserProfile() {
 
     if (profileNameEl) profileNameEl.innerText = currentUser.nama_lengkap;
     if (profileRoleEl) profileRoleEl.innerText = `${currentUser.role} ${currentUser.is_wali_kelas ? '(Wali Kelas)' : ''}`;
-}
-
-/**
- * Inject HTML Modal Login ke dalam Body secara Otomatis
- */
-function injectLoginModalDOM() {
-    const modalHtml = `
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow-lg border-0">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-school me-2"></i>Login Admin SDIT</h5>
-                </div>
-                <div class="modal-body p-4">
-                    <form id="loginForm" onsubmit="processLogin(event)">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                <input type="text" class="form-control" id="loginUsername" placeholder="Masukkan username" required autocomplete="username">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input type="password" class="form-control" id="loginPassword" placeholder="Masukkan password" required autocomplete="current-password">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mt-3">
-                            <i class="fas fa-sign-in-alt me-2"></i>Masuk Aplikasi
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
