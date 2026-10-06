@@ -20,30 +20,31 @@ function renderGuruTable() {
     }
 
     tbody.innerHTML = info.data.map(row => {
-    // Membaca nilai dengan fallback alternatif key
-    const jk = row.jenis_kelamin || row.jk || row.JK || '-';
-    const status = row.status_karyawan || row.status || row.Status || '-';
+        // Membaca nilai dengan fallback alternatif key
+        const jk = row.jenis_kelamin || row.jk || row.JK || '-';
+        const status = row.status_karyawan || row.status || row.Status || '-';
 
-    // Penentuan warna badge berdasarkan variabel fallback
-    const jkBadge = jk === 'L' ? 'bg-primary' : (jk === 'P' ? 'bg-danger' : 'bg-secondary');
-    const statusBadge = status === 'Tetap' ? 'bg-success' : (status === '-' ? 'bg-secondary' : 'bg-info text-dark');
+        // Penentuan warna badge berdasarkan variabel fallback
+        const jkBadge = jk === 'L' ? 'bg-primary' : (jk === 'P' ? 'bg-danger' : 'bg-secondary');
+        const statusBadge = status === 'Tetap' ? 'bg-success' : (status === '-' ? 'bg-secondary' : 'bg-info text-dark');
 
-    return `
-        <tr>
-            <td><b>${row.id_guru || '-'}</b></td>
-            <td>${row.nip_nik || '-'}</td>
-            <td>${row.nama_lengkap || '-'}</td>
-            <td><span class="badge ${jkBadge}">${jk}</span></td>
-            <td>${row.no_hp || '-'}</td>
-            <td>${row.email || '-'}</td>
-            <td>${row.jabatan || '-'}</td>
-            <td><span class="badge ${statusBadge}">${status}</span></td>
-            <td>${renderActionButtons('Guru', row.id_guru)}</td>
-        </tr>
-    `;
-}).join('');
+        return `
+            <tr>
+                <td><b>${row.id_guru || '-'}</b></td>
+                <td>${row.nip_nik || '-'}</td>
+                <td>${row.nama_lengkap || '-'}</td>
+                <td><span class="badge ${jkBadge}">${jk}</span></td>
+                <td>${row.no_hp || '-'}</td>
+                <td>${row.email || '-'}</td>
+                <td>${row.jabatan || '-'}</td>
+                <td><span class="badge ${statusBadge}">${status}</span></td>
+                <td>${renderActionButtons('Guru', row.id_guru)}</td>
+            </tr>
+        `;
+    }).join('');
 
-renderPaginationControls('Guru', info, renderGuruTable);
+    renderPaginationControls('Guru', info, renderGuruTable);
+}
 
 /**
  * Custom Export Excel Khusus Data Guru
@@ -59,11 +60,11 @@ function exportGuruExcel() {
         'ID Guru': item.id_guru || '-',
         'NIP / NIK': item.nip_nik || '-',
         'Nama Lengkap': item.nama_lengkap || '-',
-        'L/P': item.jenis_kelamin || '-',
+        'L/P': item.jenis_kelamin || item.jk || item.JK || '-',
         'No. HP': item.no_hp || '-',
         'Email': item.email || '-',
         'Jabatan': item.jabatan || '-',
-        'Status Karyawan': item.status_karyawan || '-'
+        'Status Karyawan': item.status_karyawan || item.status || item.Status || '-'
     }));
 
     exportToExcel(formattedData, 'Data_Master_Guru', 'Guru');
