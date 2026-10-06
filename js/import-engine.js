@@ -18,22 +18,22 @@ function getExcelVal(row, keyName) {
 
 const IMPORT_SCHEMAS = {
     Siswa: {
-    headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Pekerjaan Ayah', 'Ibu', 'Pekerjaan Ibu', 'No HP Ortu', 'Status'],
-    map: (row) => ({
-        id_siswa: String(getExcelVal(row, 'ID Siswa')),
-        nisn: String(getExcelVal(row, 'NISN')),
-        nis: String(getExcelVal(row, 'NIS')),
-        nama_siswa: getExcelVal(row, 'Nama Siswa'),
-        jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
-        id_kelas: getExcelVal(row, 'Kelas') || getExcelVal(row, 'ID Kelas'),
-        nama_ayah: getExcelVal(row, 'Ayah') || getExcelVal(row, 'Nama Ayah'),
-        pekerjaan_ayah: getExcelVal(row, 'Pekerjaan Ayah'),
-        nama_ibu: getExcelVal(row, 'Ibu') || getExcelVal(row, 'Nama Ibu'),
-        pekerjaan_ibu: getExcelVal(row, 'Pekerjaan Ibu'),
-        no_hp_ortu: String(getExcelVal(row, 'No HP Ortu')),
-        status_siswa: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Siswa') || 'Aktif'
-    })
-}
+        headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Pekerjaan Ayah', 'Ibu', 'Pekerjaan Ibu', 'No HP Ortu', 'Status'],
+        map: (row) => ({
+            id_siswa: String(getExcelVal(row, 'ID Siswa')),
+            nisn: String(getExcelVal(row, 'NISN')),
+            nis: String(getExcelVal(row, 'NIS')),
+            nama_siswa: getExcelVal(row, 'Nama Siswa'),
+            jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
+            id_kelas: getExcelVal(row, 'Kelas') || getExcelVal(row, 'ID Kelas'),
+            nama_ayah: getExcelVal(row, 'Ayah') || getExcelVal(row, 'Nama Ayah'),
+            pekerjaan_ayah: getExcelVal(row, 'Pekerjaan Ayah'),
+            nama_ibu: getExcelVal(row, 'Ibu') || getExcelVal(row, 'Nama Ibu'),
+            pekerjaan_ibu: getExcelVal(row, 'Pekerjaan Ibu'),
+            no_hp_ortu: String(getExcelVal(row, 'No HP Ortu')),
+            status_siswa: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Siswa') || 'Aktif'
+        })
+    },
     Guru: {
         headers: ['ID Guru', 'NIP/NIK', 'Nama Lengkap', 'JK', 'No HP', 'Email', 'Jabatan', 'Status'],
         map: (row) => ({
@@ -95,10 +95,21 @@ const IMPORT_SCHEMAS = {
     }
 };
 
+// Helper pencari skema impor tahan perbedaan kapital huruf (misal: 'siswa' maupun 'Siswa')
+function getSchema(moduleName) {
+    if (!moduleName) return null;
+    if (IMPORT_SCHEMAS[moduleName]) return IMPORT_SCHEMAS[moduleName];
+    
+    const key = Object.keys(IMPORT_SCHEMAS).find(
+        k => k.toLowerCase() === String(moduleName).toLowerCase()
+    );
+    return key ? IMPORT_SCHEMAS[key] : null;
+}
+
 function downloadImportTemplate(moduleName) {
-    const schema = IMPORT_SCHEMAS[moduleName];
+    const schema = getSchema(moduleName);
     if (!schema) {
-        return Swal.fire('Info', `Template untuk modul ${moduleName} belum tersedia.`, 'info');
+        return Swal.fire('Info', `Fungsi import untuk tabel ${moduleName} belum terhubung di import-engine.js.`, 'info');
     }
 
     if (typeof XLSX === 'undefined') {
@@ -114,20 +125,24 @@ function downloadImportTemplate(moduleName) {
 }
 
 function openImportModal(moduleName) {
-    const schema = IMPORT_SCHEMAS[moduleName];
+    const schema = getSchema(moduleName);
     if (!schema) {
-        return Swal.fire('Info', `Fitur impor untuk modul ${moduleName} belum didukung.`, 'info');
+        return Swal.fire('Info', `Fungsi import untuk tabel ${moduleName} belum terhubung di import-engine.js.`, 'info');
     }
 
+    const realModuleName = Object.keys(IMPORT_SCHEMAS).find(
+        k => k.toLowerCase() === String(moduleName).toLowerCase()
+    ) || moduleName;
+
     Swal.fire({
-        title: `Impor Data ${moduleName}`,
+        title: `Impor Data ${realModuleName}`,
         html: `
             <p class="text-muted small mb-3">
                 Unggah file Excel (.xlsx / .xls / .csv) sesuai format template resmi.
             </p>
             <div class="mb-3 text-start">
-                <button type="button" class="btn btn-sm btn-outline-primary w-100 mb-3" onclick="downloadImportTemplate('${moduleName}')">
-                    <i class="fas fa-download me-1"></i> Unduh Template Excel (${moduleName})
+                <button type="button" class="btn btn-sm btn-outline-primary w-100 mb-3" onclick="downloadImportTemplate('${realModuleName}')">
+                    <i class="fas fa-download me-1"></i> Unduh Template Excel (${realModuleName})
                 </button>
                 <label class="form-label fw-bold">Pilih File Excel:</label>
                 <input type="file" id="import-file-input" class="form-control" accept=".xlsx, .xls, .csv">
@@ -146,7 +161,7 @@ function openImportModal(moduleName) {
         }
     }).then((result) => {
         if (result.isConfirmed && result.value) {
-            processImportFile(moduleName, result.value);
+            processImportFile(realModuleName, result.value);
         }
     });
 }
@@ -174,19 +189,27 @@ function processImportFile(moduleName, file) {
                 return Swal.fire('Gagal', 'File Excel kosong atau tidak berisi data valid.', 'warning');
             }
 
-            const schema = IMPORT_SCHEMAS[moduleName];
+            const schema = getSchema(moduleName);
+            if (!schema) {
+                return Swal.fire('Error', `Schema impor untuk ${moduleName} tidak ditemukan.`, 'error');
+            }
+
             const parsedData = rawRows.map(schema.map);
+
+            const targetModule = Object.keys(IMPORT_SCHEMAS).find(
+                k => k.toLowerCase() === String(moduleName).toLowerCase()
+            ) || moduleName;
 
             Swal.fire({
                 title: 'Mengirim Data...',
-                text: `Memproses ${parsedData.length} data ${moduleName} ke server...`,
+                text: `Memproses ${parsedData.length} data ${targetModule} ke server...`,
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
 
             const payload = {
                 action: 'importBatch',
-                module: moduleName,
+                module: targetModule,
                 rows: parsedData
             };
 
@@ -198,7 +221,7 @@ function processImportFile(moduleName, file) {
             const result = await response.json();
 
             if (result.status === 'success') {
-                Swal.fire('Berhasil!', `${result.insertedCount || parsedData.length} data ${moduleName} berhasil diimpor.`, 'success')
+                Swal.fire('Berhasil!', `${result.insertedCount || parsedData.length} data ${targetModule} berhasil diimpor.`, 'success')
                     .then(() => {
                         if (typeof loadAllMasterData === 'function') {
                             loadAllMasterData();
