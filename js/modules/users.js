@@ -1,3 +1,7 @@
+// ==========================================
+// MODUL USER MANAGEMENT (PENGGUNA)
+// ==========================================
+
 function renderUsersTable() {
     const tbody = document.querySelector('#table-users tbody');
     if (!tbody) return;
@@ -17,25 +21,71 @@ function renderUsersTable() {
         return;
     }
 
-    tbody.innerHTML = info.data.map(row => `
-        <tr>
-            <td><b>${row.id_user || ''}</b></td>
-            <td>${row.username || ''}</td>
-            <td>${row.id_guru || '-'}</td>
-            <td><span class="badge bg-info">${row.role || ''}</span></td>
-            <td>${row.status_aktif ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>'}</td>
-            <td>${row.is_wali_kelas ? 'Ya' : 'Tidak'}</td>
-            <td>${row.is_wakur ? 'Ya' : 'Tidak'}</td>
-            <td>${row.is_t2q ? 'Ya' : 'Tidak'}</td>
-            <td>${row.is_bpi ? 'Ya' : 'Tidak'}</td>
-            <td>${row.is_ekstra ? 'Ya' : 'Tidak'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Users', '${row.id_user}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Users', '${row.id_user}')"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
+    // Map ID Guru ke Nama Guru untuk kemudahan identifikasi
+    const mapGuru = {};
+    (localData.Guru || []).forEach(g => { mapGuru[g.id_guru] = g.nama_lengkap; });
+
+    tbody.innerHTML = info.data.map(row => {
+        const namaGuruDisplay = row.id_guru 
+            ? (mapGuru[row.id_guru] ? `${mapGuru[row.id_guru]} <small class="text-muted">(${row.id_guru})</small>` : row.id_guru) 
+            : '-';
+        const statusBadge = row.status_aktif 
+            ? '<span class="badge bg-success">Aktif</span>' 
+            : '<span class="badge bg-danger">Nonaktif</span>';
+
+        return `
+            <tr>
+                <td><b>${row.id_user || ''}</b></td>
+                <td>${row.username || ''}</td>
+                <td>${namaGuruDisplay}</td>
+                <td><span class="badge bg-info">${row.role || ''}</span></td>
+                <td>${statusBadge}</td>
+                <td>${row.is_wali_kelas ? 'Ya' : 'Tidak'}</td>
+                <td>${row.is_wakur ? 'Ya' : 'Tidak'}</td>
+                <td>${row.is_t2q ? 'Ya' : 'Tidak'}</td>
+                <td>${row.is_bpi ? 'Ya' : 'Tidak'}</td>
+                <td>${row.is_ekstra ? 'Ya' : 'Tidak'}</td>
+                <td>${renderActionButtons('Users', row.id_user)}</td>
+            </tr>
+        `;
+    }).join('');
 
     // 3. Render Pagination
     renderPaginationControls('Users', info, renderUsersTable);
+}
+
+/**
+ * Custom Export Excel Khusus Data Users
+ */
+function exportUsersExcel() {
+    const data = localData.Users || [];
+    if (data.length === 0) {
+        return Swal.fire('Info', 'Tidak ada data pengguna untuk diekspor.', 'info');
+    }
+
+    const mapGuru = {};
+    (localData.Guru || []).forEach(g => { mapGuru[g.id_guru] = g.nama_lengkap; });
+
+    const formattedData = data.map((item, index) => ({
+        'No': index + 1,
+        'ID User': item.id_user || '-',
+        'Username': item.username || '-',
+        'Guru Terkait': mapGuru[item.id_guru] || item.id_guru || '-',
+        'Role': item.role || '-',
+        'Status': item.status_aktif ? 'Aktif' : 'Nonaktif',
+        'Wali Kelas': item.is_wali_kelas ? 'Ya' : 'Tidak',
+        'Wakur': item.is_wakur ? 'Ya' : 'Tidak',
+        'T2Q': item.is_t2q ? 'Ya' : 'Tidak',
+        'BPI': item.is_bpi ? 'Ya' : 'Tidak',
+        'Ekstra': item.is_ekstra ? 'Ya' : 'Tidak'
+    }));
+
+    exportToExcel(formattedData, 'Data_User_Pengguna', 'Users');
+}
+
+/**
+ * Custom Export PDF Khusus Data Users
+ */
+function exportUsersPDF() {
+    exportTableToPDF('table-users', 'Laporan Data User Pengguna SDIT');
 }
