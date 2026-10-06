@@ -1,3 +1,7 @@
+// ==========================================
+// MODUL MASTER MATA PELAJARAN (MAPEL)
+// ==========================================
+
 function renderMapelTable() {
     const tbody = document.querySelector('#table-mapel tbody');
     if (!tbody) return;
@@ -20,12 +24,36 @@ function renderMapelTable() {
             <td>${row.kode_mapel || ''}</td>
             <td>${row.nama_mapel || ''}</td>
             <td><span class="badge bg-info text-dark">${row.kategori || 'Umum'}</span></td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Mapel', '${row.id_mapel}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Mapel', '${row.id_mapel}')"><i class="fas fa-trash"></i></button>
-            </td>
+            <td>${renderActionButtons('Mapel', row.id_mapel)}</td>
         </tr>
     `).join('');
 
     renderPaginationControls('Mapel', info, renderMapelTable);
+}
+
+/**
+ * Custom Export Excel Khusus Data Mata Pelajaran
+ */
+function exportMapelExcel() {
+    const data = localData.Mapel || [];
+    if (data.length === 0) {
+        return Swal.fire('Info', 'Tidak ada data mata pelajaran untuk diekspor.', 'info');
+    }
+
+    const formattedData = data.map((item, index) => ({
+        'No': index + 1,
+        'ID Mapel': item.id_mapel || '-',
+        'Kode Mapel': item.kode_mapel || '-',
+        'Nama Mata Pelajaran': item.nama_mapel || '-',
+        'Kategori': item.kategori || 'Umum'
+    }));
+
+    exportToExcel(formattedData, 'Data_Master_Mapel', 'Mapel');
+}
+
+/**
+ * Custom Export PDF Khusus Data Mata Pelajaran
+ */
+function exportMapelPDF() {
+    exportTableToPDF('table-mapel', 'Laporan Data Mata Pelajaran SDIT');
 }
