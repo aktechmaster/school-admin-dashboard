@@ -4,6 +4,14 @@
 crudModalInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. CEK SESI TERLEBIH DAHULU SEBELUM MELAKUKAN APAPUN
+    const savedUser = localStorage.getItem('SDIT_USER_SESSION');
+    if (!savedUser) {
+        window.location.replace('login.html'); // Lempar ke login jika tidak ada sesi
+        return; // Hentikan eksekusi script selanjutnya
+    }
+
+    // 2. Jika sudah ada sesi (sudah login), lanjutkan inisialisasi aplikasi
     const modalEl = document.getElementById('crudModal');
     
     // Pengecekan aman: hanya inisialisasi jika library bootstrap tersedia
@@ -19,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gasInput) gasInput.value = GAS_URL;
     if (displayUrl) displayUrl.innerText = GAS_URL;
 
-    // Memuat data master dari server lalu menginisialisasi sesi login
+    // 3. Memuat data master dari server untuk merender dashboard
     loadAllMasterData();
 });
 
