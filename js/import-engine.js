@@ -2,6 +2,20 @@
 // ENGINE IMPOR DATA EXCEL / CSV
 // ==========================================
 
+// Fungsi pembaca nilai Excel yang aman dari perbedaan spasi/kapital
+function getExcelVal(row, keyName) {
+    if (!row) return '';
+    if (row[keyName] !== undefined && row[keyName] !== '') return row[keyName];
+    
+    const normKey = String(keyName).toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (let k in row) {
+        if (String(k).toLowerCase().replace(/[^a-z0-9]/g, '') === normKey) {
+            return row[k];
+        }
+    }
+    return '';
+}
+
 const IMPORT_SCHEMAS = {
     Siswa: {
         headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Ibu', 'No HP Ortu', 'Status'],
@@ -21,60 +35,60 @@ const IMPORT_SCHEMAS = {
     Guru: {
         headers: ['ID Guru', 'NIP/NIK', 'Nama Lengkap', 'JK', 'No HP', 'Email', 'Jabatan', 'Status'],
         map: (row) => ({
-            id_guru: String(row['ID Guru'] || ''),
-            nip_nik: String(row['NIP/NIK'] || '-'),
-            nama_lengkap: row['Nama Lengkap'] || '',
-            jk: row['JK'] || 'L',
-            no_hp: String(row['No HP'] || ''),
-            email: row['Email'] || '',
-            jabatan: row['Jabatan'] || '',
-            status: row['Status'] || 'Tetap'
+            id_guru: String(getExcelVal(row, 'ID Guru')),
+            nip_nik: String(getExcelVal(row, 'NIP/NIK')),
+            nama_lengkap: getExcelVal(row, 'Nama Lengkap'),
+            jk: getExcelVal(row, 'JK') || 'L',
+            no_hp: String(getExcelVal(row, 'No HP')),
+            email: getExcelVal(row, 'Email'),
+            jabatan: getExcelVal(row, 'Jabatan'),
+            status: getExcelVal(row, 'Status') || 'Tetap'
         })
     },
     Users: {
         headers: ['ID User', 'Username', 'ID Guru', 'Role', 'Status', 'Wali Kelas', 'Wakur', 'T2Q', 'BPI', 'Ekstra'],
         map: (row) => ({
-            id_user: String(row['ID User'] || ''),
-            username: row['Username'] || '',
-            id_guru: row['ID Guru'] || '',
-            role: row['Role'] || 'Guru',
-            status: row['Status'] || 'Aktif',
-            wali_kelas: row['Wali Kelas'] || 'Tidak',
-            wakur: row['Wakur'] || 'Tidak',
-            t2q: row['T2Q'] || 'Tidak',
-            bpi: row['BPI'] || 'Tidak',
-            ekstra: row['Ekstra'] || 'Tidak'
+            id_user: String(getExcelVal(row, 'ID User')),
+            username: getExcelVal(row, 'Username'),
+            id_guru: getExcelVal(row, 'ID Guru'),
+            role: getExcelVal(row, 'Role') || 'Guru',
+            status: getExcelVal(row, 'Status') || 'Aktif',
+            wali_kelas: getExcelVal(row, 'Wali Kelas') || 'Tidak',
+            wakur: getExcelVal(row, 'Wakur') || 'Tidak',
+            t2q: getExcelVal(row, 'T2Q') || 'Tidak',
+            bpi: getExcelVal(row, 'BPI') || 'Tidak',
+            ekstra: getExcelVal(row, 'Ekstra') || 'Tidak'
         })
     },
     Kelas: {
         headers: ['ID Kelas', 'Nama Kelas', 'Tingkat', 'Wali Kelas'],
         map: (row) => ({
-            id_kelas: String(row['ID Kelas'] || ''),
-            nama_kelas: row['Nama Kelas'] || '',
-            tingkat: row['Tingkat'] || '',
-            wali_kelas: row['Wali Kelas'] || ''
+            id_kelas: String(getExcelVal(row, 'ID Kelas')),
+            nama_kelas: getExcelVal(row, 'Nama Kelas'),
+            tingkat: getExcelVal(row, 'Tingkat'),
+            wali_kelas: getExcelVal(row, 'Wali Kelas')
         })
     },
     Mapel: {
         headers: ['ID Mapel', 'Kode', 'Nama Mata Pelajaran', 'Kategori'],
         map: (row) => ({
-            id_mapel: String(row['ID Mapel'] || ''),
-            kode: row['Kode'] || '',
-            nama_mapel: row['Nama Mata Pelajaran'] || '',
-            kategori: row['Kategori'] || 'Umum'
+            id_mapel: String(getExcelVal(row, 'ID Mapel')),
+            kode: getExcelVal(row, 'Kode'),
+            nama_mapel: getExcelVal(row, 'Nama Mata Pelajaran'),
+            kategori: getExcelVal(row, 'Kategori') || 'Umum'
         })
     },
     Jadwal: {
         headers: ['ID Jadwal', 'Hari', 'Jam Ke', 'Kelas', 'Mapel', 'Guru', 'Tahun Ajaran', 'Semester'],
         map: (row) => ({
-            id_jadwal: String(row['ID Jadwal'] || ''),
-            hari: row['Hari'] || '',
-            jam_ke: row['Jam Ke'] || '',
-            kelas: row['Kelas'] || '',
-            mapel: row['Mapel'] || '',
-            guru: row['Guru'] || '',
-            tahun_ajaran: row['Tahun Ajaran'] || '',
-            semester: row['Semester'] || ''
+            id_jadwal: String(getExcelVal(row, 'ID Jadwal')),
+            hari: getExcelVal(row, 'Hari'),
+            jam_ke: getExcelVal(row, 'Jam Ke'),
+            kelas: getExcelVal(row, 'Kelas'),
+            mapel: getExcelVal(row, 'Mapel'),
+            guru: getExcelVal(row, 'Guru'),
+            tahun_ajaran: getExcelVal(row, 'Tahun Ajaran'),
+            semester: getExcelVal(row, 'Semester')
         })
     }
 };
