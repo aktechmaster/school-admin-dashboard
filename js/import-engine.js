@@ -2,7 +2,6 @@
 // ENGINE IMPOR DATA EXCEL / CSV
 // ==========================================
 
-// Skema Kolom Wajib per Modul untuk Validasi Template
 const IMPORT_SCHEMAS = {
     Siswa: {
         headers: ['NIS', 'NISN', 'Nama Lengkap', 'Jenis Kelamin', 'ID Kelas', 'Status'],
@@ -39,12 +38,30 @@ const IMPORT_SCHEMAS = {
             tingkat: row['Tingkat'] || '',
             id_guru_wali: row['ID Wali Kelas'] || ''
         })
+    },
+    Users: {
+        headers: ['Username', 'Password', 'Role', 'ID Guru', 'Status'],
+        map: (row) => ({
+            username: row['Username'] || '',
+            password_hash: row['Password'] || '123456',
+            role: row['Role'] || 'Guru',
+            id_guru: row['ID Guru'] || '',
+            status_aktif: String(row['Status'] || 'Aktif').toLowerCase() === 'aktif'
+        })
+    },
+    Jadwal: {
+        headers: ['Hari', 'ID Kelas', 'ID Mapel', 'ID Guru', 'Jam Mulai', 'Jam Selesai'],
+        map: (row) => ({
+            hari: row['Hari'] || '',
+            id_kelas: row['ID Kelas'] || '',
+            id_mapel: row['ID Mapel'] || '',
+            id_guru: row['ID Guru'] || '',
+            jam_mulai: row['Jam Mulai'] || '',
+            jam_selesai: row['Jam Selesai'] || ''
+        })
     }
 };
 
-/**
- * Mengunduh Template File Excel Kosong sesuai Modul
- */
 function downloadImportTemplate(moduleName) {
     const schema = IMPORT_SCHEMAS[moduleName];
     if (!schema) {
@@ -55,7 +72,6 @@ function downloadImportTemplate(moduleName) {
         return Swal.fire('Error', 'Pustaka SheetJS (XLSX) belum dimuat.', 'error');
     }
 
-    // Buat worksheet dengan baris header saja
     const wsData = [schema.headers];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     const wb = XLSX.utils.book_new();
@@ -64,9 +80,6 @@ function downloadImportTemplate(moduleName) {
     XLSX.writeFile(wb, `Template_Impor_${moduleName}.xlsx`);
 }
 
-/**
- * Dialog Modal untuk Unggah File Excel
- */
 function openImportModal(moduleName) {
     const schema = IMPORT_SCHEMAS[moduleName];
     if (!schema) {
@@ -77,7 +90,7 @@ function openImportModal(moduleName) {
         title: `Impor Data ${moduleName}`,
         html: `
             <p class="text-muted small mb-3">
-                Unggah file Excel (.xlsx/.xls) sesuai dengan format template resmi.
+                Unggah file Excel (.xlsx / .xls / .csv) sesuai format template resmi.
             </p>
             <div class="mb-3 text-start">
                 <button type="button" class="btn btn-sm btn-outline-primary w-100 mb-3" onclick="downloadImportTemplate('${moduleName}')">
@@ -105,9 +118,6 @@ function openImportModal(moduleName) {
     });
 }
 
-/**
- * Membaca & Memproses File Excel lalu Mengirim ke GAS
- */
 function processImportFile(moduleName, file) {
     const reader = new FileReader();
 
@@ -125,7 +135,6 @@ function processImportFile(moduleName, file) {
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
             
-            // Konversi sheet ke JSON
             const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
             if (rawRows.length === 0) {
@@ -135,7 +144,6 @@ function processImportFile(moduleName, file) {
             const schema = IMPORT_SCHEMAS[moduleName];
             const parsedData = rawRows.map(schema.map);
 
-            // Kirim Batch ke Backend GAS
             Swal.fire({
                 title: 'Mengirim Data...',
                 text: `Memproses ${parsedData.length} data ${moduleName} ke server...`,
