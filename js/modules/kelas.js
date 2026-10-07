@@ -30,15 +30,21 @@ function getKelasFormFields() {
         },
         { 
             name: 'tingkat', 
-            label: 'Tingkat (1-6)', 
+            label: 'Tingkat (1-12)', 
             type: 'select', 
             options: [
                 { value: '1', label: 'Tingkat 1' },
-                { value: '2', label: 'Tingkat 2' },
-                { value: '3', label: 'Tingkat 3' },
-                { value: '4', label: 'Tingkat 4' },
-                { value: '5', label: 'Tingkat 5' },
-                { value: '6', label: 'Tingkat 6' }
+        { value: '2', label: 'Tingkat 2' },
+        { value: '3', label: 'Tingkat 3' },
+        { value: '4', label: 'Tingkat 4' },
+        { value: '5', label: 'Tingkat 5' },
+        { value: '6', label: 'Tingkat 6' },
+        { value: '7', label: 'Tingkat 7' },
+        { value: '8', label: 'Tingkat 8' },
+        { value: '9', label: 'Tingkat 9' },
+        { value: '10', label: 'Tingkat 10' },
+        { value: '11', label: 'Tingkat 11' },
+        { value: '12', label: 'Tingkat 12' }
             ],
             required: true 
         },
