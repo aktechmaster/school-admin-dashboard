@@ -15,12 +15,16 @@ function exportToExcel(dataArray, fileName = 'Data_Export', sheetName = 'Sheet1'
     }
 
     try {
+        // Buat worksheet dari array objek
         const worksheet = XLSX.utils.json_to_sheet(dataArray);
+        
+        // Buat workbook baru
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
+        // Unduh file excel
         XLSX.writeFile(workbook, `${fileName}_${new Date().toISOString().slice(0, 10)}.xlsx`);
-
+        
         Swal.fire({
             icon: 'success',
             title: 'Berjaya Ekspor',
@@ -48,41 +52,25 @@ function exportTableToPDF(tableId, title = 'Laporan Data') {
 
     try {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('l', 'mm', 'a4');
+        const doc = new jsPDF('p', 'mm', 'a4'); // Portrait, Millimeter, A4
 
-        doc.setFontSize(14);
+        // Judul Laporan
+        doc.setFontSize(16);
         doc.text(title, 14, 15);
         doc.setFontSize(10);
         doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 22);
 
+        // Generate Tabel PDF dengan AutoTable
         doc.autoTable({
             html: `#${tableId}`,
             startY: 28,
             theme: 'grid',
-            headStyles: { 
-                fillColor: [13, 110, 253],
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-                halign: 'center',
-                valign: 'middle'
-            },
-            bodyStyles: { 
-                fontSize: 10,
-                cellPadding: 3,
-                overflow: 'linebreak',
-                valign: 'top'
-            },
-            styles: { 
-                fontSize: 10,
-                cellPadding: 3,
-                overflow: 'linebreak',
-                lineWidth: 0.15,
-                lineColor: [220, 220, 220]
-            },
-            margin: { left: 8, right: 8, top: 28, bottom: 10 },
-            pageBreak: 'auto'
+            headStyles: { fillColor: [13, 110, 253] }, // Warna biru Bootstrap
+            styles: { fontSize: 8, cellPadding: 2 },
+            margin: { top: 28 }
         });
 
+        // Simpan PDF
         doc.save(`${title.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
 
     } catch (error) {
