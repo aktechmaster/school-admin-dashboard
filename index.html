@@ -1,25 +1,55 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin SDIT</title>
-    
-    <!-- CSS Bootstrap & FontAwesome (Cloudflare CDN) -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    
-    <!-- JS Bootstrap & SweetAlert2 (Cloudflare CDN) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.8/sweetalert2.all.min.js"></script>
-
-    <style>
+<style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
         #sidebar { min-width: 250px; max-width: 250px; min-height: 100vh; transition: all 0.3s; }
         #sidebar.active { margin-left: -250px; }
         .nav-link { color: rgba(255,255,255,.8); margin-bottom: 5px; }
         .nav-link:hover, .nav-link.active { color: #fff; background-color: rgba(255,255,255,.1); border-radius: 5px; }
         .main-content { width: 100%; min-height: 100vh; }
+
+        .table-scroll-wrapper {
+            max-height: 70vh;
+            overflow: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            background: #fff;
+        }
+
+        .table-scroll-wrapper .table {
+            margin-bottom: 0;
+            min-width: max-content;
+        }
+
+        .table-scroll-wrapper thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: linear-gradient(180deg, #0d6efd 0%, #0b5ed7 100%);
+            color: #fff;
+            white-space: nowrap;
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .table-scroll-wrapper tbody td,
+        .table-scroll-wrapper thead th {
+            white-space: nowrap;
+            min-width: 120px;
+        }
+
+        .table-scroll-wrapper tbody td {
+            vertical-align: middle;
+        }
+
+        .table-scroll-wrapper th:nth-child(4),
+        .table-scroll-wrapper td:nth-child(4),
+        .table-scroll-wrapper th:nth-child(5),
+        .table-scroll-wrapper td:nth-child(5) {
+            min-width: 180px;
+        }
+
+        .table-scroll-wrapper th:nth-child(12),
+        .table-scroll-wrapper td:nth-child(12) {
+            min-width: 150px;
+        }
 
         /* Membuat Overlay Login Menutup Penuh Seluruh Layar */
         #loginModal {
@@ -42,342 +72,3 @@
             display: none !important;
         }
     </style>
-</head>
-<body>
-    <div class="d-flex">
-        <!-- Sidebar -->
-        <nav id="sidebar" class="bg-dark p-3">
-            <h4 class="text-white mb-4"><i class="fas fa-school me-2"></i>SDIT Admin</h4>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <a href="#" class="nav-link active" onclick="showSection('dashboard', this)">
-                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" onclick="showSection('users', this)">
-                        <i class="fas fa-users-cog me-2"></i>Master Users
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" onclick="showSection('guru', this)">
-                        <i class="fas fa-chalkboard-teacher me-2"></i>Master Guru
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" onclick="showSection('siswa', this)">
-                        <i class="fas fa-user-graduate me-2"></i>Master Siswa
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" onclick="showSection('kelas', this)">
-                        <i class="fas fa-door-open me-2"></i>Master Kelas
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" onclick="showSection('mapel', this)">
-                        <i class="fas fa-book me-2"></i>Master Mapel
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" onclick="showSection('jadwal', this)">
-                        <i class="fas fa-calendar-alt me-2"></i>Master Jadwal
-                    </a>
-                </li>
-                <li class="mt-3 border-top pt-3">
-                    <a href="#" class="nav-link text-warning" onclick="showSection('settings', this)">
-                        <i class="fas fa-cog me-2"></i>Pengaturan API
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="main-content d-flex flex-column">
-            <!-- Top Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <button type="button" id="sidebarCollapse" class="btn btn-outline-secondary" onclick="toggleSidebar()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h5 class="ms-3 mb-0" id="page-title">Dashboard Overview</h5>
-                </div>
-
-                <div class="d-flex align-items-center gap-3">
-                    <button class="btn btn-sm btn-outline-primary" onclick="loadAllMasterData()">
-                        <i class="fas fa-sync-alt me-1"></i> Refresh Data
-                    </button>
-
-                    <div class="text-end d-none d-md-block border-start ps-3">
-                        <div id="user-profile-name" class="fw-bold">User</div>
-                        <small id="user-profile-role" class="text-muted">Role</small>
-                    </div>
-
-                    <button class="btn btn-outline-danger btn-sm" onclick="logout()" title="Keluar Aplikasi">
-                        <i class="fas fa-sign-out-alt me-1"></i> Logout
-                    </button>
-                </div>
-            </nav>
-
-            <!-- Dynamic Content Area -->
-            <div class="p-4 flex-grow-1">
-                <!-- Section: Dashboard -->
-                <div id="sec-dashboard" class="content-section">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="card bg-primary text-white p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">Total Siswa</h6>
-                                        <h2 class="mb-0 mt-2" id="kpi-siswa">0</h2>
-                                    </div>
-                                    <i class="fas fa-user-graduate fa-2x opacity-50"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card bg-success text-white p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">Total Guru</h6>
-                                        <h2 class="mb-0 mt-2" id="kpi-guru">0</h2>
-                                    </div>
-                                    <i class="fas fa-chalkboard-teacher fa-2x opacity-50"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card bg-warning text-white p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">Total Kelas</h6>
-                                        <h2 class="mb-0 mt-2" id="kpi-kelas">0</h2>
-                                    </div>
-                                    <i class="fas fa-door-open fa-2x opacity-50"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card bg-info text-white p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">Total Mapel</h6>
-                                        <h2 class="mb-0 mt-2" id="kpi-mapel">0</h2>
-                                    </div>
-                                    <i class="fas fa-book fa-2x opacity-50"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section: Guru -->
-                <div id="sec-guru" class="content-section d-none">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5>Data Master Guru</h5>
-                        <button class="btn btn-primary btn-sm" onclick="openModal('Guru')"><i class="fas fa-plus me-1"></i>Tambah Guru</button>
-                    </div>
-                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
-                        <table class="table table-hover align-middle" id="table-guru">
-                            <thead>
-                                <tr>
-                                    <th>ID Guru</th><th>NIP/NIK</th><th>Nama Lengkap</th><th>JK</th>
-                                    <th>No HP</th><th>Email</th><th>Jabatan</th><th>Status</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Section: Users -->
-                <div id="sec-users" class="content-section d-none">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5>Data Master Users</h5>
-                        <button class="btn btn-primary btn-sm" onclick="openModal('Users')"><i class="fas fa-plus me-1"></i>Tambah User</button>
-                    </div>
-                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
-                        <table class="table table-hover align-middle" id="table-users">
-                            <thead>
-                                <tr>
-                                    <th>ID User</th><th>Username</th><th>ID Guru</th><th>Role</th><th>Status</th>
-                                    <th>Wali Kelas</th><th>Wakur</th><th>T2Q</th><th>BPI</th><th>Ekstra</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Section: Siswa -->
-                <div id="sec-siswa" class="content-section d-none">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5>Data Master Siswa</h5>
-                        <button class="btn btn-primary btn-sm" onclick="openModal('Siswa')"><i class="fas fa-plus me-1"></i>Tambah Siswa</button>
-                    </div>
-                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
-                        <table class="table table-hover align-middle" id="table-siswa">
-                            <thead>
-                                <tr>
-                                    <th>ID Siswa</th><th>NISN</th><th>NIS</th><th>Nama Siswa</th><th>JK</th>
-                                    <th>Kelas</th><th>Ayah</th><th>Pekerjaan Ayah</th><th>Ibu</th><th>Pekerjaan Ibu</th><th>No HP Ortu</th><th>Status</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Section: Kelas -->
-                <div id="sec-kelas" class="content-section d-none">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5>Data Master Kelas</h5>
-                        <button class="btn btn-primary btn-sm" onclick="openModal('Kelas')"><i class="fas fa-plus me-1"></i>Tambah Kelas</button>
-                    </div>
-                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
-                        <table class="table table-hover align-middle" id="table-kelas">
-                            <thead>
-                                <tr>
-                                    <th>ID Kelas</th><th>Nama Kelas</th><th>Tingkat</th><th>Wali Kelas</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Section: Mapel -->
-                <div id="sec-mapel" class="content-section d-none">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5>Data Master Mapel</h5>
-                        <button class="btn btn-primary btn-sm" onclick="openModal('Mapel')"><i class="fas fa-plus me-1"></i>Tambah Mapel</button>
-                    </div>
-                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
-                        <table class="table table-hover align-middle" id="table-mapel">
-                            <thead>
-                                <tr>
-                                    <th>ID Mapel</th><th>Kode</th><th>Nama Mata Pelajaran</th><th>Kategori</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Section: Jadwal -->
-                <div id="sec-jadwal" class="content-section d-none">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5>Data Master Jadwal</h5>
-                        <button class="btn btn-primary btn-sm" onclick="openModal('Jadwal')"><i class="fas fa-plus me-1"></i>Tambah Jadwal</button>
-                    </div>
-                    <div class="table-responsive bg-white p-3 rounded shadow-sm">
-                        <table class="table table-hover align-middle" id="table-jadwal">
-                            <thead>
-                                <tr>
-                                    <th>ID Jadwal</th><th>Hari</th><th>Jam Ke</th><th>Kelas</th>
-                                    <th>Mapel</th><th>Guru</th><th>Tahun Ajaran</th><th>Semester</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Section: Settings -->
-                <div id="sec-settings" class="content-section d-none">
-                    <div class="card p-4 max-w-600">
-                        <h5>Pengaturan API Google Apps Script</h5>
-                        <p class="text-muted small">URL berikut digunakan sebagai endpoint utama data master.</p>
-                        <div class="mb-3">
-                            <label class="form-label">URL Web App GAS</label>
-                            <input type="text" id="gas-url-input" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <small class="text-muted">URL Terpasang: <span id="display-api-url" class="fw-bold"></span></small>
-                        </div>
-                        <button class="btn btn-primary" onclick="saveGasUrl()"><i class="fas fa-save me-1"></i> Simpan URL Baru</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Dynamic CRUD -->
-    <div class="modal fade" id="crudModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Form Data</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="dynamicForm">
-                        <input type="hidden" id="formTable">
-                        <input type="hidden" id="formAction">
-                        <div class="row g-3" id="formFields"></div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" onclick="submitDynamicForm()">Simpan Data</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Import Excel -->
-    <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importModalTitle">Impor Data Excel</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-muted small">Gunakan templat resmi agar struktur kolom sesuai dengan database.</p>
-                    <button class="btn btn-outline-secondary btn-sm mb-3" onclick="downloadTemplateExcel()">
-                        <i class="fas fa-download me-1"></i> Unduh Templat Excel
-                    </button>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Pilih File (.xlsx / .xls)</label>
-                        <input type="file" id="importFile" class="form-control" accept=".xlsx, .xls">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-success" onclick="processImportExcel()">Proses Impor</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 1. Konfigurasi & Engine Dynamic -->
-    <script src="js/config.js"></script>
-    <script src="js/table-engine.js"></script>
-    <script src="js/export-engine.js"></script>
-
-    <!-- 2. Modul Komponen -->
-    <script src="js/modules/beranda.js"></script>
-    <script src="js/modules/users.js"></script>
-    <script src="js/modules/guru.js"></script>
-    <script src="js/modules/siswa.js"></script>
-    <script src="js/modules/kelas.js"></script>
-    <script src="js/modules/mapel.js"></script>
-    <script src="js/modules/jadwal.js"></script>
-    <script src="js/auth.js"></script>
-
-    <!-- 3. App Controller Utama -->
-    <script src="js/app.js"></script>
-
-    <!-- CDN untuk Export & Import Excel (SheetJS / XLSX) -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-    <!-- CDN untuk Export PDF (jsPDF + AutoTable) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
-    <!-- Script Engine Import -->
-    <script src="js/import-engine.js"></script>
-    
-</body>
-</html>
