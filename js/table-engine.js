@@ -1,5 +1,8 @@
-// Engine CRUD Dynamic & Pengurusan Form
-let crudModalInstance;
+/* ==========================================================================
+   ENGINE CRUD DYNAMIC & PENGURUSAN FORM (table-engine.js)
+   ========================================================================== */
+
+let crudModalInstance = null;
 
 // State Global untuk Filter, Search, dan Pagination per Tabel
 let tableState = {
@@ -128,7 +131,13 @@ function getTableSchema(table) {
     return schemas[table] || [];
 }
 
+/**
+ * Membuka Modal Input Dynamic
+ */
 function openModal(table, data = null) {
+    const form = document.getElementById('dynamicForm');
+    if (form) form.reset();
+
     document.getElementById('formTable').value = table;
     document.getElementById('formAction').value = data ? 'update' : 'create';
     document.getElementById('modalTitle').innerText = (data ? 'Edit Data ' : 'Tambah Data ') + table;
@@ -176,12 +185,11 @@ function openModal(table, data = null) {
         fieldsContainer.insertAdjacentHTML('beforeend', fieldHtml);
     });
     
-    if (!crudModalInstance) {
-        const modalEl = document.getElementById('crudModal');
-        if (modalEl) crudModalInstance = new bootstrap.Modal(modalEl);
+    const modalEl = document.getElementById('crudModal');
+    if (modalEl) {
+        crudModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+        crudModalInstance.show();
     }
-    
-    if (crudModalInstance) crudModalInstance.show();
 }
 
 function editRow(table, id) {
@@ -285,7 +293,7 @@ async function deleteRow(table, id) {
 }
 
 /* ==========================================================================
-   ENGINE SEARCH, FILTER & PAGINATION ENGINE
+   ENGINE SEARCH, FILTER & PAGINATION
    ========================================================================== */
 
 /**
@@ -336,7 +344,7 @@ function getFilteredAndPaginatedData(table) {
 }
 
 /**
- * Menyuntikkan Komponen Filter, Input Pencarian, Tombol Impor & Ekspor di atas Tabel
+ * Menyuntikkan Komponen Filter & Input Pencarian di atas Tabel
  */
 function renderTableControls(table, filterConfigs = [], renderCallback) {
     const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
@@ -344,9 +352,7 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
 
     let controlsEl = document.getElementById(`controls-${table.toLowerCase()}`);
     
-    // JIKA CONTROLS SUDAH ADA DI DOM:
-    // Hentikan eksekusi agar tidak meng-overwrite innerHTML.
-    // Hal ini menjaga elemen input tetap utuh sehingga kursor/fokus ketikan tidak hilang.
+    // Hentikan eksekusi jika controls sudah ada di DOM untuk menjaga fokus input ketikan
     if (controlsEl) return;
 
     controlsEl = document.createElement('div');
@@ -355,6 +361,7 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
     tableEl.parentNode.insertBefore(controlsEl, tableEl);
 
     const state = tableState[table];
+    const callbackName = (typeof renderCallback === 'function' && renderCallback.name) ? renderCallback.name : 'null';
 
     // Buat HTML Dropdown Filter
     const filterHtml = filterConfigs.map(cfg => {
@@ -367,8 +374,8 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
 
         return `
             <div class="col-md-3 col-6">
-                <select class="form-select form-select-sm" onchange="updateTableFilter('${table}', '${cfg.field}', this.value, ${renderCallback.name})">
-                    <option value="">-- All ${cfg.label} --</option>
+                <select class="form-select form-select-sm" onchange="updateTableFilter('${table}', '${cfg.field}', this.value, ${callbackName})">
+                    <option value="">-- Semua ${cfg.label} --</option>
                     ${optsHtml}
                 </select>
             </div>
@@ -376,31 +383,20 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
     }).join('');
 
     controlsEl.innerHTML = `
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="input-group input-group-sm">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Cari data ${table}..." value="${state.search}" oninput="updateTableSearch('${table}', this.value, ${renderCallback.name})">
+                <input type="text" class="form-control" placeholder="Cari data ${table}..." value="${state.search}" oninput="updateTableSearch('${table}', this.value, ${callbackName})">
             </div>
         </div>
         ${filterHtml}
         <div class="col-md-2 col-6 ms-auto">
-            <select class="form-select form-select-sm" onchange="updateTableLimit('${table}', this.value, ${renderCallback.name})">
+            <select class="form-select form-select-sm" onchange="updateTableLimit('${table}', this.value, ${callbackName})">
                 <option value="5" ${state.limit == 5 ? 'selected' : ''}>5 data/hal</option>
                 <option value="10" ${state.limit == 10 ? 'selected' : ''}>10 data/hal</option>
                 <option value="25" ${state.limit == 25 ? 'selected' : ''}>25 data/hal</option>
                 <option value="50" ${state.limit == 50 ? 'selected' : ''}>50 data/hal</option>
             </select>
-        </div>
-        <div class="col-auto d-flex gap-1">
-            <button type="button" class="btn btn-outline-primary btn-sm" title="Impor Excel" onclick="handleTableImportExcel('${table}')">
-                <i class="fas fa-file-import me-1"></i> Impor
-            </button>
-            <button type="button" class="btn btn-outline-success btn-sm" title="Export Excel" onclick="handleTableExportExcel('${table}')">
-                <i class="fas fa-file-excel me-1"></i> Excel
-            </button>
-            <button type="button" class="btn btn-outline-danger btn-sm" title="Export PDF" onclick="handleTableExportPDF('${table}')">
-                <i class="fas fa-file-pdf me-1"></i> PDF
-            </button>
         </div>
     `;
 }
@@ -423,10 +419,11 @@ function renderPaginationControls(table, info, renderCallback) {
     let buttonsHtml = '';
     const maxPage = info.totalPages;
     const curPage = info.currentPage;
+    const callbackName = (typeof renderCallback === 'function' && renderCallback.name) ? renderCallback.name : 'null';
 
     buttonsHtml += `
         <li class="page-item ${curPage === 1 ? 'disabled' : ''}">
-            <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${curPage - 1}, ${renderCallback.name})">Prev</button>
+            <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${curPage - 1}, ${callbackName})">Prev</button>
         </li>
     `;
 
@@ -434,7 +431,7 @@ function renderPaginationControls(table, info, renderCallback) {
         if (i === 1 || i === maxPage || (i >= curPage - 1 && i <= curPage + 1)) {
             buttonsHtml += `
                 <li class="page-item ${i === curPage ? 'active' : ''}">
-                    <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${i}, ${renderCallback.name})">${i}</button>
+                    <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${i}, ${callbackName})">${i}</button>
                 </li>
             `;
         } else if (i === curPage - 2 || i === curPage + 2) {
@@ -444,7 +441,7 @@ function renderPaginationControls(table, info, renderCallback) {
 
     buttonsHtml += `
         <li class="page-item ${curPage === maxPage || maxPage === 0 ? 'disabled' : ''}">
-            <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${curPage + 1}, ${renderCallback.name})">Next</button>
+            <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${curPage + 1}, ${callbackName})">Next</button>
         </li>
     `;
 
