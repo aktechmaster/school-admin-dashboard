@@ -72,7 +72,7 @@ function getTableSchema(table) {
         Kelas: [
             { name: 'id_kelas', label: 'ID Kelas', type: 'text', primaryKey: true, placeholder: 'Contoh: KLS-1A' },
             { name: 'nama_kelas', label: 'Nama Kelas', type: 'text', required: true, placeholder: 'Contoh: 1 Abu Bakar' },
-            { name: 'tingkat', label: 'Tingkat (1-6)', type: 'select', options: ['1', '2', '3', '4', '5', '6'] },
+            { name: 'tingkat', label: 'Tingkat (1-12)', type: 'select', options: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
             { 
                 name: 'id_wali_kelas', 
                 label: 'Wali Kelas', 
