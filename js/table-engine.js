@@ -11,205 +11,6 @@ let tableState = {
     Jadwal: { search: '', filter: {}, page: 1, limit: 10 }
 };
 
-function ensureTableScrollWrapper(tableName) {
-    const tableEl = document.querySelector(`#table-${tableName.toLowerCase()}`);
-    if (!tableEl) return;
-
-    const parent = tableEl.parentElement;
-    if (!parent || parent.classList.contains('table-scroll-wrapper')) return;
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'table-scroll-wrapper';
-    parent.insertBefore(wrapper, tableEl);
-    wrapper.appendChild(tableEl);
-}
-
-function getExportRows(tableName, scope = 'current') {
-    const state = tableState[tableName] || { search: '', filter: {}, page: 1, limit: 10 };
-    let rows = [...(localData[tableName] || [])];
-
-    if (state.search) {
-        const q = state.search.toLowerCase();
-        rows = rows.filter(item => Object.values(item).some(val => {
-            if (val === null || val === undefined) return false;
-            return String(val).toLowerCase().includes(q);
-        }));
-    }
-
-    Object.keys(state.filter).forEach(key => {
-        const filterVal = state.filter[key];
-        if (filterVal !== undefined && filterVal !== null && filterVal !== '') {
-            rows = rows.filter(item => String(item[key]) === String(filterVal));
-        }
-    });
-
-    if (scope === 'current') {
-        const info = getFilteredAndPaginatedData(tableName);
-        return info.data;
-    }
-
-    return rows;
-}
-
-function buildExportRows(tableName, rows) {
-    const schema = getTableSchema(tableName);
-    return (rows || []).map(row => {
-        const output = {};
-        schema.forEach(field => {
-            let value = row[field.name];
-            if (field.type === 'boolean') {
-                value = value === true || value === 'TRUE' || value === 1 || value === '1' ? 'Ya' : 'Tidak';
-            } else if (value === undefined || value === null || value === '') {
-                value = '-';
-            }
-            output[field.label] = value;
-        });
-        return output;
-    });
-}
-
-function createTempExportTable(tableName, rows) {
-    const exportRows = buildExportRows(tableName, rows);
-    const schema = getTableSchema(tableName);
-    const table = document.createElement('table');
-    const thead = document.createElement('thead');
-    const tbody = document.createElement('tbody');
-
-    thead.innerHTML = `<tr>${schema.map(field => `<th>${field.label}</th>`).join('')}</tr>`;
-
-    tbody.innerHTML = exportRows.map(row => {
-        const cells = schema.map(field => `<td>${row[field.label] ?? '-'}</td>`).join('');
-        return `<tr>${cells}</tr>`;
-    }).join('');
-
-    table.appendChild(thead);
-    table.appendChild(tbody);
-    return table;
-}
-
-function getPdfColumnStyles(tableName) {
-    const schema = getTableSchema(tableName);
-    const widths = {
-        Users: [18, 22, 26, 20, 18, 16, 16, 16, 16, 16, 16],
-        Guru: [18, 24, 32, 12, 24, 32, 32, 24, 18],
-        Siswa: [18, 22, 18, 40, 12, 20, 28, 24, 28, 24, 30, 18],
-        Kelas: [22, 32, 18, 28],
-        Mapel: [20, 20, 38, 24],
-        Jadwal: [20, 18, 16, 22, 22, 24, 20, 18]
-    };
-
-    const columnStyles = {};
-    const tableWidths = widths[tableName] || Array(schema.length).fill(22);
-    schema.forEach((field, index) => {
-        columnStyles[index] = { cellWidth: tableWidths[index] || 22 };
-    });
-    return columnStyles;
-}
-
-function showExportScopeModal(tableName, exportType) {
-    const modalEl = document.getElementById('exportScopeModal');
-    if (!modalEl) return;
-
-    const currentPageInfo = document.getElementById('currentPageInfo');
-    const allDataInfo = document.getElementById('allDataInfo');
-    const exportScopeTitle = document.getElementById('exportScopeTitle');
-
-    const pageInfo = getFilteredAndPaginatedData(tableName);
-    currentPageInfo.textContent = `${pageInfo.data.length} data (Halaman ${pageInfo.currentPage}/${pageInfo.totalPages})`;
-    allDataInfo.textContent = `${(localData[tableName] || []).length} data total`;
-    exportScopeTitle.textContent = `Pilih Scope ${exportType.toUpperCase()} - ${tableName}`;
-
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modal.show();
-
-    const confirmBtn = document.getElementById('confirmExportBtn');
-    if (confirmBtn) {
-        confirmBtn.onclick = () => {
-            const scope = document.querySelector('input[name="exportScope"]:checked')?.value || 'current';
-            modal.hide();
-
-            if (exportType === 'excel') {
-                processExcelExport(tableName, scope);
-            } else if (exportType === 'pdf') {
-                processPdfExport(tableName, scope);
-            }
-        };
-    }
-}
-
-function processExcelExport(tableName, scope) {
-    const rows = getExportRows(tableName, scope);
-    const exportData = buildExportRows(tableName, rows);
-
-    Swal.fire({
-        title: 'Mengunduh Excel...',
-        text: 'Harap tunggu sebentar.',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-    });
-
-    exportToExcel(exportData, `Data_Master_${tableName}`, tableName);
-    setTimeout(() => Swal.close(), 300);
-}
-
-function processPdfExport(tableName, scope) {
-    const rows = getExportRows(tableName, scope);
-
-    Swal.fire({
-        title: 'Membuat PDF...',
-        text: 'Harap tunggu sebentar.',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-    });
-
-    if (scope === 'current') {
-        exportTableToPDF(`table-${tableName.toLowerCase()}`, `Laporan Master ${tableName}`);
-    } else {
-        const tempTable = createTempExportTable(tableName, rows);
-        tempTable.id = `temp-export-table-${Date.now()}`;
-        document.body.appendChild(tempTable);
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('l', 'mm', 'a4');
-
-        doc.setFontSize(14);
-        doc.text(`Laporan Master ${tableName}`, 14, 15);
-        doc.setFontSize(10);
-        doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 22);
-        doc.text(`Total Data: ${rows.length}`, 14, 28);
-
-        doc.autoTable({
-            html: `#${tempTable.id}`,
-            startY: 32,
-            theme: 'grid',
-            styles: {
-                fontSize: 10,
-                cellPadding: 3,
-                overflow: 'linebreak',
-                valign: 'middle'
-            },
-            headStyles: {
-                fillColor: [13, 110, 253],
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-                halign: 'center'
-            },
-            bodyStyles: {
-                overflow: 'linebreak',
-                valign: 'top'
-            },
-            columnStyles: getPdfColumnStyles(tableName),
-            margin: { left: 8, right: 8 },
-            pageBreak: 'auto'
-        });
-
-        doc.save(`Laporan_Master_${tableName}_${new Date().toISOString().slice(0, 10)}.pdf`);
-        tempTable.remove();
-    }
-
-    setTimeout(() => Swal.close(), 300);
-}
-
 /**
  * Mengambil Schema Table secara Dinamis
  */
@@ -497,6 +298,7 @@ function getFilteredAndPaginatedData(table) {
     const state = tableState[table];
     let data = [...(localData[table] || [])];
 
+    // 1. Pencarian Real-time Global
     if (state.search) {
         const q = state.search.toLowerCase();
         data = data.filter(item => {
@@ -506,6 +308,7 @@ function getFilteredAndPaginatedData(table) {
         });
     }
 
+    // 2. Filter Dropdown Spesifik
     Object.keys(state.filter).forEach(key => {
         const filterVal = state.filter[key];
         if (filterVal !== undefined && filterVal !== null && filterVal !== '') {
@@ -539,9 +342,11 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
     const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
     if (!tableEl) return;
 
-    ensureTableScrollWrapper(table);
-
     let controlsEl = document.getElementById(`controls-${table.toLowerCase()}`);
+    
+    // JIKA CONTROLS SUDAH ADA DI DOM:
+    // Hentikan eksekusi agar tidak meng-overwrite innerHTML.
+    // Hal ini menjaga elemen input tetap utuh sehingga kursor/fokus ketikan tidak hilang.
     if (controlsEl) return;
 
     controlsEl = document.createElement('div');
@@ -551,6 +356,7 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
 
     const state = tableState[table];
 
+    // Buat HTML Dropdown Filter
     const filterHtml = filterConfigs.map(cfg => {
         const optsHtml = cfg.options.map(opt => {
             const val = typeof opt === 'object' ? opt.value : opt;
@@ -654,6 +460,7 @@ function renderPaginationControls(table, info, renderCallback) {
     `;
 }
 
+// Handler event pencarian, filter, dan pagination
 function updateTableSearch(table, val, callback) {
     tableState[table].search = val;
     tableState[table].page = 1;
@@ -714,26 +521,25 @@ function handleTableImportExcel(table) {
 }
 
 function handleTableExportExcel(table) {
-    showExportScopeModal(table, 'excel');
+    const data = localData[table] || [];
+    if (!data || data.length === 0) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire('Info', `Tidak ada data ${table} untuk diekspor.`, 'info');
+        }
+        return;
+    }
+    if (typeof exportToExcel === 'function') {
+        exportToExcel(data, `Data_Master_${table}`, table);
+    } else {
+        console.error('Fungsi exportToExcel tidak ditemukan. Pastikan export-engine.js sudah dimuat.');
+    }
 }
 
 function handleTableExportPDF(table) {
-    showExportScopeModal(table, 'pdf');
-}
-
-function bindExportScopeModal() {
-    const confirmBtn = document.getElementById('confirmExportBtn');
-    if (!confirmBtn || confirmBtn.dataset.bound === 'true') return;
-
-    confirmBtn.dataset.bound = 'true';
-    confirmBtn.addEventListener('click', () => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('exportScopeModal'));
-        if (modal) modal.hide();
-    });
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bindExportScopeModal);
-} else {
-    bindExportScopeModal();
+    const tableId = `table-${table.toLowerCase()}`;
+    if (typeof exportTableToPDF === 'function') {
+        exportTableToPDF(tableId, `Laporan Master Data ${table}`);
+    } else {
+        console.error('Fungsi exportTableToPDF tidak ditemukan. Pastikan export-engine.js sudah dimuat.');
+    }
 }
