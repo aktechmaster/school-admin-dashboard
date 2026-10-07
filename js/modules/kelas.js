@@ -1,7 +1,6 @@
 // ==========================================
 // MODUL MASTER KELAS
 // ==========================================
-
 /**
  * Mengambil Struktur Skema Form Khusus Kelas
  */
@@ -11,7 +10,6 @@ function getKelasFormFields() {
         value: g.id_guru,
         label: `${g.nama_lengkap} (${g.id_guru})`
     }));
-
     return [
         { 
             name: 'id_kelas', 
@@ -34,17 +32,17 @@ function getKelasFormFields() {
             type: 'select', 
             options: [
                 { value: '1', label: 'Tingkat 1' },
-        { value: '2', label: 'Tingkat 2' },
-        { value: '3', label: 'Tingkat 3' },
-        { value: '4', label: 'Tingkat 4' },
-        { value: '5', label: 'Tingkat 5' },
-        { value: '6', label: 'Tingkat 6' },
-        { value: '7', label: 'Tingkat 7' },
-        { value: '8', label: 'Tingkat 8' },
-        { value: '9', label: 'Tingkat 9' },
-        { value: '10', label: 'Tingkat 10' },
-        { value: '11', label: 'Tingkat 11' },
-        { value: '12', label: 'Tingkat 12' }
+                { value: '2', label: 'Tingkat 2' },
+                { value: '3', label: 'Tingkat 3' },
+                { value: '4', label: 'Tingkat 4' },
+                { value: '5', label: 'Tingkat 5' },
+                { value: '6', label: 'Tingkat 6' },
+                { value: '7', label: 'Tingkat 7' },
+                { value: '8', label: 'Tingkat 8' },
+                { value: '9', label: 'Tingkat 9' },
+                { value: '10', label: 'Tingkat 10' },
+                { value: '11', label: 'Tingkat 11' },
+                { value: '12', label: 'Tingkat 12' }
             ],
             required: true 
         },
@@ -67,18 +65,17 @@ function renderKelasTable() {
     const tbody = document.querySelector('#table-kelas tbody');
     if (!tbody) return;
 
+    // ✅ Filter diperluas sampai tingkat 12
     renderTableControls('Kelas', [
-        { field: 'tingkat', label: 'Tingkat', options: ['1', '2', '3', '4', '5', '6'] }
+        { field: 'tingkat', label: 'Tingkat', options: ['1','2','3','4','5','6','7','8','9','10','11','12'] }
     ], renderKelasTable);
 
     const info = getFilteredAndPaginatedData('Kelas');
-
     if (info.data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3"><i class="fas fa-info-circle me-1"></i> Belum ada data kelas.</td></tr>`;
         renderPaginationControls('Kelas', info, renderKelasTable);
         return;
     }
-
     tbody.innerHTML = info.data.map(row => {
         let waliKelasDisplay = '-';
         if (row.id_wali_kelas) {
@@ -87,7 +84,6 @@ function renderKelasTable() {
                 ? `${guru.nama_lengkap} <small class="text-muted">(${guru.id_guru})</small>` 
                 : row.id_wali_kelas;
         }
-
         return `
             <tr>
                 <td><b>${row.id_kelas || '-'}</b></td>
@@ -98,7 +94,6 @@ function renderKelasTable() {
             </tr>
         `;
     }).join('');
-
     renderPaginationControls('Kelas', info, renderKelasTable);
 }
 
@@ -110,10 +105,8 @@ function exportKelasExcel() {
     if (data.length === 0) {
         return Swal.fire('Info', 'Tidak ada data kelas untuk diekspor.', 'info');
     }
-
     const mapGuru = {};
     (localData.Guru || []).forEach(g => { mapGuru[g.id_guru] = g.nama_lengkap; });
-
     const formattedData = data.map((item, index) => ({
         'No': index + 1,
         'ID Kelas': item.id_kelas || '-',
@@ -121,7 +114,6 @@ function exportKelasExcel() {
         'Tingkat': item.tingkat || '-',
         'Wali Kelas': mapGuru[item.id_wali_kelas] || item.id_wali_kelas || '-'
     }));
-
     exportToExcel(formattedData, 'Data_Master_Kelas', 'Kelas');
 }
 
