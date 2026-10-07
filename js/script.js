@@ -1,7 +1,7 @@
 // script.js
 
 // CONFIG & STATE (Hardcoded Web App URL)
-let GAS_URL = 'https://script.google.com/macros/s/AKfycbwkapFCSh949dImZF-gw959mmFvQ05GL7Fkf-RRXsbZMp0AvAG2KYuadbeBjqFH55M_/exec';
+let GAS_URL = 'https://script.google.com/macros/s/AKfycbyvPJwCpToLpXk0kNoJb67dV5Rm4ajZBLzxpJVJrTsQhQKa4qcYjyfIHZsimseDcdEL/exec';
 let localData = { Users: [], Guru: [], Siswa: [], Kelas: [], Mapel: [], Jadwal: [] };
 let crudModalInstance;
 
