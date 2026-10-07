@@ -1,74 +1,71 @@
-<style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
-        #sidebar { min-width: 250px; max-width: 250px; min-height: 100vh; transition: all 0.3s; }
-        #sidebar.active { margin-left: -250px; }
-        .nav-link { color: rgba(255,255,255,.8); margin-bottom: 5px; }
-        .nav-link:hover, .nav-link.active { color: #fff; background-color: rgba(255,255,255,.1); border-radius: 5px; }
-        .main-content { width: 100%; min-height: 100vh; }
+    <!-- Modal Export Scope -->
+    <div class="modal fade" id="exportScopeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportScopeTitle">Pilih Scope Download</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-4">
+                        Pilih data apa yang ingin diunduh.
+                    </p>
 
-        .table-scroll-wrapper {
-            max-height: 70vh;
-            overflow: auto;
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            background: #fff;
-        }
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="exportScope" id="scopeCurrentPage" value="current" checked>
+                            <label class="form-check-label" for="scopeCurrentPage">
+                                <strong>Halaman Ini</strong><br>
+                                <small class="text-muted" id="currentPageInfo">Data yang ditampilkan sekarang</small>
+                            </label>
+                        </div>
+                    </div>
 
-        .table-scroll-wrapper .table {
-            margin-bottom: 0;
-            min-width: max-content;
-        }
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="exportScope" id="scopeAllData" value="all">
+                            <label class="form-check-label" for="scopeAllData">
+                                <strong>Semua Data</strong><br>
+                                <small class="text-muted" id="allDataInfo">Semua data sesuai filter</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="confirmExportBtn">Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        .table-scroll-wrapper thead th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: linear-gradient(180deg, #0d6efd 0%, #0b5ed7 100%);
-            color: #fff;
-            white-space: nowrap;
-            border-color: rgba(255,255,255,0.15);
-        }
+    <!-- 1. Konfigurasi & Engine Dynamic -->
+    <script src="js/config.js"></script>
+    <script src="js/table-engine.js"></script>
+    <script src="js/export-engine.js"></script>
 
-        .table-scroll-wrapper tbody td,
-        .table-scroll-wrapper thead th {
-            white-space: nowrap;
-            min-width: 120px;
-        }
+    <!-- 2. Modul Komponen -->
+    <script src="js/modules/beranda.js"></script>
+    <script src="js/modules/users.js"></script>
+    <script src="js/modules/guru.js"></script>
+    <script src="js/modules/siswa.js"></script>
+    <script src="js/modules/kelas.js"></script>
+    <script src="js/modules/mapel.js"></script>
+    <script src="js/modules/jadwal.js"></script>
+    <script src="js/auth.js"></script>
 
-        .table-scroll-wrapper tbody td {
-            vertical-align: middle;
-        }
+    <!-- 3. App Controller Utama -->
+    <script src="js/app.js"></script>
 
-        .table-scroll-wrapper th:nth-child(4),
-        .table-scroll-wrapper td:nth-child(4),
-        .table-scroll-wrapper th:nth-child(5),
-        .table-scroll-wrapper td:nth-child(5) {
-            min-width: 180px;
-        }
+    <!-- CDN untuk Export & Import Excel (SheetJS / XLSX) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-        .table-scroll-wrapper th:nth-child(12),
-        .table-scroll-wrapper td:nth-child(12) {
-            min-width: 150px;
-        }
+    <!-- CDN untuk Export PDF (jsPDF + AutoTable) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-        /* Membuat Overlay Login Menutup Penuh Seluruh Layar */
-        #loginModal {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
-        }
-
-        #loginModal .modal-dialog {
-            max-width: 420px;
-        }
-
-        #loginModal .modal-content {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
-            overflow: hidden;
-        }
-
-        /* Menghilangkan latar berbayang bawaan bootstrap */
-        .modal-backdrop {
-            display: none !important;
-        }
-    </style>
+    <!-- Script Engine Import -->
+    <script src="js/import-engine.js"></script>
+    
+</body>
+</html>
