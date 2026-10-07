@@ -65,7 +65,7 @@ function renderKelasTable() {
     const tbody = document.querySelector('#table-kelas tbody');
     if (!tbody) return;
 
-    // ✅ Filter diperluas sampai tingkat 12
+    // Filter tingkat sudah lengkap 1–12
     renderTableControls('Kelas', [
         { field: 'tingkat', label: 'Tingkat', options: ['1','2','3','4','5','6','7','8','9','10','11','12'] }
     ], renderKelasTable);
@@ -76,6 +76,7 @@ function renderKelasTable() {
         renderPaginationControls('Kelas', info, renderKelasTable);
         return;
     }
+
     tbody.innerHTML = info.data.map(row => {
         let waliKelasDisplay = '-';
         if (row.id_wali_kelas) {
@@ -94,11 +95,12 @@ function renderKelasTable() {
             </tr>
         `;
     }).join('');
+
     renderPaginationControls('Kelas', info, renderKelasTable);
 }
 
 /**
- * Custom Export Excel Khusus Data Kelas (Lookup Wali Kelas)
+ * Custom Export Excel Khusus Data Kelas
  */
 function exportKelasExcel() {
     const data = localData.Kelas || [];
