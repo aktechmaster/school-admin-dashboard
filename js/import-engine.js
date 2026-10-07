@@ -1,28 +1,38 @@
-// ==========================================
-// ENGINE IMPOR DATA EXCEL / CSV
-// ==========================================
+/* ==========================================================================
+   ENGINE IMPOR DATA EXCEL / CSV - js/import-engine.js
+   ========================================================================== */
 
-// Fungsi pembaca nilai Excel yang aman dari perbedaan spasi/kapital
+/**
+ * Helper pembaca nilai sel Excel yang tahan terhadap perbedaan spasi, tanda baca, dan kapitalisasi header
+ * @param {Object} row - Objek baris data dari XLSX
+ * @param {String} keyName - Nama header yang dicari
+ */
 function getExcelVal(row, keyName) {
     if (!row) return '';
-    if (row[keyName] !== undefined && row[keyName] !== '') return row[keyName];
+    if (row[keyName] !== undefined && row[keyName] !== null && row[keyName] !== '') {
+        return String(row[keyName]).trim();
+    }
     
     const normKey = String(keyName).toLowerCase().replace(/[^a-z0-9]/g, '');
     for (let k in row) {
         if (String(k).toLowerCase().replace(/[^a-z0-9]/g, '') === normKey) {
-            return row[k];
+            return String(row[k]).trim();
         }
     }
     return '';
 }
 
+/**
+ * Skema Pemetaan Header Excel ke Kolom Database
+ */
 const IMPORT_SCHEMAS = {
     Siswa: {
         headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Pekerjaan Ayah', 'Ibu', 'Pekerjaan Ibu', 'No HP Ortu', 'Status'],
+        sampleRow: ['SW001', '0012345678', '21221001', 'Ahmad Fulan', 'L', '1-A', 'Budi', 'Wiraswasta', 'Siti', 'Ibu Rumah Tangga', '081234567890', 'Aktif'],
         map: (row) => ({
-            id_siswa: String(getExcelVal(row, 'ID Siswa')),
-            nisn: String(getExcelVal(row, 'NISN')),
-            nis: String(getExcelVal(row, 'NIS')),
+            id_siswa: getExcelVal(row, 'ID Siswa'),
+            nisn: getExcelVal(row, 'NISN'),
+            nis: getExcelVal(row, 'NIS'),
             nama_siswa: getExcelVal(row, 'Nama Siswa'),
             jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
             id_kelas: getExcelVal(row, 'Kelas') || getExcelVal(row, 'ID Kelas'),
@@ -30,19 +40,19 @@ const IMPORT_SCHEMAS = {
             pekerjaan_ayah: getExcelVal(row, 'Pekerjaan Ayah'),
             nama_ibu: getExcelVal(row, 'Ibu') || getExcelVal(row, 'Nama Ibu'),
             pekerjaan_ibu: getExcelVal(row, 'Pekerjaan Ibu'),
-            no_hp_ortu: String(getExcelVal(row, 'No HP Ortu')),
+            no_hp_ortu: getExcelVal(row, 'No HP Ortu'),
             status_siswa: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Siswa') || 'Aktif'
         })
     },
     Guru: {
         headers: ['ID Guru', 'NIP/NIK', 'Nama Lengkap', 'JK', 'No HP', 'Email', 'Jabatan', 'Status'],
+        sampleRow: ['GR001', '198501012010011001', 'Ustadz Abdullah, S.Pd.', 'L', '081987654321', 'abdullah@sekolah.sch.id', 'Guru Kelas', 'Tetap'],
         map: (row) => ({
-            id_guru: String(getExcelVal(row, 'ID Guru')),
-            nip_nik: String(getExcelVal(row, 'NIP/NIK')),
+            id_guru: getExcelVal(row, 'ID Guru'),
+            nip_nik: getExcelVal(row, 'NIP/NIK'),
             nama_lengkap: getExcelVal(row, 'Nama Lengkap'),
-            // Sesuaikan key agar persis sama dengan nama kolom di Google Sheets
             jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
-            no_hp: String(getExcelVal(row, 'No HP')),
+            no_hp: getExcelVal(row, 'No HP'),
             email: getExcelVal(row, 'Email'),
             jabatan: getExcelVal(row, 'Jabatan'),
             status_karyawan: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Karyawan') || 'Tetap'
@@ -50,8 +60,9 @@ const IMPORT_SCHEMAS = {
     },
     Users: {
         headers: ['ID User', 'Username', 'ID Guru', 'Role', 'Status', 'Wali Kelas', 'Wakur', 'T2Q', 'BPI', 'Ekstra'],
+        sampleRow: ['US001', 'abdullah', 'GR001', 'Guru', 'Aktif', 'Ya', 'Tidak', 'Ya', 'Tidak', 'Tidak'],
         map: (row) => ({
-            id_user: String(getExcelVal(row, 'ID User')),
+            id_user: getExcelVal(row, 'ID User'),
             username: getExcelVal(row, 'Username'),
             id_guru: getExcelVal(row, 'ID Guru'),
             role: getExcelVal(row, 'Role') || 'Guru',
@@ -65,8 +76,9 @@ const IMPORT_SCHEMAS = {
     },
     Kelas: {
         headers: ['ID Kelas', 'Nama Kelas', 'Tingkat', 'Wali Kelas'],
+        sampleRow: ['KL001', '1-A Al-Fatih', '1', 'GR001'],
         map: (row) => ({
-            id_kelas: String(getExcelVal(row, 'ID Kelas')),
+            id_kelas: getExcelVal(row, 'ID Kelas'),
             nama_kelas: getExcelVal(row, 'Nama Kelas'),
             tingkat: getExcelVal(row, 'Tingkat'),
             wali_kelas: getExcelVal(row, 'Wali Kelas')
@@ -74,8 +86,9 @@ const IMPORT_SCHEMAS = {
     },
     Mapel: {
         headers: ['ID Mapel', 'Kode', 'Nama Mata Pelajaran', 'Kategori'],
+        sampleRow: ['MP001', 'PAI01', 'Pendidikan Agama Islam', 'PAI'],
         map: (row) => ({
-            id_mapel: String(getExcelVal(row, 'ID Mapel')),
+            id_mapel: getExcelVal(row, 'ID Mapel'),
             kode: getExcelVal(row, 'Kode'),
             nama_mapel: getExcelVal(row, 'Nama Mata Pelajaran'),
             kategori: getExcelVal(row, 'Kategori') || 'Umum'
@@ -83,8 +96,9 @@ const IMPORT_SCHEMAS = {
     },
     Jadwal: {
         headers: ['ID Jadwal', 'Hari', 'Jam Ke', 'Kelas', 'Mapel', 'Guru', 'Tahun Ajaran', 'Semester'],
+        sampleRow: ['JW001', 'Senin', '1', 'KL001', 'MP001', 'GR001', '2025/2026', 'Ganjil'],
         map: (row) => ({
-            id_jadwal: String(getExcelVal(row, 'ID Jadwal')),
+            id_jadwal: getExcelVal(row, 'ID Jadwal'),
             hari: getExcelVal(row, 'Hari'),
             jam_ke: getExcelVal(row, 'Jam Ke'),
             kelas: getExcelVal(row, 'Kelas'),
@@ -96,7 +110,9 @@ const IMPORT_SCHEMAS = {
     }
 };
 
-// Helper pencari skema impor tahan perbedaan kapital huruf (misal: 'siswa' maupun 'Siswa')
+/**
+ * Mencari skema berdasarkan nama modul (case-insensitive)
+ */
 function getSchema(moduleName) {
     if (!moduleName) return null;
     if (IMPORT_SCHEMAS[moduleName]) return IMPORT_SCHEMAS[moduleName];
@@ -107,28 +123,43 @@ function getSchema(moduleName) {
     return key ? IMPORT_SCHEMAS[key] : null;
 }
 
+/**
+ * Mengunduh Template File Excel (.xlsx) Lengkap dengan Header & Baris Contoh
+ */
 function downloadImportTemplate(moduleName) {
     const schema = getSchema(moduleName);
     if (!schema) {
-        return Swal.fire('Info', `Fungsi import untuk tabel ${moduleName} belum terhubung di import-engine.js.`, 'info');
+        return Swal.fire('Info', `Skema impor untuk modul "${moduleName}" tidak ditemukan.`, 'info');
     }
 
     if (typeof XLSX === 'undefined') {
-        return Swal.fire('Error', 'Pustaka SheetJS (XLSX) belum dimuat.', 'error');
+        return Swal.fire('Error Library', 'Pustaka SheetJS (XLSX) belum dimuat di index.html.', 'error');
     }
 
-    const wsData = [schema.headers];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Template');
+    try {
+        const wsData = [schema.headers, schema.sampleRow || []];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-    XLSX.writeFile(wb, `Template_Impor_${moduleName}.xlsx`);
+        // Atur Lebar Kolom Otomatis
+        ws['!cols'] = schema.headers.map(h => ({ wch: Math.max(h.length + 5, 15) }));
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Template');
+
+        XLSX.writeFile(wb, `Template_Impor_${moduleName}.xlsx`);
+    } catch (err) {
+        console.error('Error downloadImportTemplate:', err);
+        Swal.fire('Error', 'Gagal mengunduh template Excel.', 'error');
+    }
 }
 
+/**
+ * Membuka Modal Dialog Unggah File
+ */
 function openImportModal(moduleName) {
     const schema = getSchema(moduleName);
     if (!schema) {
-        return Swal.fire('Info', `Fungsi import untuk tabel ${moduleName} belum terhubung di import-engine.js.`, 'info');
+        return Swal.fire('Info', `Fungsi import untuk tabel "${moduleName}" belum dikonfigurasi.`, 'info');
     }
 
     const realModuleName = Object.keys(IMPORT_SCHEMAS).find(
@@ -139,23 +170,24 @@ function openImportModal(moduleName) {
         title: `Impor Data ${realModuleName}`,
         html: `
             <p class="text-muted small mb-3">
-                Unggah file Excel (.xlsx / .xls / .csv) sesuai format template resmi.
+                Unggah file Excel (<code>.xlsx</code> / <code>.xls</code> / <code>.csv</code>) sesuai format template resmi.
             </p>
             <div class="mb-3 text-start">
                 <button type="button" class="btn btn-sm btn-outline-primary w-100 mb-3" onclick="downloadImportTemplate('${realModuleName}')">
-                    <i class="fas fa-download me-1"></i> Unduh Template Excel (${realModuleName})
+                    <i class="fas fa-file-download me-1"></i> Unduh Template Excel (${realModuleName})
                 </button>
-                <label class="form-label fw-bold">Pilih File Excel:</label>
+                <label class="form-label fw-bold">Pilih File Data:</label>
                 <input type="file" id="import-file-input" class="form-control" accept=".xlsx, .xls, .csv">
             </div>
         `,
         showCancelButton: true,
-        confirmButtonText: '<i class="fas fa-upload me-1"></i> Proses Impor',
+        confirmButtonText: '<i class="fas fa-file-upload me-1"></i> Proses Impor',
         cancelButtonText: 'Batal',
+        focusConfirm: false,
         preConfirm: () => {
             const fileInput = document.getElementById('import-file-input');
-            if (!fileInput || !fileInput.files[0]) {
-                Swal.showValidationMessage('Silakan pilih file Excel terlebih dahulu!');
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                Swal.showValidationMessage('Harap pilih file Excel terlebih dahulu!');
                 return false;
             }
             return fileInput.files[0];
@@ -167,12 +199,19 @@ function openImportModal(moduleName) {
     });
 }
 
+/**
+ * Membaca dan Mengirim Data File Excel ke Backend GAS
+ */
 function processImportFile(moduleName, file) {
+    if (typeof GAS_URL === 'undefined' || !GAS_URL) {
+        return Swal.fire('Error Konfigurasi', 'Variabel GAS_URL belum didefinisikan.', 'error');
+    }
+
     const reader = new FileReader();
 
     Swal.fire({
         title: 'Membaca File...',
-        text: 'Harap tunggu sebentar',
+        text: 'Harap tunggu, data sedang di-parsing.',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
@@ -186,16 +225,24 @@ function processImportFile(moduleName, file) {
             
             const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-            if (rawRows.length === 0) {
-                return Swal.fire('Gagal', 'File Excel kosong atau tidak berisi data valid.', 'warning');
+            if (!rawRows || rawRows.length === 0) {
+                return Swal.fire('Gagal', 'File Excel kosong atau tidak berisi baris data valid.', 'warning');
             }
 
             const schema = getSchema(moduleName);
             if (!schema) {
-                return Swal.fire('Error', `Schema impor untuk ${moduleName} tidak ditemukan.`, 'error');
+                return Swal.fire('Error', `Skema impor untuk ${moduleName} tidak ditemukan.`, 'error');
             }
 
-            const parsedData = rawRows.map(schema.map);
+            // Mapping setiap baris Excel ke skema database
+            const parsedData = rawRows.map(schema.map).filter(row => {
+                // Saring baris yang benar-benar kosong
+                return Object.values(row).some(val => val !== '');
+            });
+
+            if (parsedData.length === 0) {
+                return Swal.fire('Peringatan', 'Tidak ada baris data valid yang dapat diproses.', 'warning');
+            }
 
             const targetModule = Object.keys(IMPORT_SCHEMAS).find(
                 k => k.toLowerCase() === String(moduleName).toLowerCase()
@@ -203,7 +250,7 @@ function processImportFile(moduleName, file) {
 
             Swal.fire({
                 title: 'Mengirim Data...',
-                text: `Memproses ${parsedData.length} data ${targetModule} ke server...`,
+                text: `Mengirim ${parsedData.length} baris data ${targetModule} ke server...`,
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
@@ -216,26 +263,38 @@ function processImportFile(moduleName, file) {
 
             const response = await fetch(GAS_URL, {
                 method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
 
             const result = await response.json();
 
-            if (result.status === 'success') {
-                Swal.fire('Berhasil!', `${result.insertedCount || parsedData.length} data ${targetModule} berhasil diimpor.`, 'success')
-                    .then(() => {
-                        if (typeof loadAllMasterData === 'function') {
-                            loadAllMasterData();
-                        }
-                    });
+            if (result.status === 'success' || result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Impor!',
+                    text: `${result.insertedCount || parsedData.length} data ${targetModule} berhasil disimpan.`,
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Refresh data master jika fungsi reloader tersedia
+                    if (typeof loadAllMasterData === 'function') {
+                        loadAllMasterData();
+                    } else if (typeof window[`load${targetModule}`] === 'function') {
+                        window[`load${targetModule}`]();
+                    }
+                });
             } else {
-                throw new Error(result.message || 'Gagal menyimpan data impor di server.');
+                throw new Error(result.message || 'Gagal menyimpan data impor pada server Google Sheets.');
             }
 
         } catch (error) {
             console.error('Import Error:', error);
             Swal.fire('Gagal Impor', error.message || 'Terjadi kesalahan saat memproses file Excel.', 'error');
         }
+    };
+
+    reader.onerror = function () {
+        Swal.fire('Error File', 'Terjadi kesalahan saat membaca berkas fisik file.', 'error');
     };
 
     reader.readAsArrayBuffer(file);
