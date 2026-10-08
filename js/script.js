@@ -1,6 +1,6 @@
-// CONFIG & STATE MANAGEMENT
-const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyvPJwCpToLpXk0kNoJb67dV5Rm4ajZBLzxpJVJrTsQhQKa4qcYjyfIHZsimseDcdEL/exec';
-let GAS_URL = localStorage.getItem('SDIT_GAS_URL') || DEFAULT_GAS_URL;
+// Gunakan variabel yang sudah ada atau ambil dari localStorage
+window.GAS_URL = localStorage.getItem('SDIT_GAS_URL') || window.GAS_URL || 'https://script.google.com/macros/s/AKfycbyvPJwCpToLpXk0kNoJb67dV5Rm4ajZBLzxpJVJrTsQhQKa4qcYjyfIHZsimseDcdEL/exec';
+var GAS_URL = window.GAS_URL;
 
 let localData = { 
     Users: [], 
