@@ -18,7 +18,7 @@ function getExcelVal(row, keyName) {
 
 const IMPORT_SCHEMAS = {
     Siswa: {
-        headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Pekerjaan Ayah', 'Ibu', 'Pekerjaan Ibu', 'No HP Ortu', 'Status'],
+        headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Pekerjaan Ayah', 'Ibu', 'Pekerjaan Ibu', 'No HP Ortu', 'Alamat', 'Status'],
         map: (row) => ({
             id_siswa: String(getExcelVal(row, 'ID Siswa')),
             nisn: String(getExcelVal(row, 'NISN')),
@@ -31,6 +31,7 @@ const IMPORT_SCHEMAS = {
             nama_ibu: getExcelVal(row, 'Ibu') || getExcelVal(row, 'Nama Ibu'),
             pekerjaan_ibu: getExcelVal(row, 'Pekerjaan Ibu'),
             no_hp_ortu: String(getExcelVal(row, 'No HP Ortu')),
+            alamat: getExcelVal(row, 'Alamat'),
             status_siswa: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Siswa') || 'Aktif'
         })
     },
