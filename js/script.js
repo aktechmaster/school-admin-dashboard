@@ -1,7 +1,4 @@
 // CONFIG & STATE MANAGEMENT
-if (localStorage.getItem('SDIT_GAS_URL')) {
-    GAS_URL = localStorage.getItem('SDIT_GAS_URL');
-}
 
 let crudModalInstance = null;
 
