@@ -9,42 +9,40 @@
   --sidebar-active: #0d6efd;
 }
 
-body {
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Mengunci scroll seluruh halaman utama */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--bg-main);
-  overflow-x: hidden;
 }
 
-/* Base Layout Structure */
-#wrapper {
+/* Base App Layout (Fixed Viewport) */
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   display: flex;
-  width: 100%;
-  align-items: stretch;
-  min-height: 100vh;
 }
 
-/* Sidebar Styling */
+/* Sidebar Styling - Statis di Kiri */
 #sidebar {
   min-width: var(--sidebar-width);
   max-width: var(--sidebar-width);
+  height: 100vh;
   background-color: var(--sidebar-bg);
   color: var(--sidebar-color);
   transition: all 0.3s ease;
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
 }
 
-#sidebar.collapsed {
+#sidebar.active, #sidebar.collapsed {
   margin-left: calc(-1 * var(--sidebar-width));
-}
-
-#sidebar .sidebar-header {
-  padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.15);
-  height: var(--header-height);
-  display: flex;
-  align-items: center;
 }
 
 #sidebar .nav-link {
@@ -76,29 +74,116 @@ body {
   text-align: center;
 }
 
-/* Page Content Layout */
-#page-content-wrapper {
+/* Page Content Layout - Statis di Kanan */
+.main-content {
   width: 100%;
-  flex-grow: 1;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
   min-width: 0;
 }
 
-/* Header Navbar */
-.top-navbar {
+/* Top Header Navbar - Statis di Atas */
+.top-navbar, nav.navbar {
   height: var(--header-height);
+  min-height: var(--header-height);
   background-color: #ffffff;
   border-bottom: 1px solid #e3e6f0;
+  flex-shrink: 0;
 }
 
-/* Content Dynamic Container */
-.main-content {
-  padding: 1.5rem;
+/* Dynamic Content Area Wrapper */
+.content-area-wrapper {
   flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
 }
 
-/* Loading Spinner Overlay */
+.content-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Section Controls Header (Judul & Tombol Tambah) */
+.section-header-controls {
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+}
+
+/* Container Tabel Mengambang (Hanya baris data yang di-scroll) */
+.table-responsive {
+  flex-grow: 1;
+  overflow: auto;
+  border-radius: 0.375rem;
+  background-color: #ffffff;
+  position: relative;
+  max-height: 100%;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+/* Sticky Column Header (<thead>) */
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #f1f5f9 !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #475569;
+  border-top: none;
+  box-shadow: inset 0 -1px 0 #dee2e6;
+}
+
+.table td {
+  font-size: 0.9rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Dashboard Cards */
+.card-dashboard {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-dashboard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* Modals & Overlays */
+#loginModal {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+}
+
+#loginModal .modal-dialog {
+  max-width: 420px;
+}
+
+#loginModal .modal-content {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+  overflow: hidden;
+}
+
+.modal-backdrop {
+  display: none !important;
+}
+
 #globalSpinner {
   position: fixed;
   top: 0;
@@ -113,45 +198,11 @@ body {
   flex-direction: column;
 }
 
-/* Table Customizations */
-.table-responsive {
-  border-radius: 0.375rem;
-}
-
-.table th {
-  background-color: #f1f5f9;
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #475569;
-  border-top: none;
-}
-
-.table td {
-  font-size: 0.9rem;
-  vertical-align: middle;
-}
-
-/* Card Improvements */
-.card-dashboard {
-  border: none;
-  border-radius: 0.5rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card-dashboard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-}
-
-/* Responsiveness adjustments */
+/* Responsive Handling */
 @media (max-width: 768px) {
   #sidebar {
     margin-left: calc(-1 * var(--sidebar-width));
   }
-  
   #sidebar.active {
     margin-left: 0;
   }
