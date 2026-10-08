@@ -337,23 +337,27 @@ function getFilteredAndPaginatedData(table) {
 }
 
 /**
- * Menyuntikkan Komponen Filter, Input Pencarian, Tombol Impor & Ekspor di atas Tabel
+ * Menyuntikkan Komponen Filter, Input Pencarian, Tombol Impor & Ekspor di ATAS/Luar Pembungkus Scrollable Tabel
  */
 function renderTableControls(table, filterConfigs = [], renderCallback) {
     const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
     if (!tableEl) return;
 
+    // Deteksi apakah tabel berada di dalam pembungkus .table-responsive (scrollable)
+    const wrapperEl = tableEl.closest('.table-responsive') || tableEl;
+
     let controlsEl = document.getElementById(`controls-${table.toLowerCase()}`);
     
-    // JIKA CONTROLS SUDAH ADA DI DOM:
-    // Hentikan eksekusi agar tidak meng-overwrite innerHTML.
-    // Hal ini menjaga elemen input tetap utuh sehingga kursor/fokus ketikan tidak hilang.
+    // Jika toolbar controls sudah ada di DOM, hentikan agar input/focus tidak ter-reset
     if (controlsEl) return;
 
     controlsEl = document.createElement('div');
     controlsEl.id = `controls-${table.toLowerCase()}`;
-    controlsEl.className = 'row g-2 mb-3 align-items-center';
-    tableEl.parentNode.insertBefore(controlsEl, tableEl);
+    // Memberikan kontainer styling agar terpisah rapi dari area scrollabel tabel
+    controlsEl.className = 'table-toolbar-container bg-light p-2 p-md-3 rounded border mb-3';
+    
+    // Menyuntikkan toolbar DI LUAR & SEBELUM wrapper scrollable
+    wrapperEl.parentNode.insertBefore(controlsEl, wrapperEl);
 
     const state = tableState[table];
 
@@ -377,48 +381,55 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
     }).join('');
 
     controlsEl.innerHTML = `
-        <div class="col-md-3">
-            <div class="input-group input-group-sm">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Cari data ${table}..." value="${state.search}" oninput="updateTableSearch('${table}', this.value, ${renderCallback.name})">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-3 col-12">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" class="form-control" placeholder="Cari data ${table}..." value="${state.search}" oninput="updateTableSearch('${table}', this.value, ${renderCallback.name})">
+                </div>
             </div>
-        </div>
-        ${filterHtml}
-        <div class="col-md-2 col-6 ms-auto">
-            <select class="form-select form-select-sm" onchange="updateTableLimit('${table}', this.value, ${renderCallback.name})">
-                <option value="5" ${state.limit == 5 ? 'selected' : ''}>5 data/hal</option>
-                <option value="10" ${state.limit == 10 ? 'selected' : ''}>10 data/hal</option>
-                <option value="25" ${state.limit == 25 ? 'selected' : ''}>25 data/hal</option>
-                <option value="50" ${state.limit == 50 ? 'selected' : ''}>50 data/hal</option>
-            </select>
-        </div>
-        <div class="col-auto d-flex gap-1">
-            <button type="button" class="btn btn-outline-primary btn-sm" title="Impor Excel" onclick="handleTableImportExcel('${table}')">
-                <i class="fas fa-file-import me-1"></i> Impor
-            </button>
-            <button type="button" class="btn btn-outline-success btn-sm" title="Export Excel" onclick="handleTableExportExcel('${table}')">
-                <i class="fas fa-file-excel me-1"></i> Excel
-            </button>
-            <button type="button" class="btn btn-outline-danger btn-sm" title="Export PDF" onclick="handleTableExportPDF('${table}')">
-                <i class="fas fa-file-pdf me-1"></i> PDF
-            </button>
+            ${filterHtml}
+            <div class="col-md-2 col-6 ms-auto">
+                <select class="form-select form-select-sm" onchange="updateTableLimit('${table}', this.value, ${renderCallback.name})">
+                    <option value="5" ${state.limit == 5 ? 'selected' : ''}>5 data/hal</option>
+                    <option value="10" ${state.limit == 10 ? 'selected' : ''}>10 data/hal</option>
+                    <option value="25" ${state.limit == 25 ? 'selected' : ''}>25 data/hal</option>
+                    <option value="50" ${state.limit == 50 ? 'selected' : ''}>50 data/hal</option>
+                </select>
+            </div>
+            <div class="col-auto d-flex gap-1 flex-wrap">
+                <button type="button" class="btn btn-outline-primary btn-sm" title="Impor Excel" onclick="handleTableImportExcel('${table}')">
+                    <i class="fas fa-file-import me-1"></i> Impor
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm" title="Export Excel" onclick="handleTableExportExcel('${table}')">
+                    <i class="fas fa-file-excel me-1"></i> Excel
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" title="Export PDF" onclick="handleTableExportPDF('${table}')">
+                    <i class="fas fa-file-pdf me-1"></i> PDF
+                </button>
+            </div>
         </div>
     `;
 }
 
 /**
- * Menyuntikkan Komponen Pagination di bawah Tabel
+ * Menyuntikkan Komponen Pagination di DI LUAR & SETELAH Pembungkus Scrollable Tabel
  */
 function renderPaginationControls(table, info, renderCallback) {
     const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
     if (!tableEl) return;
 
+    // Deteksi apakah tabel berada di dalam pembungkus .table-responsive (scrollable)
+    const wrapperEl = tableEl.closest('.table-responsive') || tableEl;
+
     let pagEl = document.getElementById(`pagination-${table.toLowerCase()}`);
     if (!pagEl) {
         pagEl = document.createElement('div');
         pagEl.id = `pagination-${table.toLowerCase()}`;
-        pagEl.className = 'd-flex justify-content-between align-items-center mt-3 flex-wrap gap-2';
-        tableEl.parentNode.insertBefore(pagEl, tableEl.nextSibling);
+        pagEl.className = 'table-pagination-container d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2 pt-2 border-top';
+        
+        // Menyuntikkan pagination SETELAH wrapper scrollable
+        wrapperEl.parentNode.insertBefore(pagEl, wrapperEl.nextSibling);
     }
 
     let buttonsHtml = '';
