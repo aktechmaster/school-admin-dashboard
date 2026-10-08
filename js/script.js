@@ -1,6 +1,7 @@
-// Gunakan variabel yang sudah ada atau ambil dari localStorage
-window.GAS_URL = localStorage.getItem('SDIT_GAS_URL') || window.GAS_URL || 'https://script.google.com/macros/s/AKfycbyvPJwCpToLpXk0kNoJb67dV5Rm4ajZBLzxpJVJrTsQhQKa4qcYjyfIHZsimseDcdEL/exec';
-var GAS_URL = window.GAS_URL;
+// CONFIG & STATE MANAGEMENT
+if (localStorage.getItem('SDIT_GAS_URL') && typeof GAS_URL !== 'undefined') {
+    try { GAS_URL = localStorage.getItem('SDIT_GAS_URL'); } catch (e) {}
+}
 
 let localData = { 
     Users: [], 
@@ -104,8 +105,9 @@ function toggleSidebar() {
 function syncSettingsUI() {
     const gasInput = document.getElementById('gas-url-input');
     const displayUrl = document.getElementById('display-api-url');
-    if (gasInput) gasInput.value = GAS_URL;
-    if (displayUrl) displayUrl.innerText = GAS_URL;
+    const currentUrl = typeof GAS_URL !== 'undefined' ? GAS_URL : '';
+    if (gasInput) gasInput.value = currentUrl;
+    if (displayUrl) displayUrl.innerText = currentUrl;
 }
 
 function saveGasUrl() {
@@ -113,7 +115,7 @@ function saveGasUrl() {
     if (!url) return Swal.fire('Error', 'URL tidak boleh kosong', 'error');
     
     localStorage.setItem('SDIT_GAS_URL', url);
-    GAS_URL = url;
+    try { GAS_URL = url; } catch (e) {}
     syncSettingsUI();
     Swal.fire('Berhasil', 'URL Web App GAS berhasil diperbarui!', 'success');
     loadAllMasterData();
@@ -143,7 +145,8 @@ function showSection(sectionId, element) {
 
 // FETCH & RENDER API DATA
 async function loadAllMasterData() {
-    if (!GAS_URL) return;
+    const activeUrl = typeof GAS_URL !== 'undefined' ? GAS_URL : localStorage.getItem('SDIT_GAS_URL');
+    if (!activeUrl) return;
     
     Swal.fire({ 
         title: 'Memuat Data...', 
@@ -153,7 +156,7 @@ async function loadAllMasterData() {
     });
     
     try {
-        const response = await fetch(`${GAS_URL}?action=readAllMaster`);
+        const response = await fetch(`${activeUrl}?action=readAllMaster`);
         const result = await response.json();
         
         if (result.status === 'success') {
@@ -372,6 +375,7 @@ async function submitDynamicForm() {
     const action = document.getElementById('formAction').value;
     const form = document.getElementById('dynamicForm');
     const formData = new FormData(form);
+    const activeUrl = typeof GAS_URL !== 'undefined' ? GAS_URL : localStorage.getItem('SDIT_GAS_URL');
     
     const payload = {
         action: action,
@@ -391,7 +395,7 @@ async function submitDynamicForm() {
     Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
     try {
-        const response = await fetch(GAS_URL, {
+        const response = await fetch(activeUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
@@ -412,6 +416,8 @@ async function submitDynamicForm() {
 
 async function deleteRow(table, id) {
     const pkName = TABLE_SCHEMAS[table].find(f => f.primaryKey).name;
+    const activeUrl = typeof GAS_URL !== 'undefined' ? GAS_URL : localStorage.getItem('SDIT_GAS_URL');
+    
     const confirm = await Swal.fire({
         title: 'Hapus Data?',
         text: `Apakah Anda yakin ingin menghapus data dengan ${pkName}: ${id}?`,
@@ -431,7 +437,7 @@ async function deleteRow(table, id) {
                 data: { [pkName]: id }
             };
 
-            const response = await fetch(GAS_URL, {
+            const response = await fetch(activeUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
