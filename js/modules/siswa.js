@@ -16,8 +16,8 @@ function renderSiswaTable() {
     const info = getFilteredAndPaginatedData('Siswa');
 
     if (info.data.length === 0) {
-        // Colspan diubah menjadi 13 karena ada tambahan 2 kolom baru
-        tbody.innerHTML = `<tr><td colspan="13" class="text-center text-muted py-3"><i class="fas fa-info-circle me-1"></i> Data siswa tidak ditemukan.</td></tr>`;
+        // Colspan diubah menjadi 14 sesuai jumlah total kolom tabel Siswa
+        tbody.innerHTML = `<tr><td colspan="14" class="text-center text-muted py-3"><i class="fas fa-info-circle me-1"></i> Data siswa tidak ditemukan.</td></tr>`;
         renderPaginationControls('Siswa', info, renderSiswaTable);
         return;
     }
@@ -34,6 +34,7 @@ function renderSiswaTable() {
         const pekerjaanAyah = row.pekerjaan_ayah || row['Pekerjaan Ayah'] || '-';
         const ibu = row.nama_ibu || row.ibu || row.Ibu || '-';
         const pekerjaanIbu = row.pekerjaan_ibu || row['Pekerjaan Ibu'] || '-';
+        const alamat = row.alamat || row.Alamat || '-';
         const status = row.status_siswa || row.status || row.Status || 'Aktif';
 
         return `
@@ -49,6 +50,7 @@ function renderSiswaTable() {
                 <td>${ibu}</td>
                 <td>${pekerjaanIbu}</td>
                 <td>${row.no_hp_ortu || row['No HP Ortu'] || '-'}</td>
+                <td>${alamat}</td>
                 <td><span class="badge bg-primary">${status}</span></td>
                 <td>${renderActionButtons('Siswa', row.id_siswa)}</td>
             </tr>
@@ -83,6 +85,7 @@ function exportSiswaExcel() {
         'Nama Ibu': item.nama_ibu || item.ibu || item.Ibu || '-',
         'Pekerjaan Ibu': item.pekerjaan_ibu || item['Pekerjaan Ibu'] || '-',
         'No. HP Ortu': item.no_hp_ortu || item['No HP Ortu'] || '-',
+        'Alamat': item.alamat || item.Alamat || '-',
         'Status': item.status_siswa || item.status || item.Status || 'Aktif'
     }));
 
