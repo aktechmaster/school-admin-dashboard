@@ -1,16 +1,7 @@
 // CONFIG & STATE MANAGEMENT
-if (localStorage.getItem('SDIT_GAS_URL') && typeof GAS_URL !== 'undefined') {
-    try { GAS_URL = localStorage.getItem('SDIT_GAS_URL'); } catch (e) {}
+if (localStorage.getItem('SDIT_GAS_URL')) {
+    GAS_URL = localStorage.getItem('SDIT_GAS_URL');
 }
-
-let localData = { 
-    Users: [], 
-    Guru: [], 
-    Siswa: [], 
-    Kelas: [], 
-    Mapel: [], 
-    Jadwal: [] 
-};
 
 let crudModalInstance = null;
 
