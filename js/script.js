@@ -1,236 +1,19 @@
-// script.js
+// CONFIG & STATE MANAGEMENT
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyvPJwCpToLpXk0kNoJb67dV5Rm4ajZBLzxpJVJrTsQhQKa4qcYjyfIHZsimseDcdEL/exec';
+let GAS_URL = localStorage.getItem('SDIT_GAS_URL') || DEFAULT_GAS_URL;
 
-// CONFIG & STATE (Hardcoded Web App URL)
-let GAS_URL = 'https://script.google.com/macros/s/AKfycbyvPJwCpToLpXk0kNoJb67dV5Rm4ajZBLzxpJVJrTsQhQKa4qcYjyfIHZsimseDcdEL/exec';
-let localData = { Users: [], Guru: [], Siswa: [], Kelas: [], Mapel: [], Jadwal: [] };
-let crudModalInstance;
+let localData = { 
+    Users: [], 
+    Guru: [], 
+    Siswa: [], 
+    Kelas: [], 
+    Mapel: [], 
+    Jadwal: [] 
+};
 
-document.addEventListener('DOMContentLoaded', () => {
-    const modalEl = document.getElementById('crudModal');
-    if (modalEl) {
-        crudModalInstance = new bootstrap.Modal(modalEl);
-    }
+let crudModalInstance = null;
 
-    // Tampilkan URL terpasang di menu Pengaturan
-    const gasInput = document.getElementById('gas-url-input');
-    const displayUrl = document.getElementById('display-api-url');
-    
-    if (gasInput) gasInput.value = GAS_URL;
-    if (displayUrl) displayUrl.innerText = GAS_URL;
-
-    // Muat seluruh data master dari GAS saat pertama kali dibuka
-    loadAllMasterData();
-});
-
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('active');
-}
-
-function saveGasUrl() {
-    const url = document.getElementById('gas-url-input').value.trim();
-    if (!url) return Swal.fire('Error', 'URL tidak boleh kosong', 'error');
-    
-    localStorage.setItem('SDIT_GAS_URL', url);
-    GAS_URL = url;
-    document.getElementById('display-api-url').innerText = url;
-    Swal.fire('Berhasil', 'URL Web App GAS berhasil diperbarui!', 'success');
-    loadAllMasterData();
-}
-
-function showSection(sectionId, element) {
-    document.querySelectorAll('.content-section').forEach(el => el.classList.add('d-none'));
-    document.getElementById('sec-' + sectionId).classList.remove('d-none');
-    
-    document.querySelectorAll('#sidebar .nav-link').forEach(el => el.classList.remove('active'));
-    if (element) element.classList.add('active');
-
-    const titles = {
-        dashboard: 'Dashboard Overview',
-        users: 'Master Users',
-        guru: 'Master Guru',
-        siswa: 'Master Siswa',
-        kelas: 'Master Kelas',
-        mapel: 'Master Mapel',
-        jadwal: 'Master Jadwal Pelajaran',
-        settings: 'Pengaturan Koneksi API'
-    };
-    document.getElementById('page-title').innerText = titles[sectionId] || 'Dashboard Admin';
-}
-
-// ================= FETCH & RENDER API DATA =================
-async function loadAllMasterData() {
-    if (!GAS_URL) return;
-    
-    Swal.fire({ 
-        title: 'Memuat Data...', 
-        text: 'Mengambil data dari Google Sheets', 
-        allowOutsideClick: false, 
-        didOpen: () => Swal.showLoading() 
-    });
-    
-    try {
-        const response = await fetch(`${GAS_URL}?action=readAllMaster`);
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            localData = result.data;
-            updateDashboardKPI();
-            renderAllTables();
-            Swal.close();
-        } else {
-            throw new Error(result.message || 'Gagal memuat data');
-        }
-    } catch (error) {
-        console.error(error);
-        Swal.fire('Gagal Memuat Data', error.message || 'Periksa kembali koneksi atau URL Web App GAS Anda.', 'error');
-    }
-}
-
-function updateDashboardKPI() {
-    document.getElementById('kpi-siswa').innerText = (localData.Siswa || []).length;
-    document.getElementById('kpi-guru').innerText = (localData.Guru || []).length;
-    document.getElementById('kpi-kelas').innerText = (localData.Kelas || []).length;
-    document.getElementById('kpi-mapel').innerText = (localData.Mapel || []).length;
-}
-
-function renderAllTables() {
-    renderUsersTable();
-    renderGuruTable();
-    renderSiswaTable();
-    renderKelasTable();
-    renderMapelTable();
-    renderJadwalTable();
-}
-
-function renderUsersTable() {
-    const tbody = document.querySelector('#table-users tbody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = (localData.Users || []).map(row => `
-        <tr>
-            <td><b>${row.id_user || ''}</b></td>
-            <td>${row.username || ''}</td>
-            <td>${row.id_guru || '-'}</td>
-            <td><span class="badge bg-info">${row.role || ''}</span></td>
-            <td>${row.status_aktif ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>'}</td>
-            <td>${row.is_wali_kelas ? 'Ya' : 'Tidak'}</td>
-            <td>${row.is_wakur ? 'Ya' : 'Tidak'}</td>
-            <td>${row.is_t2q ? 'Ya' : 'Tidak'}</td>
-            <td>${row.is_bpi ? 'Ya' : 'Tidak'}</td>
-            <td>${row.is_ekstra ? 'Ya' : 'Tidak'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Users', '${row.id_user}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Users', '${row.id_user}')"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderGuruTable() {
-    const tbody = document.querySelector('#table-guru tbody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = (localData.Guru || []).map(row => `
-        <tr>
-            <td><b>${row.id_guru || ''}</b></td>
-            <td>${row.nip_nik || '-'}</td>
-            <td>${row.nama_lengkap || ''}</td>
-            <td>${row.jenis_kelamin || ''}</td>
-            <td>${row.no_hp || ''}</td>
-            <td>${row.email || ''}</td>
-            <td>${row.jabatan || ''}</td>
-            <td><span class="badge bg-secondary">${row.status_karyawan || ''}</span></td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Guru', '${row.id_guru}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Guru', '${row.id_guru}')"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderSiswaTable() {
-    const tbody = document.querySelector('#table-siswa tbody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = (localData.Siswa || []).map(row => `
-        <tr>
-            <td><b>${row.id_siswa || ''}</b></td>
-            <td>${row.nisn || '-'}</td>
-            <td>${row.nis || '-'}</td>
-            <td>${row.nama_siswa || ''}</td>
-            <td>${row.jenis_kelamin || ''}</td>
-            <td>${row.id_kelas || ''}</td>
-            <td>${row.nama_ayah || ''}</td>
-            <td>${row.nama_ibu || ''}</td>
-            <td>${row.no_hp_ortu || ''}</td>
-            <td><span class="badge bg-primary">${row.status_siswa || 'Aktif'}</span></td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Siswa', '${row.id_siswa}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Siswa', '${row.id_siswa}')"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderKelasTable() {
-    const tbody = document.querySelector('#table-kelas tbody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = (localData.Kelas || []).map(row => `
-        <tr>
-            <td><b>${row.id_kelas || ''}</b></td>
-            <td>${row.nama_kelas || ''}</td>
-            <td>Tingkat ${row.tingkat || ''}</td>
-            <td>${row.id_wali_kelas || '-'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Kelas', '${row.id_kelas}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Kelas', '${row.id_kelas}')"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderMapelTable() {
-    const tbody = document.querySelector('#table-mapel tbody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = (localData.Mapel || []).map(row => `
-        <tr>
-            <td><b>${row.id_mapel || ''}</b></td>
-            <td>${row.kode_mapel || ''}</td>
-            <td>${row.nama_mapel || ''}</td>
-            <td><span class="badge bg-info text-dark">${row.kategori || 'Umum'}</span></td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Mapel', '${row.id_mapel}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Mapel', '${row.id_mapel}')"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderJadwalTable() {
-    const tbody = document.querySelector('#table-jadwal tbody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = (localData.Jadwal || []).map(row => `
-        <tr>
-            <td><b>${row.id_jadwal || ''}</b></td>
-            <td>${row.hari || ''}</td>
-            <td>Jam Ke-${row.jam_ke || ''}</td>
-            <td>${row.id_kelas || ''}</td>
-            <td>${row.id_mapel || ''}</td>
-            <td>${row.id_guru || ''}</td>
-            <td>${row.tahun_ajaran || ''}</td>
-            <td>Semester ${row.semester || ''}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Jadwal', '${row.id_jadwal}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Jadwal', '${row.id_jadwal}')"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// ================= DYNAMIC FORM GENERATOR =================
+// SCHEMAS MASTER DATA
 const TABLE_SCHEMAS = {
     Users: [
         { name: 'id_user', label: 'ID User', type: 'text', primaryKey: true },
@@ -293,6 +76,243 @@ const TABLE_SCHEMAS = {
     ]
 };
 
+// INITIALIZATION
+document.addEventListener('DOMContentLoaded', () => {
+    const modalEl = document.getElementById('crudModal');
+    if (modalEl) {
+        crudModalInstance = new bootstrap.Modal(modalEl);
+    }
+
+    const dynamicForm = document.getElementById('dynamicForm');
+    if (dynamicForm) {
+        dynamicForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            submitDynamicForm();
+        });
+    }
+
+    syncSettingsUI();
+    loadAllMasterData();
+});
+
+// UI & SETTINGS HANDLERS
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('active');
+}
+
+function syncSettingsUI() {
+    const gasInput = document.getElementById('gas-url-input');
+    const displayUrl = document.getElementById('display-api-url');
+    if (gasInput) gasInput.value = GAS_URL;
+    if (displayUrl) displayUrl.innerText = GAS_URL;
+}
+
+function saveGasUrl() {
+    const url = document.getElementById('gas-url-input').value.trim();
+    if (!url) return Swal.fire('Error', 'URL tidak boleh kosong', 'error');
+    
+    localStorage.setItem('SDIT_GAS_URL', url);
+    GAS_URL = url;
+    syncSettingsUI();
+    Swal.fire('Berhasil', 'URL Web App GAS berhasil diperbarui!', 'success');
+    loadAllMasterData();
+}
+
+function showSection(sectionId, element) {
+    document.querySelectorAll('.content-section').forEach(el => el.classList.add('d-none'));
+    const targetSection = document.getElementById('sec-' + sectionId);
+    if (targetSection) targetSection.classList.remove('d-none');
+    
+    document.querySelectorAll('#sidebar .nav-link').forEach(el => el.classList.remove('active'));
+    if (element) element.classList.add('active');
+
+    const titles = {
+        dashboard: 'Dashboard Overview',
+        users: 'Master Users',
+        guru: 'Master Guru',
+        siswa: 'Master Siswa',
+        kelas: 'Master Kelas',
+        mapel: 'Master Mapel',
+        jadwal: 'Master Jadwal Pelajaran',
+        settings: 'Pengaturan Koneksi API'
+    };
+    const titleEl = document.getElementById('page-title');
+    if (titleEl) titleEl.innerText = titles[sectionId] || 'Dashboard Admin';
+}
+
+// FETCH & RENDER API DATA
+async function loadAllMasterData() {
+    if (!GAS_URL) return;
+    
+    Swal.fire({ 
+        title: 'Memuat Data...', 
+        text: 'Mengambil data dari Google Sheets', 
+        allowOutsideClick: false, 
+        didOpen: () => Swal.showLoading() 
+    });
+    
+    try {
+        const response = await fetch(`${GAS_URL}?action=readAllMaster`);
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            localData = result.data;
+            updateDashboardKPI();
+            renderAllTables();
+            Swal.close();
+        } else {
+            throw new Error(result.message || 'Gagal memuat data');
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire('Gagal Memuat Data', error.message || 'Periksa kembali koneksi atau URL Web App GAS Anda.', 'error');
+    }
+}
+
+function updateDashboardKPI() {
+    const setKPI = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+    };
+    setKPI('kpi-siswa', (localData.Siswa || []).length);
+    setKPI('kpi-guru', (localData.Guru || []).length);
+    setKPI('kpi-kelas', (localData.Kelas || []).length);
+    setKPI('kpi-mapel', (localData.Mapel || []).length);
+}
+
+function renderAllTables() {
+    renderUsersTable();
+    renderGuruTable();
+    renderSiswaTable();
+    renderKelasTable();
+    renderMapelTable();
+    renderJadwalTable();
+}
+
+function renderUsersTable() {
+    const tbody = document.querySelector('#table-users tbody');
+    if (!tbody) return;
+    tbody.innerHTML = (localData.Users || []).map(row => `
+        <tr>
+            <td><b>${row.id_user || ''}</b></td>
+            <td>${row.username || ''}</td>
+            <td>${row.id_guru || '-'}</td>
+            <td><span class="badge bg-info">${row.role || ''}</span></td>
+            <td>${row.status_aktif ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>'}</td>
+            <td>${row.is_wali_kelas ? 'Ya' : 'Tidak'}</td>
+            <td>${row.is_wakur ? 'Ya' : 'Tidak'}</td>
+            <td>${row.is_t2q ? 'Ya' : 'Tidak'}</td>
+            <td>${row.is_bpi ? 'Ya' : 'Tidak'}</td>
+            <td>${row.is_ekstra ? 'Ya' : 'Tidak'}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Users', '${row.id_user}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Users', '${row.id_user}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderGuruTable() {
+    const tbody = document.querySelector('#table-guru tbody');
+    if (!tbody) return;
+    tbody.innerHTML = (localData.Guru || []).map(row => `
+        <tr>
+            <td><b>${row.id_guru || ''}</b></td>
+            <td>${row.nip_nik || '-'}</td>
+            <td>${row.nama_lengkap || ''}</td>
+            <td>${row.jenis_kelamin || ''}</td>
+            <td>${row.no_hp || ''}</td>
+            <td>${row.email || ''}</td>
+            <td>${row.jabatan || ''}</td>
+            <td><span class="badge bg-secondary">${row.status_karyawan || ''}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Guru', '${row.id_guru}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Guru', '${row.id_guru}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderSiswaTable() {
+    const tbody = document.querySelector('#table-siswa tbody');
+    if (!tbody) return;
+    tbody.innerHTML = (localData.Siswa || []).map(row => `
+        <tr>
+            <td><b>${row.id_siswa || ''}</b></td>
+            <td>${row.nisn || '-'}</td>
+            <td>${row.nis || '-'}</td>
+            <td>${row.nama_siswa || ''}</td>
+            <td>${row.jenis_kelamin || ''}</td>
+            <td>${row.id_kelas || ''}</td>
+            <td>${row.nama_ayah || ''}</td>
+            <td>${row.nama_ibu || ''}</td>
+            <td>${row.no_hp_ortu || ''}</td>
+            <td><span class="badge bg-primary">${row.status_siswa || 'Aktif'}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Siswa', '${row.id_siswa}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Siswa', '${row.id_siswa}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderKelasTable() {
+    const tbody = document.querySelector('#table-kelas tbody');
+    if (!tbody) return;
+    tbody.innerHTML = (localData.Kelas || []).map(row => `
+        <tr>
+            <td><b>${row.id_kelas || ''}</b></td>
+            <td>${row.nama_kelas || ''}</td>
+            <td>Tingkat ${row.tingkat || ''}</td>
+            <td>${row.id_wali_kelas || '-'}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Kelas', '${row.id_kelas}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Kelas', '${row.id_kelas}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderMapelTable() {
+    const tbody = document.querySelector('#table-mapel tbody');
+    if (!tbody) return;
+    tbody.innerHTML = (localData.Mapel || []).map(row => `
+        <tr>
+            <td><b>${row.id_mapel || ''}</b></td>
+            <td>${row.kode_mapel || ''}</td>
+            <td>${row.nama_mapel || ''}</td>
+            <td><span class="badge bg-info text-dark">${row.kategori || 'Umum'}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Mapel', '${row.id_mapel}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Mapel', '${row.id_mapel}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderJadwalTable() {
+    const tbody = document.querySelector('#table-jadwal tbody');
+    if (!tbody) return;
+    tbody.innerHTML = (localData.Jadwal || []).map(row => `
+        <tr>
+            <td><b>${row.id_jadwal || ''}</b></td>
+            <td>${row.hari || ''}</td>
+            <td>Jam Ke-${row.jam_ke || ''}</td>
+            <td>${row.id_kelas || ''}</td>
+            <td>${row.id_mapel || ''}</td>
+            <td>${row.id_guru || ''}</td>
+            <td>${row.tahun_ajaran || ''}</td>
+            <td>Semester ${row.semester || ''}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning me-1" onclick="editRow('Jadwal', '${row.id_jadwal}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow('Jadwal', '${row.id_jadwal}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// FORM GENERATOR & MODAL CONTROL
 function openModal(table, data = null) {
     document.getElementById('formTable').value = table;
     document.getElementById('formAction').value = data ? 'update' : 'create';
@@ -335,7 +355,7 @@ function openModal(table, data = null) {
         fieldsContainer.insertAdjacentHTML('beforeend', fieldHtml);
     });
     
-    crudModalInstance.show();
+    if (crudModalInstance) crudModalInstance.show();
 }
 
 function editRow(table, id) {
@@ -346,7 +366,7 @@ function editRow(table, id) {
     }
 }
 
-// ================= CRUD ACTIONS (POST TO GAS) =================
+// CRUD ACTIONS (POST TO GAS)
 async function submitDynamicForm() {
     const table = document.getElementById('formTable').value;
     const action = document.getElementById('formAction').value;
@@ -379,7 +399,7 @@ async function submitDynamicForm() {
         const res = await response.json();
 
         if (res.status === 'success') {
-            crudModalInstance.hide();
+            if (crudModalInstance) crudModalInstance.hide();
             Swal.fire('Berhasil!', res.message || 'Data berhasil disimpan.', 'success');
             loadAllMasterData();
         } else {
