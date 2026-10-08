@@ -128,5 +128,3 @@ function renderAllModules() {
         applyRolePermissions();
     }
 }
-
-
