@@ -42,8 +42,9 @@ function exportToExcel(dataArray, fileName = 'Data_Export', sheetName = 'Sheet1'
  * Mencetak atau Mengunduh PDF dari Tabel HTML
  * @param {String} tableId - ID dari elemen <table>
  * @param {String} title - Judul Laporan yang akan muncul di atas tabel
+ * @param {String} orientation - Orientasi halaman ('p' untuk portrait, 'l' untuk landscape)
  */
-function exportTableToPDF(tableId, title = 'Laporan Data') {
+function exportTableToPDF(tableId, title = 'Laporan Data', orientation = 'l') {
     const tableEl = document.getElementById(tableId);
     if (!tableEl) {
         Swal.fire('Error', 'Elemen tabel tidak ditemukan.', 'error');
@@ -52,7 +53,8 @@ function exportTableToPDF(tableId, title = 'Laporan Data') {
 
     try {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4'); // Portrait, Millimeter, A4
+        // Default landscape ('l') disarankan agar tabel dengan kolom banyak (termasuk Alamat) muat dengan baik
+        const doc = new jsPDF(orientation, 'mm', 'a4');
 
         // Judul Laporan
         doc.setFontSize(16);
@@ -66,7 +68,7 @@ function exportTableToPDF(tableId, title = 'Laporan Data') {
             startY: 28,
             theme: 'grid',
             headStyles: { fillColor: [13, 110, 253] }, // Warna biru Bootstrap
-            styles: { fontSize: 8, cellPadding: 2 },
+            styles: { fontSize: 7, cellPadding: 1.5, overflow: 'linebreak' },
             margin: { top: 28 }
         });
 
@@ -103,6 +105,7 @@ function printReportSection(elementId, title = 'Cetak Dokumen') {
                 body { font-family: 'Poppins', sans-serif; padding: 20px; }
                 @media print {
                     .no-print { display: none !important; }
+                    @page { size: landscape; }
                 }
             </style>
         </head>
