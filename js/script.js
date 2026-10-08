@@ -1,12 +1,3 @@
-if (window.SDIT_ADMIN_APP_LOADED) {
-    console.warn('School Admin Dashboard already initialized. Skipping duplicate script execution.');
-} else {
-    window.SDIT_ADMIN_APP_LOADED = true;
-
-    // CONFIG & STATE MANAGEMENT
-
-    var crudModalInstance = null;
-
     // SCHEMAS MASTER DATA
     var TABLE_SCHEMAS = {
         Users: [
