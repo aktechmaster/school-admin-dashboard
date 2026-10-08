@@ -67,6 +67,7 @@ function getTableSchema(table) {
             { name: 'nama_ibu', label: 'Nama Ibu', type: 'text' },
             { name: 'pekerjaan_ibu', label: 'Pekerjaan Ibu', type: 'text' },
             { name: 'no_hp_ortu', label: 'No HP Orang Tua', type: 'text' },
+            { name: 'alamat', label: 'Alamat', type: 'text', placeholder: 'Alamat Lengkap' },
             { name: 'status_siswa', label: 'Status Siswa', type: 'select', options: ['Aktif', 'Lulus', 'Pindah', 'Keluar'] }
         ],
         Kelas: [
