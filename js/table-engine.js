@@ -12,6 +12,62 @@ let tableState = {
 };
 
 /**
+ * Membuat Modal Bootstrap dapat digeser (Draggable)
+ */
+function makeModalDraggable(modalId) {
+    const modalEl = document.getElementById(modalId);
+    if (!modalEl) return;
+
+    const modalHeader = modalEl.querySelector('.modal-header');
+    const modalDialog = modalEl.querySelector('.modal-dialog');
+    if (!modalHeader || !modalDialog) return;
+
+    if (modalHeader.dataset.draggableBound === 'true') return;
+    modalHeader.dataset.draggableBound = 'true';
+
+    modalHeader.style.cursor = 'move';
+    modalHeader.style.userSelect = 'none';
+
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    modalHeader.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.btn-close') || e.target.closest('button')) return;
+
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+
+        const rect = modalDialog.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+
+        modalDialog.style.margin = '0';
+        modalDialog.style.position = 'fixed';
+        modalDialog.style.left = `${initialLeft}px`;
+        modalDialog.style.top = `${initialTop}px`;
+
+        const onMouseMove = (moveEvent) => {
+            if (!isDragging) return;
+            const dx = moveEvent.clientX - startX;
+            const dy = moveEvent.clientY - startY;
+
+            modalDialog.style.left = `${initialLeft + dx}px`;
+            modalDialog.style.top = `${initialTop + dy}px`;
+        };
+
+        const onMouseUp = () => {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
+}
+
+/**
  * Mengambil Schema Table secara Dinamis
  */
 function getTableSchema(table) {
@@ -130,6 +186,15 @@ function getTableSchema(table) {
 }
 
 function openModal(table, data = null) {
+    // Reset posisi modal dialog ke posisi awal (tengah) setiap kali dibuka
+    const modalDialog = document.querySelector('#crudModal .modal-dialog');
+    if (modalDialog) {
+        modalDialog.style.position = '';
+        modalDialog.style.left = '';
+        modalDialog.style.top = '';
+        modalDialog.style.margin = '';
+    }
+
     document.getElementById('formTable').value = table;
     document.getElementById('formAction').value = data ? 'update' : 'create';
     document.getElementById('modalTitle').innerText = (data ? 'Edit Data ' : 'Tambah Data ') + table;
@@ -182,6 +247,9 @@ function openModal(table, data = null) {
         if (modalEl) crudModalInstance = new bootstrap.Modal(modalEl);
     }
     
+    // Inisialisasi fitur geser (draggable)
+    makeModalDraggable('crudModal');
+
     if (crudModalInstance) crudModalInstance.show();
 }
 
