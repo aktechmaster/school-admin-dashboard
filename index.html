@@ -324,12 +324,20 @@
         </div>
     </div>
 
-    <!-- 1. Konfigurasi & Engine Dynamic -->
+    <!-- 1. Pustaka Pihak Ketiga (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- 2. Konfigurasi Global -->
     <script src="js/config.js"></script>
+
+    <!-- 3. Engine Utama -->
     <script src="js/table-engine.js"></script>
     <script src="js/export-engine.js"></script>
+    <script src="js/import-engine.js"></script>
 
-    <!-- 2. Modul Komponen -->
+    <!-- 4. Modul Fitur/Komponen -->
     <script src="js/modules/beranda.js"></script>
     <script src="js/modules/users.js"></script>
     <script src="js/modules/guru.js"></script>
@@ -337,20 +345,9 @@
     <script src="js/modules/kelas.js"></script>
     <script src="js/modules/mapel.js"></script>
     <script src="js/modules/jadwal.js"></script>
+
+    <!-- 5. Autentikasi & Controller Utama -->
     <script src="js/auth.js"></script>
-
-    <!-- 3. App Controller Utama -->
     <script src="js/script.js"></script>
-
-    <!-- CDN untuk Export & Import Excel (SheetJS / XLSX) -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-    <!-- CDN untuk Export PDF (jsPDF + AutoTable) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
-    <!-- Script Engine Import -->
-    <script src="js/import-engine.js"></script>
-    
 </body>
 </html>
