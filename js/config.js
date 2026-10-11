@@ -7,8 +7,10 @@ let localData = {
     Siswa: [],
     Kelas: [],
     Mapel: [],
-    Jadwal: []
+    Jadwal: [],
+    Tim_Pengajar: []
 };
+
 // Penampung state pencarian, filter, & paginasi per tabel
 const tableStates = {};
 
