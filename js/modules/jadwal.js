@@ -57,9 +57,18 @@ function renderJadwalTable() {
 }
 
 /**
- * Membuka Modal Matriks Jadwal Kelas & Mengisi Dropdown Kelas
+ * Membuka Modal Matriks Jadwal Kelas, Mengaktifkan Fitur Draggable, & Mengisi Dropdown Kelas
  */
 function openModalGridJadwal() {
+    // Reset posisi modal dialog ke posisi awal (tengah) setiap kali dibuka
+    const modalDialog = document.querySelector('#modalGridJadwal .modal-dialog');
+    if (modalDialog) {
+        modalDialog.style.position = '';
+        modalDialog.style.left = '';
+        modalDialog.style.top = '';
+        modalDialog.style.margin = '';
+    }
+
     const selectKelas = document.getElementById('grid-select-kelas');
     if (!selectKelas) return;
 
@@ -73,6 +82,11 @@ function openModalGridJadwal() {
             <td colspan="6" class="text-muted py-4">Silakan pilih kelas di atas terlebih dahulu untuk menampilkan grid jadwal.</td>
         </tr>
     `;
+
+    // Inisialisasi fitur geser (Draggable) pada modal matriks
+    if (typeof makeModalDraggable === 'function') {
+        makeModalDraggable('modalGridJadwal');
+    }
 
     // Tampilkan Modal
     const modalEl = document.getElementById('modalGridJadwal');
@@ -98,7 +112,7 @@ function renderGridJadwal() {
     }
 
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-    const maxJam = 10; // Ditingkatkan menjadi 10 Jam Pelajaran per Hari
+    const maxJam = 10; // 10 Jam Pelajaran per Hari
 
     // Ambil data jadwal yang sudah ada untuk kelas ini (jika pernah diinput sebelumnya)
     const existingJadwal = {};
@@ -123,15 +137,21 @@ function renderGridJadwal() {
 
         hariList.forEach(hari => {
             const key = `${hari}_${jam}`;
-            const existingData = existingJadwal[key] || {};
 
             rowsHTML += `
                 <td class="p-1">
-                    <select class="form-select form-select-sm mb-1 grid-mapel-select" data-hari="${hari}" data-jam="${jam}" style="font-size: 0.78rem;">
+                    <!-- Dropdown Mapel: Biru Muda -->
+                    <select class="form-select form-select-sm mb-1 grid-mapel-select" data-hari="${hari}" data-jam="${jam}" 
+                            style="font-size: 0.78rem; background-color: #e7f1ff; border-color: #9ec5fe; color: #084298; font-weight: 600;" 
+                            title="Pilih Mata Pelajaran">
                         <option value="">-- Select Mapel --</option>
                         ${mapelOptionsHTML}
                     </select>
-                    <select class="form-select form-select-sm grid-guru-select" data-hari="${hari}" data-jam="${jam}" style="font-size: 0.78rem;">
+
+                    <!-- Dropdown Guru: Hijau Muda -->
+                    <select class="form-select form-select-sm grid-guru-select" data-hari="${hari}" data-jam="${jam}" 
+                            style="font-size: 0.78rem; background-color: #e8f5e9; border-color: #a5d6a7; color: #0f5132; font-weight: 600;" 
+                            title="Pilih Guru Pengajar">
                         <option value="">-- Select Guru --</option>
                         ${guruOptionsHTML}
                     </select>
@@ -172,7 +192,7 @@ async function simpanBatchJadwal() {
     }
 
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-    const maxJam = 10; // Ditingkatkan menjadi 10 Jam Pelajaran per Hari
+    const maxJam = 10;
     const batchData = [];
 
     hariList.forEach(hari => {
