@@ -117,7 +117,7 @@ function renderGridJadwal() {
     // Ambil data jadwal yang sudah ada untuk kelas ini (jika pernah diinput sebelumnya)
     const existingJadwal = {};
     (localData.Jadwal || []).forEach(j => {
-        if (j.id_kelas === idKelas) {
+        if (String(j.id_kelas) === String(idKelas)) {
             existingJadwal[`${j.hari}_${j.jam_ke}`] = j;
         }
     });
@@ -136,8 +136,6 @@ function renderGridJadwal() {
         rowsHTML += `<td class="fw-bold bg-light align-middle">Jam ${jam}</td>`;
 
         hariList.forEach(hari => {
-            const key = `${hari}_${jam}`;
-
             rowsHTML += `
                 <td class="p-1">
                     <!-- Dropdown Mapel: Biru Muda -->
@@ -180,7 +178,8 @@ function renderGridJadwal() {
 }
 
 /**
- * Mengumpulkan semua data dari Grid Matriks dan mengirimikannya secara Batch/Massal ke Google Sheets Backend
+ * Mengumpulkan semua data dari Grid Matriks dan mengirimkannya secara Batch/Massal ke Google Sheets Backend
+ * Mempertahankan id_jadwal jika slot tersebut sudah ada sebelumnya.
  */
 async function simpanBatchJadwal() {
     const idKelas = document.getElementById('grid-select-kelas').value;
@@ -190,6 +189,14 @@ async function simpanBatchJadwal() {
     if (!idKelas) {
         return Swal.fire('Peringatan', 'Silakan pilih kelas terlebih dahulu!', 'warning');
     }
+
+    // Mapping jadwal eksis untuk mempertahankan id_jadwal lama
+    const existingJadwal = {};
+    (localData.Jadwal || []).forEach(j => {
+        if (String(j.id_kelas) === String(idKelas)) {
+            existingJadwal[`${j.hari}_${j.jam_ke}`] = j;
+        }
+    });
 
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
     const maxJam = 10;
@@ -205,7 +212,10 @@ async function simpanBatchJadwal() {
 
             // Hanya proses slot yang dipilih mata pelajarannya
             if (idMapel) {
+                const existing = existingJadwal[`${hari}_${jam}`];
+                
                 batchData.push({
+                    id_jadwal: existing ? (existing.id_jadwal || existing['ID Jadwal'] || '') : '', // Tetapkan ID lama jika ada
                     hari: hari,
                     jam_ke: jam,
                     id_kelas: idKelas,
