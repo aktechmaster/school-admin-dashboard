@@ -81,7 +81,7 @@ function openModalGridJadwal() {
 }
 
 /**
- * Generasi Tabel Grid Mingguan (Senin-Jumat vs Jam 1-9) berdasarkan Kelas yang dipilih
+ * Generasi Tabel Grid Mingguan (Senin-Jumat vs Jam 1-10) berdasarkan Kelas yang dipilih
  */
 function renderGridJadwal() {
     const idKelas = document.getElementById('grid-select-kelas').value;
@@ -98,7 +98,7 @@ function renderGridJadwal() {
     }
 
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-    const maxJam = 9; // Jumlah jam pelajaran per hari
+    const maxJam = 10; // Ditingkatkan menjadi 10 Jam Pelajaran per Hari
 
     // Ambil data jadwal yang sudah ada untuk kelas ini (jika pernah diinput sebelumnya)
     const existingJadwal = {};
@@ -160,7 +160,7 @@ function renderGridJadwal() {
 }
 
 /**
- * Mengumpulkan semua data dari Grid Matriks dan mengirimkannya secara Batch/Massal ke Google Sheets Backend
+ * Mengumpulkan semua data dari Grid Matriks dan mengirimikannya secara Batch/Massal ke Google Sheets Backend
  */
 async function simpanBatchJadwal() {
     const idKelas = document.getElementById('grid-select-kelas').value;
@@ -172,7 +172,7 @@ async function simpanBatchJadwal() {
     }
 
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-    const maxJam = 10;
+    const maxJam = 10; // Ditingkatkan menjadi 10 Jam Pelajaran per Hari
     const batchData = [];
 
     hariList.forEach(hari => {
