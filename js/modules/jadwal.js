@@ -57,6 +57,200 @@ function renderJadwalTable() {
 }
 
 /**
+ * Membuka Modal Matriks Jadwal Kelas & Mengisi Dropdown Kelas
+ */
+function openModalGridJadwal() {
+    const selectKelas = document.getElementById('grid-select-kelas');
+    if (!selectKelas) return;
+
+    // Reset dan isi opsi kelas
+    selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
+        (localData.Kelas || []).map(k => `<option value="${k.id_kelas}">${k.nama_kelas}</option>`).join('');
+
+    // Reset grid ke tampilan kosong
+    document.getElementById('tbody-grid-jadwal').innerHTML = `
+        <tr>
+            <td colspan="6" class="text-muted py-4">Silakan pilih kelas di atas terlebih dahulu untuk menampilkan grid jadwal.</td>
+        </tr>
+    `;
+
+    // Tampilkan Modal
+    const modalEl = document.getElementById('modalGridJadwal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+/**
+ * Generasi Tabel Grid Mingguan (Senin-Jumat vs Jam 1-9) berdasarkan Kelas yang dipilih
+ */
+function renderGridJadwal() {
+    const idKelas = document.getElementById('grid-select-kelas').value;
+    const tbody = document.getElementById('tbody-grid-jadwal');
+    if (!tbody) return;
+
+    if (!idKelas) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-muted py-4">Silakan pilih kelas di atas terlebih dahulu untuk menampilkan grid jadwal.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+    const maxJam = 9; // Jumlah jam pelajaran per hari
+
+    // Ambil data jadwal yang sudah ada untuk kelas ini (jika pernah diinput sebelumnya)
+    const existingJadwal = {};
+    (localData.Jadwal || []).forEach(j => {
+        if (j.id_kelas === idKelas) {
+            existingJadwal[`${j.hari}_${j.jam_ke}`] = j;
+        }
+    });
+
+    // Opsi Mapel & Guru
+    const mapelOptionsHTML = (localData.Mapel || [])
+        .map(m => `<option value="${m.id_mapel}">${m.nama_mapel}</option>`).join('');
+    
+    const guruOptionsHTML = (localData.Guru || [])
+        .map(g => `<option value="${g.id_guru}">${g.nama_lengkap}</option>`).join('');
+
+    let rowsHTML = '';
+
+    for (let jam = 1; jam <= maxJam; jam++) {
+        rowsHTML += `<tr>`;
+        rowsHTML += `<td class="fw-bold bg-light align-middle">Jam ${jam}</td>`;
+
+        hariList.forEach(hari => {
+            const key = `${hari}_${jam}`;
+            const existingData = existingJadwal[key] || {};
+            const selectedMapel = existingData.id_mapel || '';
+            const selectedGuru = existingData.id_guru || '';
+
+            rowsHTML += `
+                <td class="p-1">
+                    <select class="form-select form-select-sm mb-1 grid-mapel-select" data-hari="${hari}" data-jam="${jam}" style="font-size: 0.78rem;">
+                        <option value="">-- Select Mapel --</option>
+                        ${mapelOptionsHTML}
+                    </select>
+                    <select class="form-select form-select-sm grid-guru-select" data-hari="${hari}" data-jam="${jam}" style="font-size: 0.78rem;">
+                        <option value="">-- Select Guru --</option>
+                        ${guruOptionsHTML}
+                    </select>
+                </td>
+            `;
+        });
+
+        rowsHTML += `</tr>`;
+    }
+
+    tbody.innerHTML = rowsHTML;
+
+    // Pre-select data terisi jika ada jadwal eksis
+    for (let jam = 1; jam <= maxJam; jam++) {
+        hariList.forEach(hari => {
+            const key = `${hari}_${jam}`;
+            const existingData = existingJadwal[key];
+            if (existingData) {
+                const mapelSel = tbody.querySelector(`.grid-mapel-select[data-hari="${hari}"][data-jam="${jam}"]`);
+                const guruSel = tbody.querySelector(`.grid-guru-select[data-hari="${hari}"][data-jam="${jam}"]`);
+                if (mapelSel && existingData.id_mapel) mapelSel.value = existingData.id_mapel;
+                if (guruSel && existingData.id_guru) guruSel.value = existingData.id_guru;
+            }
+        });
+    }
+}
+
+/**
+ * Mengumpulkan semua data dari Grid Matriks dan mengirimkannya secara Batch/Massal ke Google Sheets Backend
+ */
+async function simpanBatchJadwal() {
+    const idKelas = document.getElementById('grid-select-kelas').value;
+    const tahunAjaran = document.getElementById('grid-tahun-ajaran').value;
+    const semester = document.getElementById('grid-semester').value;
+
+    if (!idKelas) {
+        return Swal.fire('Peringatan', 'Silakan pilih kelas terlebih dahulu!', 'warning');
+    }
+
+    const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+    const maxJam = 9;
+    const batchData = [];
+
+    hariList.forEach(hari => {
+        for (let jam = 1; jam <= maxJam; jam++) {
+            const mapelSel = document.querySelector(`.grid-mapel-select[data-hari="${hari}"][data-jam="${jam}"]`);
+            const guruSel = document.querySelector(`.grid-guru-select[data-hari="${hari}"][data-jam="${jam}"]`);
+
+            const idMapel = mapelSel ? mapelSel.value : '';
+            const idGuru = guruSel ? guruSel.value : '';
+
+            // Hanya proses slot yang dipilih mata pelajarannya
+            if (idMapel) {
+                batchData.push({
+                    hari: hari,
+                    jam_ke: jam,
+                    id_kelas: idKelas,
+                    id_mapel: idMapel,
+                    id_guru: idGuru,
+                    tahun_ajaran: tahunAjaran,
+                    semester: semester
+                });
+            }
+        }
+    });
+
+    if (batchData.length === 0) {
+        return Swal.fire('Peringatan', 'Belum ada mata pelajaran yang dipilih pada grid jadwal.', 'warning');
+    }
+
+    // Tampilkan Loading
+    Swal.fire({
+        title: 'Menyimpan Jadwal Kelas...',
+        text: `Memproses ${batchData.length} slot jam pelajaran sekaligus.`,
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    try {
+        const apiUrl = getApiUrl();
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            contentType: 'application/json',
+            body: JSON.stringify({
+                action: 'batchSaveJadwal',
+                table: 'Jadwal',
+                id_kelas: idKelas,
+                tahun_ajaran: tahunAjaran,
+                semester: semester,
+                data: batchData
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success' || result.result === 'success') {
+            Swal.fire('Berhasil!', `Jadwal kelas berhasil disimpan (${batchData.length} slot tersimpan).`, 'success');
+            
+            // Tutup modal
+            const modalEl = document.getElementById('modalGridJadwal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+            // Refresh data utama
+            if (typeof loadAllMasterData === 'function') {
+                loadAllMasterData();
+            }
+        } else {
+            throw new Error(result.message || 'Gagal menyimpan data jadwal.');
+        }
+    } catch (err) {
+        console.error('Error simpanBatchJadwal:', err);
+        Swal.fire('Error', 'Terjadi kesalahan saat menyimpan data: ' + err.message, 'error');
+    }
+}
+
+/**
  * Custom Export Excel Khusus Data Jadwal Pelajaran
  */
 function exportJadwalExcel() {
