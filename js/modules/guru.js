@@ -27,7 +27,7 @@ function calculateTotalJpGuru(idGuru) {
         teamIds.forEach(idTim => {
             const teamJadwal = jadwal.filter(j => String(j.id_guru) === String(idTim));
 
-            // Ambil slot jam unik agar kelas paralel tidak memicu double count (9 JP -> 3 JP)
+            // Ambil slot jam unik agar kelas paralel tidak memicu double count
             const uniqueSlots = new Set();
             teamJadwal.forEach(j => {
                 if (j.hari && j.jam_ke) {
@@ -73,7 +73,7 @@ function renderGuruTable() {
         const jkBadge = jk === 'L' ? 'bg-primary' : (jk === 'P' ? 'bg-danger' : 'bg-secondary');
         const statusBadge = status === 'Tetap' ? 'bg-success' : (status === '-' ? 'bg-secondary' : 'bg-info text-dark');
 
-        // Cek apakah ID Guru ini merupakan Tim / Dummy (misal: t2q-007, bpi-007, atau Pengajar T2Q)
+        // Cek apakah ID Guru ini merupakan akun Tim / Dummy
         const isTeamTeacher = String(idGuru).toLowerCase().startsWith('t2q') || 
                               String(idGuru).toLowerCase().startsWith('bpi') || 
                               String(row.nama_lengkap || '').toLowerCase().includes('pengajar');
@@ -91,17 +91,12 @@ function renderGuruTable() {
                 </button>
             `;
         } else {
-            // Jika guru biasa, tampilkan badge total JP beserta rinciannya
-            if (jpInfo.timJp > 0) {
-                jpDisplay = `
-                    <span class="badge bg-primary fw-bold" title="${jpInfo.mandiriJp} JP Mandiri + ${jpInfo.timJp} JP Tim T2Q/BPI">
-                        ${jpInfo.totalJp} JP
-                    </span>
-                    <small class="d-block text-muted" style="font-size: 0.68rem;">(${jpInfo.mandiriJp} M + ${jpInfo.timJp} Tim)</small>
-                `;
-            } else {
-                jpDisplay = `<span class="badge bg-primary fw-bold">${jpInfo.totalJp} JP</span>`;
-            }
+            // Tampilkan badge total JP secara bersih tanpa keterangan M/Tim di bawahnya
+            jpDisplay = `
+                <span class="badge bg-primary fw-bold" title="${jpInfo.mandiriJp} JP Mandiri + ${jpInfo.timJp} JP Tim T2Q/BPI">
+                    ${jpInfo.totalJp} JP
+                </span>
+            `;
         }
 
         return `
