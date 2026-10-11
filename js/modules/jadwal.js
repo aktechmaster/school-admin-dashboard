@@ -124,8 +124,6 @@ function renderGridJadwal() {
         hariList.forEach(hari => {
             const key = `${hari}_${jam}`;
             const existingData = existingJadwal[key] || {};
-            const selectedMapel = existingData.id_mapel || '';
-            const selectedGuru = existingData.id_guru || '';
 
             rowsHTML += `
                 <td class="p-1">
@@ -213,10 +211,9 @@ async function simpanBatchJadwal() {
     });
 
     try {
-        const apiUrl = getApiUrl();
-        const response = await fetch(apiUrl, {
+        const response = await fetch(GAS_URL, {
             method: 'POST',
-            contentType: 'application/json',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
                 action: 'batchSaveJadwal',
                 table: 'Jadwal',
@@ -229,8 +226,8 @@ async function simpanBatchJadwal() {
 
         const result = await response.json();
 
-        if (result.status === 'success' || result.result === 'success') {
-            Swal.fire('Berhasil!', `Jadwal kelas berhasil disimpan (${batchData.length} slot tersimpan).`, 'success');
+        if (result.status === 'success') {
+            Swal.fire('Berhasil!', result.message || `Jadwal kelas berhasil disimpan (${batchData.length} slot tersimpan).`, 'success');
             
             // Tutup modal
             const modalEl = document.getElementById('modalGridJadwal');
