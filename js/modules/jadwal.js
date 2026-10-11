@@ -172,7 +172,7 @@ async function simpanBatchJadwal() {
     }
 
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-    const maxJam = 9;
+    const maxJam = 10;
     const batchData = [];
 
     hariList.forEach(hari => {
