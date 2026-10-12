@@ -1,8 +1,6 @@
 // ==========================================
-// MODUL MASTER HALAQOH T2Q
+// MODUL MASTER HALAQOH T2Q (LINTAS KELAS)
 // ==========================================
-
-let massalT2QCounter = 0;
 
 function renderT2QTable() {
     const tbody = document.querySelector('#table-halaqoh_t2q tbody');
@@ -54,6 +52,9 @@ function renderT2QTable() {
     renderPaginationControls('Halaqoh_T2Q', info, renderT2QTable);
 }
 
+/**
+ * Membuka Modal Input Massal Lintas Kelas
+ */
 function openModalMassalT2Q() {
     const modalDialog = document.querySelector('#modalMassalT2Q .modal-dialog');
     if (modalDialog) {
@@ -63,16 +64,14 @@ function openModalMassalT2Q() {
         modalDialog.style.margin = '';
     }
 
-    const selectKelas = document.getElementById('massal-t2q-kelas');
-    if (!selectKelas) return;
+    const selectGuru = document.getElementById('massal-t2q-guru');
+    if (selectGuru) {
+        selectGuru.innerHTML = '<option value="">-- Pilih Pengajar T2Q --</option>' +
+            (localData.Guru || []).map(g => `<option value="${g.id_guru}">${g.nama_lengkap} (${g.id_guru})</option>`).join('');
+    }
 
-    selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
-        (localData.Kelas || []).map(k => `<option value="${k.id_kelas}">${k.nama_kelas}</option>`).join('');
-
-    document.getElementById('container-kelompok-t2q').innerHTML = `
-        <div class="text-center text-muted py-4">Silakan pilih kelas terlebih dahulu untuk mulai mengalokasikan siswa ke kelompok Halaqoh T2Q.</div>
-    `;
-    document.getElementById('btn-tambah-kelompok-t2q').style.display = 'none';
+    document.getElementById('massal-t2q-tingkat').value = '';
+    document.getElementById('wrapper-input-t2q').classList.add('d-none');
 
     if (typeof makeModalDraggable === 'function') {
         makeModalDraggable('modalMassalT2Q');
@@ -83,162 +82,157 @@ function openModalMassalT2Q() {
     modal.show();
 }
 
+/**
+ * Render Tabel Checklist Siswa Lintas Kelas berdasarkan Tingkat
+ */
 function renderFormMassalT2Q() {
-    const idKelas = document.getElementById('massal-t2q-kelas').value;
-    const container = document.getElementById('container-kelompok-t2q');
-    const btnTambah = document.getElementById('btn-tambah-kelompok-t2q');
+    const tingkat = document.getElementById('massal-t2q-tingkat').value;
+    const idGuru = document.getElementById('massal-t2q-guru').value;
+    const tahunAjaran = document.getElementById('massal-t2q-ta').value;
+    const semester = document.getElementById('massal-t2q-semester').value;
+    const wrapper = document.getElementById('wrapper-input-t2q');
+    const tbody = document.getElementById('tbody-siswa-t2q');
 
-    if (!idKelas) {
-        container.innerHTML = `
-            <div class="text-center text-muted py-4">Silakan pilih kelas terlebih dahulu untuk mulai mengalokasikan siswa ke kelompok Halaqoh T2Q.</div>
-        `;
-        btnTambah.style.display = 'none';
+    if (!tingkat || !idGuru) {
+        wrapper.classList.add('d-none');
         return;
     }
 
-    container.innerHTML = '';
-    massalT2QCounter = 0;
-    btnTambah.style.display = 'block';
+    wrapper.classList.remove('d-none');
 
-    // Buat kelompok Halaqoh pertama secara otomatis
-    tambahKelompokT2Q();
-}
+    // Set Default Nama Halaqoh
+    const guruObj = (localData.Guru || []).find(g => String(g.id_guru) === String(idGuru));
+    const namaGuru = guruObj ? guruObj.nama_lengkap : 'Pengajar';
+    document.getElementById('massal-t2q-nama-halaqoh').value = `Halaqoh ${namaGuru} - Tingkat ${tingkat}`;
 
-function tambahKelompokT2Q() {
-    massalT2QCounter++;
-    const idKelas = document.getElementById('massal-t2q-kelas').value;
-    const container = document.getElementById('container-kelompok-t2q');
+    // 1. Cari semua ID Kelas yang berada pada Tingkat tersebut
+    const kelasTingkat = (localData.Kelas || []).filter(k => String(k.tingkat) === String(tingkat));
+    const idKelasMap = {};
+    const namaKelasMap = {};
+    kelasTingkat.forEach(k => {
+        idKelasMap[k.id_kelas] = true;
+        namaKelasMap[k.id_kelas] = k.nama_kelas;
+    });
 
-    // Ambil daftar siswa yang berada di kelas pilihan ini
-    const siswaKelas = (localData.Siswa || []).filter(s => String(s.id_kelas) === String(idKelas));
+    // 2. Filter Siswa yang berada di kelas-kelas tingkat tersebut
+    const siswaTingkat = (localData.Siswa || []).filter(s => idKelasMap[s.id_kelas]);
 
-    // Pilihan Pengajar T2Q (Semua Guru)
-    const guruOptions = (localData.Guru || [])
-        .map(g => `<option value="${g.id_guru}">${g.nama_lengkap} (${g.id_guru})</option>`).join('');
-
-    let checklistSiswaHTML = '';
-    if (siswaKelas.length === 0) {
-        checklistSiswaHTML = `<div class="text-danger small p-2">Tidak ada siswa yang terdaftar pada kelas ini di Master Siswa.</div>`;
-    } else {
-        checklistSiswaHTML = `<div class="row g-2 p-2 border rounded bg-white max-h-250 overflow-auto" style="max-height: 220px;">`;
-        siswaKelas.forEach((s, idx) => {
-            checklistSiswaHTML += `
-                <div class="col-md-6 col-12">
-                    <div class="form-check py-1 border-bottom">
-                        <input class="form-check-input chk-siswa-t2q-${massalT2QCounter}" type="checkbox" value="${s.id_siswa}" id="chk_t2q_${massalT2QCounter}_${s.id_siswa}" onchange="updateCounterSiswaT2Q(${massalT2QCounter})">
-                        <label class="form-check-label small cursor-pointer" for="chk_t2q_${massalT2QCounter}_${s.id_siswa}">
-                            <b>${idx + 1}.</b> ${s.nama_siswa} <span class="text-muted">(${s.id_siswa})</span>
-                        </label>
-                    </div>
-                </div>
-            `;
-        });
-        checklistSiswaHTML += `</div>`;
+    if (siswaTingkat.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada siswa terdaftar pada Tingkat ${tingkat}.</td></tr>`;
+        updateCounterSiswaSelected();
+        return;
     }
 
-    const cardHTML = `
-        <div class="card mb-3 border shadow-sm card-kelompok-t2q" id="card-kelompok-t2q-${massalT2QCounter}" data-group-id="${massalT2QCounter}">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                <span class="fw-bold text-success"><i class="fas fa-users-class me-1"></i> Kelompok Halaqoh #${massalT2QCounter}</span>
-                <button type="button" class="btn btn-outline-danger btn-sm py-0 px-2" onclick="hapusKelompokT2Q(${massalT2QCounter})" title="Hapus Kelompok Ini">
-                    <i class="fas fa-times me-1"></i> Hapus Kelompok
-                </button>
-            </div>
-            <div class="card-body p-3">
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Nama Kelompok Halaqoh <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-sm input-nama-halaqoh" value="Halaqoh T2Q ${massalT2QCounter}" placeholder="Contoh: Halaqoh 1 / Halaqoh Al-Fatihah">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">2. Pilih Pengajar T2Q <span class="text-danger">*</span></label>
-                        <select class="form-select form-select-sm select-pengajar-t2q">
-                            <option value="">-- Pilih Pengajar T2Q --</option>
-                            ${guruOptions}
-                        </select>
-                    </div>
-                </div>
+    // 3. Mapping data Halaqoh T2Q eksis untuk mengecek status siswa saat ini
+    const mapHalaqohSiswa = {};
+    const mapGuruSiswa = {};
+    (localData.Halaqoh_T2Q || []).forEach(h => {
+        if (String(h.tahun_ajaran) === String(tahunAjaran) && String(h.semester) === String(semester)) {
+            mapHalaqohSiswa[h.id_siswa] = h;
+            const g = (localData.Guru || []).find(guru => String(guru.id_guru) === String(h.id_guru));
+            mapGuruSiswa[h.id_siswa] = g ? g.nama_lengkap : h.id_guru;
+        }
+    });
 
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label class="form-label fw-bold small mb-0">3. Pilih Siswa (1 Halaqoh Idealnya 10-15 Siswa) <span class="text-danger">*</span></label>
-                        <span class="badge bg-info text-dark" id="badge-count-t2q-${massalT2QCounter}">0 Siswa Terpilih</span>
-                    </div>
-                    ${checklistSiswaHTML}
-                </div>
-            </div>
-        </div>
-    `;
+    // 4. Render Baris Siswa
+    tbody.innerHTML = siswaTingkat.map((s, idx) => {
+        const halaqohEksis = mapHalaqohSiswa[s.id_siswa];
+        const isCurrentGuru = halaqohEksis && String(halaqohEksis.id_guru) === String(idGuru);
+        const isOtherGuru = halaqohEksis && String(halaqohEksis.id_guru) !== String(idGuru);
 
-    container.insertAdjacentHTML('beforeend', cardHTML);
+        let statusBadge = `<span class="badge bg-light text-muted border"><i class="fas fa-minus-circle me-1"></i>Belum Ada Halaqoh</span>`;
+        if (isCurrentGuru) {
+            statusBadge = `<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Halaqoh Ini</span>`;
+        } else if (isOtherGuru) {
+            const namaGuruLain = mapGuruSiswa[s.id_siswa] || 'Guru Lain';
+            statusBadge = `<span class="badge bg-warning text-dark"><i class="fas fa-user-tag me-1"></i>Halaqoh ${namaGuruLain}</span>`;
+        }
+
+        const isChecked = isCurrentGuru ? 'checked' : '';
+
+        return `
+            <tr class="row-siswa-t2q">
+                <td class="text-center small">${idx + 1}</td>
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input chk-siswa-massal" type="checkbox" value="${s.id_siswa}" data-id-kelas="${s.id_kelas}" id="chk_s_${s.id_siswa}" ${isChecked} onchange="updateCounterSiswaSelected()">
+                    </div>
+                </td>
+                <td>
+                    <label class="form-check-label fw-bold cursor-pointer small mb-0" for="chk_s_${s.id_siswa}">
+                        ${s.nama_siswa}
+                    </label>
+                    <div class="small text-muted" style="font-size: 0.75rem;">ID: ${s.id_siswa}</div>
+                </td>
+                <td><span class="badge bg-info text-dark">${namaKelasMap[s.id_kelas] || s.id_kelas}</span></td>
+                <td>${statusBadge}</td>
+            </tr>
+        `;
+    }).join('');
+
+    updateCounterSiswaSelected();
 }
 
-function hapusKelompokT2Q(groupId) {
-    const el = document.getElementById(`card-kelompok-t2q-${groupId}`);
-    if (el) el.remove();
+function filterListSiswaT2Q() {
+    const q = document.getElementById('search-siswa-t2q').value.toLowerCase();
+    const rows = document.querySelectorAll('#tbody-siswa-t2q tr.row-siswa-t2q');
+
+    rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        r.style.display = text.includes(q) ? '' : 'none';
+    });
 }
 
-function updateCounterSiswaT2Q(groupId) {
-    const checked = document.querySelectorAll(`.chk-siswa-t2q-${groupId}:checked`).length;
-    const badge = document.getElementById(`badge-count-t2q-${groupId}`);
+function updateCounterSiswaSelected() {
+    const count = document.querySelectorAll('.chk-siswa-massal:checked').length;
+    const badge = document.getElementById('badge-total-terpilih-t2q');
     if (badge) {
-        badge.innerText = `${checked} Siswa Terpilih`;
-        if (checked >= 10 && checked <= 15) {
-            badge.className = 'badge bg-success';
-        } else if (checked > 15) {
-            badge.className = 'badge bg-warning text-dark';
+        badge.innerText = `${count} Siswa Terpilih`;
+        if (count >= 10 && count <= 15) {
+            badge.className = 'badge bg-success fs-6';
+        } else if (count > 15) {
+            badge.className = 'badge bg-warning text-dark fs-6';
         } else {
-            badge.className = 'badge bg-info text-dark';
+            badge.className = 'badge bg-primary fs-6';
         }
     }
 }
 
+/**
+ * Simpan Batch Massal Halaqoh T2Q
+ */
 async function simpanBatchMassalT2Q() {
-    const idKelas = document.getElementById('massal-t2q-kelas').value;
+    const tingkat = document.getElementById('massal-t2q-tingkat').value;
+    const idGuru = document.getElementById('massal-t2q-guru').value;
+    const namaHalaqoh = document.getElementById('massal-t2q-nama-halaqoh').value.trim();
     const tahunAjaran = document.getElementById('massal-t2q-ta').value;
     const semester = document.getElementById('massal-t2q-semester').value;
 
-    if (!idKelas) {
-        return Swal.fire('Peringatan', 'Silakan pilih kelas terlebih dahulu!', 'warning');
+    if (!tingkat || !idGuru || !namaHalaqoh) {
+        return Swal.fire('Peringatan', 'Harap lengkapi Tingkat, Pengajar, dan Nama Halaqoh!', 'warning');
     }
 
-    const cards = document.querySelectorAll('.card-kelompok-t2q');
-    if (cards.length === 0) {
-        return Swal.fire('Peringatan', 'Belum ada kelompok Halaqoh T2Q yang dibuat.', 'warning');
+    const selectedChks = document.querySelectorAll('.chk-siswa-massal:checked');
+    if (selectedChks.length === 0) {
+        return Swal.fire('Peringatan', 'Pilih minimal 1 siswa untuk dimasukkan ke dalam Halaqoh ini!', 'warning');
     }
 
     const batchPayload = [];
-
-    for (let card of cards) {
-        const groupId = card.getAttribute('data-group-id');
-        const namaHalaqoh = card.querySelector('.input-nama-halaqoh').value.trim() || `Halaqoh T2Q ${groupId}`;
-        const idGuru = card.querySelector('.select-pengajar-t2q').value;
-        const checkedSiswaEls = card.querySelectorAll(`.chk-siswa-t2q-${groupId}:checked`);
-
-        if (!idGuru) {
-            return Swal.fire('Peringatan', `Pengajar T2Q pada '${namaHalaqoh}' belum dipilih!`, 'warning');
-        }
-
-        if (checkedSiswaEls.length === 0) {
-            return Swal.fire('Peringatan', `Pilih minimal 1 siswa pada '${namaHalaqoh}'!`, 'warning');
-        }
-
-        checkedSiswaEls.forEach(chk => {
-            batchPayload.push({
-                id_halaqoh: '',
-                nama_halaqoh: namaHalaqoh,
-                id_kelas: idKelas,
-                id_guru: idGuru,
-                id_siswa: chk.value,
-                tahun_ajaran: tahunAjaran,
-                semester: semester
-            });
+    selectedChks.forEach(chk => {
+        batchPayload.push({
+            id_halaqoh: '',
+            nama_halaqoh: namaHalaqoh,
+            id_kelas: chk.getAttribute('data-id-kelas') || '',
+            id_guru: idGuru,
+            id_siswa: chk.value,
+            tahun_ajaran: tahunAjaran,
+            semester: semester
         });
-    }
+    });
 
     Swal.fire({
         title: 'Menyimpan Master Halaqoh T2Q...',
-        text: `Memproses ${batchPayload.length} alokasi siswa ke kelompok Halaqoh T2Q.`,
+        text: `Memproses ${batchPayload.length} siswa ke dalam ${namaHalaqoh}.`,
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
@@ -250,7 +244,8 @@ async function simpanBatchMassalT2Q() {
             body: JSON.stringify({
                 action: 'batchSaveHalaqohT2Q',
                 table: 'Halaqoh_T2Q',
-                id_kelas: idKelas,
+                tingkat: tingkat,
+                id_guru: idGuru,
                 tahun_ajaran: tahunAjaran,
                 semester: semester,
                 data: batchPayload
