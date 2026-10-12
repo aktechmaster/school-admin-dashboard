@@ -114,7 +114,7 @@ function renderFormMassalT2Q() {
         namaKelasMap[k.id_kelas] = k.nama_kelas;
     });
 
-    // 2. Filter Siswa yang berada di kelas-kelas tingkat tersebut
+    // 2. Filter Siswa pada Tingkat tersebut
     const siswaTingkat = (localData.Siswa || []).filter(s => idKelasMap[s.id_kelas]);
 
     if (siswaTingkat.length === 0) {
@@ -123,7 +123,7 @@ function renderFormMassalT2Q() {
         return;
     }
 
-    // 3. Mapping data Halaqoh T2Q eksis untuk mengecek status siswa saat ini
+    // 3. Mapping data Halaqoh T2Q eksis
     const mapHalaqohSiswa = {};
     const mapGuruSiswa = {};
     (localData.Halaqoh_T2Q || []).forEach(h => {
@@ -149,17 +149,19 @@ function renderFormMassalT2Q() {
         }
 
         const isChecked = isCurrentGuru ? 'checked' : '';
+        // KUNCI CHECKBOX jika siswa sudah terdaftar di guru lain
+        const isDisabled = isOtherGuru ? 'disabled' : '';
 
         return `
-            <tr class="row-siswa-t2q">
+            <tr class="row-siswa-t2q ${isOtherGuru ? 'bg-light' : ''}">
                 <td class="text-center small">${idx + 1}</td>
                 <td>
                     <div class="form-check">
-                        <input class="form-check-input chk-siswa-massal" type="checkbox" value="${s.id_siswa}" data-id-kelas="${s.id_kelas}" id="chk_s_${s.id_siswa}" ${isChecked} onchange="updateCounterSiswaSelected()">
+                        <input class="form-check-input chk-siswa-massal" type="checkbox" value="${s.id_siswa}" data-id-kelas="${s.id_kelas}" id="chk_s_${s.id_siswa}" ${isChecked} ${isDisabled} onchange="updateCounterSiswaSelected()">
                     </div>
                 </td>
                 <td>
-                    <label class="form-check-label fw-bold cursor-pointer small mb-0" for="chk_s_${s.id_siswa}">
+                    <label class="form-check-label fw-bold cursor-pointer small mb-0 ${isOtherGuru ? 'text-muted' : ''}" for="chk_s_${s.id_siswa}">
                         ${s.nama_siswa}
                     </label>
                     <div class="small text-muted" style="font-size: 0.75rem;">ID: ${s.id_siswa}</div>
