@@ -70,6 +70,7 @@ function showSection(sectionId, element) {
         kelas: 'Master Kelas',
         mapel: 'Master Mapel',
         jadwal: 'Master Jadwal Pelajaran',
+        t2q: 'Master Halaqoh T2Q',
         settings: 'Pengaturan Koneksi API'
     };
     const titleEl = document.getElementById('page-title');
