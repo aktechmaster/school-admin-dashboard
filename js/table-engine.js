@@ -214,6 +214,39 @@ function getTableSchema(table) {
     },
     { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
     { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
+],
+        Halaqoh_BPI: [
+    { name: 'id_halaqoh', label: 'ID Halaqoh', type: 'text', primaryKey: true, placeholder: 'Contoh: HBPI-001' },
+    { name: 'nama_halaqoh', label: 'Nama / Kelompok Halaqoh BPI', type: 'text', required: true, placeholder: 'Contoh: Halaqoh BPI 1' },
+    { 
+        name: 'id_kelas', 
+        label: 'Kelas', 
+        type: 'select', 
+        options: [
+            { value: '', label: '-- Pilih Kelas --' },
+            ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
+        ] 
+    },
+    { 
+        name: 'id_guru', 
+        label: 'Pembina BPI', 
+        type: 'select', 
+        options: [
+            { value: '', label: '-- Pilih Pembina --' },
+            ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+        ] 
+    },
+    { 
+        name: 'id_siswa', 
+        label: 'Siswa', 
+        type: 'select', 
+        options: [
+            { value: '', label: '-- Pilih Siswa --' },
+            ...(localData.Siswa || []).map(s => ({ value: s.id_siswa, label: `${s.nama_siswa} (${s.id_siswa})` }))
+        ] 
+    },
+    { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
+    { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
 ]
     };
 
