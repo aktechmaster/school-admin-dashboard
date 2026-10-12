@@ -123,6 +123,7 @@ function renderAllModules() {
     if (typeof renderKelasTable === 'function') renderKelasTable();
     if (typeof renderMapelTable === 'function') renderMapelTable();
     if (typeof renderJadwalTable === 'function') renderJadwalTable();
+    if (typeof renderT2QTable === 'function') renderT2QTable();
 
     // Terapkan batasan hak akses role pengguna pada komponen yang di-render
     if (typeof applyRolePermissions === 'function') {
