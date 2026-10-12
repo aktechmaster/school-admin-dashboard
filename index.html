@@ -62,6 +62,11 @@
                         <i class="fas fa-quran me-2"></i>Master Halaqoh T2Q
                     </a>
                 </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('bpi', this)">
+                        <i class="fas fa-hands-helping me-2"></i>Master Halaqoh BPI
+                    </a>
+                </li>
                 <li class="mt-3 border-top pt-3">
                     <a href="#" class="nav-link text-warning" onclick="showSection('settings', this)">
                         <i class="fas fa-cog me-2"></i>Pengaturan API
@@ -300,6 +305,38 @@
                     </div>
                 </div>
 
+                <!-- Section: Halaqoh BPI -->
+                <div id="sec-bpi" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center section-header-controls mb-3">
+                        <h5>Data Master Halaqoh BPI</h5>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-sm" onclick="openModalMassalBPI()">
+                                <i class="fas fa-th-list me-1"></i> Input Massal Halaqoh BPI Lintas Kelas
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="openModal('Halaqoh_BPI')">
+                                <i class="fas fa-plus me-1"></i> Tambah Single Data
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive p-3 rounded shadow-sm">
+                        <table class="table table-hover align-middle" id="table-halaqoh_bpi">
+                            <thead>
+                                <tr>
+                                    <th>ID Halaqoh</th>
+                                    <th>Kelas</th>
+                                    <th>Nama Halaqoh BPI</th>
+                                    <th>Pembina BPI</th>
+                                    <th>Siswa</th>
+                                    <th>Tahun Ajaran</th>
+                                    <th>Semester</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Section: Settings -->
                 <div id="sec-settings" class="content-section d-none">
                     <div class="card p-4 max-w-600">
@@ -507,6 +544,106 @@
     </div>
 </div>
 
+    <!-- Modal Input Massal Halaqoh BPI Lintas Kelas per Tingkat -->
+            <div class="modal fade" id="modalMassalBPI" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title"><i class="fas fa-hands-helping me-2"></i>Input Massal Halaqoh BPI Lintas Kelas</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Panel Parameter Utama -->
+                            <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold small mb-1">1. Pilih Tingkat Kelas <span class="text-danger">*</span></label>
+                                        <select id="massal-bpi-tingkat" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
+                                            <option value="">-- Pilih Tingkat --</option>
+                                            <option value="1">Tingkat 1</option>
+                                            <option value="2">Tingkat 2</option>
+                                            <option value="3">Tingkat 3</option>
+                                            <option value="4">Tingkat 4</option>
+                                            <option value="5">Tingkat 5</option>
+                                            <option value="6">Tingkat 6</option>
+                                            <option value="7">Tingkat 7</option>
+                                            <option value="8">Tingkat 8</option>
+                                            <option value="9">Tingkat 9</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold small mb-1">2. Pilih Pembina BPI <span class="text-danger">*</span></label>
+                                        <select id="massal-bpi-guru" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
+                                            <option value="">-- Pilih Pembina BPI --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold small mb-1">Tahun Ajaran <span class="text-danger">*</span></label>
+                                        <input type="text" id="massal-bpi-ta" class="form-control form-control-sm" value="2026/2027" onchange="renderFormMassalBPI()">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold small mb-1">Semester <span class="text-danger">*</span></label>
+                                        <select id="massal-bpi-semester" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
+                                            <option value="Ganjil">Ganjil</option>
+                                            <option value="Genap">Genap</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <div class="alert alert-info py-2 small mb-3">
+                                <i class="fas fa-info-circle me-1"></i> Pilih <strong>Tingkat Kelas</strong> dan <strong>Pembina BPI</strong>. Sistem akan menampilkan seluruh siswa dari semua kelas pada tingkat tersebut. Centang siswa yang akan dialokasikan ke Pembina ini.
+                            </div>
+            
+                            <!-- Detail Input Nama Halaqoh & Daftar Siswa -->
+                            <div id="wrapper-input-bpi" class="d-none">
+                                <div class="card p-3 mb-3 border">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small mb-1">Nama Kelompok Halaqoh BPI <span class="text-danger">*</span></label>
+                                            <input type="text" id="massal-bpi-nama-halaqoh" class="form-control form-control-sm" placeholder="Contoh: Halaqoh BPI Ustadz A">
+                                        </div>
+                                        <div class="col-md-6 text-end">
+                                            <span class="badge bg-primary fs-6" id="badge-total-terpilih-bpi">0 Siswa Terpilih</span>
+                                        </div>
+                                    </div>
+                                </div>
+            
+                                <!-- Toolbar Pencarian Siswa -->
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 text-primary"><i class="fas fa-user-check me-1"></i> Daftar Siswa Lintas Kelas</h6>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" id="search-siswa-bpi" class="form-control form-control-sm" placeholder="Cari nama siswa..." oninput="filterListSiswaBPI()">
+                                    </div>
+                                </div>
+            
+                                <!-- Checklist Container Siswa -->
+                                <div class="table-responsive border rounded bg-white" style="max-height: 380px;">
+                                    <table class="table table-hover align-middle mb-0" id="table-checklist-bpi">
+                                        <thead class="table-light sticky-top">
+                                            <tr>
+                                                <th style="width: 40px;" class="text-center">#</th>
+                                                <th>Pilih</th>
+                                                <th>Nama Siswa</th>
+                                                <th>Kelas Asal</th>
+                                                <th>Status Halaqoh BPI Saat Ini</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-siswa-bpi"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-primary" onclick="simpanBatchMassalBPI()">
+                                <i class="fas fa-save me-1"></i> Simpan Kelompok BPI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
     <!-- Modal Import Excel -->
     <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -547,6 +684,7 @@
     <script src="js/modules/mapel.js"></script>
     <script src="js/modules/jadwal.js"></script>
     <script src="js/modules/t2q.js"></script>
+    <script src="js/modules/bpi.js"></script>
     <script src="js/auth.js"></script>
 
     <!-- 3. App Controller Utama -->
