@@ -407,61 +407,105 @@
         </div>
     </div>
 
-        <!-- Modal Input Massal Halaqoh T2Q per Kelas -->
-    <div class="modal fade" id="modalMassalT2Q" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title"><i class="fas fa-quran me-2"></i>Input Massal Halaqoh T2Q per Kelas</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Modal Input Massal Halaqoh T2Q Lintas Kelas per Tingkat -->
+<div class="modal fade" id="modalMassalT2Q" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-quran me-2"></i>Input Massal Halaqoh T2Q Lintas Kelas</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Panel Parameter Utama -->
+                <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small mb-1">1. Pilih Tingkat Kelas <span class="text-danger">*</span></label>
+                            <select id="massal-t2q-tingkat" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
+                                <option value="">-- Pilih Tingkat --</option>
+                                <option value="1">Tingkat 1</option>
+                                <option value="2">Tingkat 2</option>
+                                <option value="3">Tingkat 3</option>
+                                <option value="4">Tingkat 4</option>
+                                <option value="5">Tingkat 5</option>
+                                <option value="6">Tingkat 6</option>
+                                <option value="7">Tingkat 7</option>
+                                <option value="8">Tingkat 8</option>
+                                <option value="9">Tingkat 9</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small mb-1">2. Pilih Pengajar T2Q <span class="text-danger">*</span></label>
+                            <select id="massal-t2q-guru" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
+                                <option value="">-- Pilih Pengajar T2Q --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small mb-1">Tahun Ajaran <span class="text-danger">*</span></label>
+                            <input type="text" id="massal-t2q-ta" class="form-control form-control-sm" value="2026/2027" onchange="renderFormMassalT2Q()">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small mb-1">Semester <span class="text-danger">*</span></label>
+                            <select id="massal-t2q-semester" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
+                                <option value="Ganjil">Ganjil</option>
+                                <option value="Genap">Genap</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <!-- Panel Konfigurasi Kelas -->
-                    <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
-                        <div class="row g-3 align-items-center">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small mb-1">1. Pilih Kelas <span class="text-danger">*</span></label>
-                                <select id="massal-t2q-kelas" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
-                                    <option value="">-- Pilih Kelas --</option>
-                                </select>
+
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="fas fa-info-circle me-1"></i> Pilih <strong>Tingkat Kelas</strong> dan <strong>Pengajar T2Q</strong>. Sistem akan menampilkan seluruh siswa dari semua kelas pada tingkat tersebut. Centang siswa yang akan dialokasikan ke Pengajar ini.
+                </div>
+
+                <!-- Detail Input Nama Halaqoh & Daftar Siswa -->
+                <div id="wrapper-input-t2q" class="d-none">
+                    <div class="card p-3 mb-3 border">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small mb-1">Nama Kelompok Halaqoh <span class="text-danger">*</span></label>
+                                <input type="text" id="massal-t2q-nama-halaqoh" class="form-control form-control-sm" placeholder="Contoh: Halaqoh Ustadz A">
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small mb-1">Tahun Ajaran <span class="text-danger">*</span></label>
-                                <input type="text" id="massal-t2q-ta" class="form-control form-control-sm" value="2026/2027">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small mb-1">Semester <span class="text-danger">*</span></label>
-                                <select id="massal-t2q-semester" class="form-select form-select-sm">
-                                    <option value="Ganjil">Ganjil</option>
-                                    <option value="Genap">Genap</option>
-                                </select>
+                            <div class="col-md-6 text-end">
+                                <span class="badge bg-primary fs-6" id="badge-total-terpilih-t2q">0 Siswa Terpilih</span>
                             </div>
                         </div>
                     </div>
-    
-                    <div class="alert alert-info py-2 small mb-3">
-                        <i class="fas fa-info-circle me-1"></i> Pilih <strong>Kelas</strong> di atas. Sistem akan menampilkan seluruh siswa kelas tersebut. Anda dapat membagi siswa ke dalam beberapa kelompok Halaqoh (1 kelompok idealnya 10–15 siswa) dan menentukan Pengajar T2Q masing-masing.
+
+                    <!-- Toolbar Pencarian Siswa & Filter Kelas -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0 text-success"><i class="fas fa-user-check me-1"></i> Daftar Siswa Lintas Kelas</h6>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="search-siswa-t2q" class="form-control form-control-sm" placeholder="Cari nama siswa..." oninput="filterListSiswaT2Q()">
+                        </div>
                     </div>
-    
-                    <!-- Container Dinamis Kelompok Halaqoh -->
-                    <div id="container-kelompok-t2q">
-                        <div class="text-center text-muted py-4">Silakan pilih kelas terlebih dahulu untuk mulai mengalokasikan siswa ke kelompok Halaqoh T2Q.</div>
-                    </div>
-                </div>
-                <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-primary btn-sm" id="btn-tambah-kelompok-t2q" onclick="tambahKelompokT2Q()" style="display:none;">
-                        <i class="fas fa-plus me-1"></i> Tambah Kelompok Halaqoh T2Q
-                    </button>
-                    <div>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-success" onclick="simpanBatchMassalT2Q()">
-                            <i class="fas fa-save me-1"></i> Simpan Semua Halaqoh T2Q
-                        </button>
+
+                    <!-- Checklist Container Siswa -->
+                    <div class="table-responsive border rounded bg-white" style="max-height: 380px;">
+                        <table class="table table-hover align-middle mb-0" id="table-checklist-t2q">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th style="width: 40px;" class="text-center">#</th>
+                                    <th>Pilih</th>
+                                    <th>Nama Siswa</th>
+                                    <th>Kelas Asal</th>
+                                    <th>Status Halaqoh Saat Ini</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-siswa-t2q"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" onclick="simpanBatchMassalT2Q()">
+                    <i class="fas fa-save me-1"></i> Simpan Kelompok Halaqoh
+                </button>
+            </div>
         </div>
     </div>
+</div>
 
     <!-- Modal Import Excel -->
     <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
