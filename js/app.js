@@ -125,6 +125,7 @@ function renderAllModules() {
     if (typeof renderMapelTable === 'function') renderMapelTable();
     if (typeof renderJadwalTable === 'function') renderJadwalTable();
     if (typeof renderT2QTable === 'function') renderT2QTable();
+    if (typeof renderBPITable === 'function') renderBPITable();
     
 
     // Terapkan batasan hak akses role pengguna pada komponen yang di-render
