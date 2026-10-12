@@ -9,7 +9,8 @@ let localData = {
     Mapel: [],
     Jadwal: [],
     Tim_Pengajar: [],
-    Halaqoh_T2Q: []
+    Halaqoh_T2Q: [],
+    Halaqoh_BPI: []
 };
 
 // Penampung state pencarian, filter, & paginasi per tabel
