@@ -149,17 +149,19 @@ function renderFormMassalBPI() {
         }
 
         const isChecked = isCurrentGuru ? 'checked' : '';
+        // KUNCI CHECKBOX jika siswa sudah terdaftar di pembina BPI lain
+        const isDisabled = isOtherGuru ? 'disabled' : '';
 
         return `
-            <tr class="row-siswa-bpi">
+            <tr class="row-siswa-bpi ${isOtherGuru ? 'bg-light' : ''}">
                 <td class="text-center small">${idx + 1}</td>
                 <td>
                     <div class="form-check">
-                        <input class="form-check-input chk-siswa-massal-bpi" type="checkbox" value="${s.id_siswa}" data-id-kelas="${s.id_kelas}" id="chk_bpi_${s.id_siswa}" ${isChecked} onchange="updateCounterSiswaSelectedBPI()">
+                        <input class="form-check-input chk-siswa-massal-bpi" type="checkbox" value="${s.id_siswa}" data-id-kelas="${s.id_kelas}" id="chk_bpi_${s.id_siswa}" ${isChecked} ${isDisabled} onchange="updateCounterSiswaSelectedBPI()">
                     </div>
                 </td>
                 <td>
-                    <label class="form-check-label fw-bold cursor-pointer small mb-0" for="chk_bpi_${s.id_siswa}">
+                    <label class="form-check-label fw-bold cursor-pointer small mb-0 ${isOtherGuru ? 'text-muted' : ''}" for="chk_bpi_${s.id_siswa}">
                         ${s.nama_siswa}
                     </label>
                     <div class="small text-muted" style="font-size: 0.75rem;">ID: ${s.id_siswa}</div>
