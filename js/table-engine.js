@@ -8,7 +8,8 @@ let tableState = {
     Siswa: { search: '', filter: {}, page: 1, limit: 10 },
     Kelas: { search: '', filter: {}, page: 1, limit: 10 },
     Mapel: { search: '', filter: {}, page: 1, limit: 10 },
-    Jadwal: { search: '', filter: {}, page: 1, limit: 10 }
+    Jadwal: { search: '', filter: {}, page: 1, limit: 10 },
+    Halaqoh_T2Q: { search: '', filter: {}, page: 1, limit: 10 }
 };
 
 /**
