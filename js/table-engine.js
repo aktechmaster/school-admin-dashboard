@@ -9,7 +9,8 @@ let tableState = {
     Kelas: { search: '', filter: {}, page: 1, limit: 10 },
     Mapel: { search: '', filter: {}, page: 1, limit: 10 },
     Jadwal: { search: '', filter: {}, page: 1, limit: 10 },
-    Halaqoh_T2Q: { search: '', filter: {}, page: 1, limit: 10 }
+    Halaqoh_T2Q: { search: '', filter: {}, page: 1, limit: 10 },
+    Halaqoh_BPI: { search: '', filter: {}, page: 1, limit: 10 }
 };
 
 /**
