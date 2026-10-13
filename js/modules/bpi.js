@@ -219,6 +219,11 @@ async function simpanBatchMassalBPI() {
         return Swal.fire('Peringatan', 'Pilih minimal 1 siswa untuk dimasukkan ke dalam Halaqoh BPI ini!', 'warning');
     }
 
+    // Ambil semua ID Kelas yang terdaftar di Tingkat ini
+    const idKelasList = (localData.Kelas || [])
+        .filter(k => String(k.tingkat) === String(tingkat))
+        .map(k => String(k.id_kelas));
+
     const batchPayload = [];
     selectedChks.forEach(chk => {
         batchPayload.push({
@@ -250,6 +255,7 @@ async function simpanBatchMassalBPI() {
                 id_guru: idGuru,
                 tahun_ajaran: tahunAjaran,
                 semester: semester,
+                id_kelas_list: idKelasList, // <--- Dikirim ke backend
                 data: batchPayload
             })
         });
