@@ -41,7 +41,6 @@ const IMPORT_SCHEMAS = {
             id_guru: String(getExcelVal(row, 'ID Guru')),
             nip_nik: String(getExcelVal(row, 'NIP/NIK')),
             nama_lengkap: getExcelVal(row, 'Nama Lengkap'),
-            // Sesuaikan key agar persis sama dengan nama kolom di Google Sheets
             jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
             no_hp: String(getExcelVal(row, 'No HP')),
             email: getExcelVal(row, 'Email'),
@@ -85,19 +84,20 @@ const IMPORT_SCHEMAS = {
     Jadwal: {
         headers: ['ID Jadwal', 'Hari', 'Jam Ke', 'Kelas', 'Mapel', 'Guru', 'Tahun Ajaran', 'Semester'],
         map: (row) => ({
-            id_jadwal: String(getExcelVal(row, 'ID Jadwal')),
-            hari: getExcelVal(row, 'Hari'),
-            jam_ke: getExcelVal(row, 'Jam Ke'),
-            kelas: getExcelVal(row, 'Kelas'),
-            mapel: getExcelVal(row, 'Mapel'),
-            guru: getExcelVal(row, 'Guru'),
-            tahun_ajaran: getExcelVal(row, 'Tahun Ajaran'),
-            semester: getExcelVal(row, 'Semester')
+            id_jadwal: String(getExcelVal(row, 'ID Jadwal') || getExcelVal(row, 'id_jadwal')),
+            hari: getExcelVal(row, 'Hari') || getExcelVal(row, 'hari'),
+            jam_ke: getExcelVal(row, 'Jam Ke') || getExcelVal(row, 'jam_ke'),
+            // Mengembalikan nama key yang persis sama dengan nama kolom di database Google Sheets
+            id_kelas: String(getExcelVal(row, 'Kelas') || getExcelVal(row, 'ID Kelas') || getExcelVal(row, 'id_kelas')),
+            id_mapel: String(getExcelVal(row, 'Mapel') || getExcelVal(row, 'ID Mapel') || getExcelVal(row, 'id_mapel')),
+            id_guru: String(getExcelVal(row, 'Guru') || getExcelVal(row, 'ID Guru') || getExcelVal(row, 'id_guru') || getExcelVal(row, 'id_g')),
+            tahun_ajaran: String(getExcelVal(row, 'Tahun Ajaran') || getExcelVal(row, 'tahun_ajaran')),
+            semester: String(getExcelVal(row, 'Semester') || getExcelVal(row, 'semester'))
         })
     }
 };
 
-// Helper pencari skema impor tahan perbedaan kapital huruf (misal: 'siswa' maupun 'Siswa')
+// Helper pencari skema impor tahan perbedaan kapital huruf
 function getSchema(moduleName) {
     if (!moduleName) return null;
     if (IMPORT_SCHEMAS[moduleName]) return IMPORT_SCHEMAS[moduleName];
