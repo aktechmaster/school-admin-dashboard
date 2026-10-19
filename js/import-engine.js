@@ -1,18 +1,33 @@
 // ==========================================
-// ENGINE IMPOR DATA EXCEL / CSV
+// ENGINE IMPOR DATA EXCEL / CSV (SOLUSI TUNTAS)
 // ==========================================
 
-// Fungsi pembaca nilai Excel yang aman dari perbedaan spasi/kapital
-function getExcelVal(row, keyName) {
+/**
+ * Fungsi pembaca nilai Excel yang aman dari variasi nama header, spasi, dan huruf kapital/kecil
+ */
+function getExcelVal(row, keyNames) {
     if (!row) return '';
-    if (row[keyName] !== undefined && row[keyName] !== '') return row[keyName];
+    const keys = Array.isArray(keyNames) ? keyNames : [keyNames];
     
-    const normKey = String(keyName).toLowerCase().replace(/[^a-z0-9]/g, '');
-    for (let k in row) {
-        if (String(k).toLowerCase().replace(/[^a-z0-9]/g, '') === normKey) {
-            return row[k];
+    // Tahap 1: Pencocokan Langsung
+    for (let key of keys) {
+        if (row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== '') {
+            return String(row[key]).trim();
         }
     }
+    
+    // Tahap 2: Pencocokan Fleksibel (Abaikan Kapital & Karakater Khusus)
+    for (let key of keys) {
+        const normKey = String(key).toLowerCase().replace(/[^a-z0-9]/g, '');
+        for (let k in row) {
+            if (String(k).toLowerCase().replace(/[^a-z0-9]/g, '') === normKey) {
+                if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== '') {
+                    return String(row[k]).trim();
+                }
+            }
+        }
+    }
+    
     return '';
 }
 
@@ -20,80 +35,108 @@ const IMPORT_SCHEMAS = {
     Siswa: {
         headers: ['ID Siswa', 'NISN', 'NIS', 'Nama Siswa', 'JK', 'Kelas', 'Ayah', 'Pekerjaan Ayah', 'Ibu', 'Pekerjaan Ibu', 'No HP Ortu', 'Alamat', 'Status'],
         map: (row) => ({
-            id_siswa: String(getExcelVal(row, 'ID Siswa')),
-            nisn: String(getExcelVal(row, 'NISN')),
-            nis: String(getExcelVal(row, 'NIS')),
-            nama_siswa: getExcelVal(row, 'Nama Siswa'),
-            jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
-            id_kelas: getExcelVal(row, 'Kelas') || getExcelVal(row, 'ID Kelas'),
-            nama_ayah: getExcelVal(row, 'Ayah') || getExcelVal(row, 'Nama Ayah'),
-            pekerjaan_ayah: getExcelVal(row, 'Pekerjaan Ayah'),
-            nama_ibu: getExcelVal(row, 'Ibu') || getExcelVal(row, 'Nama Ibu'),
-            pekerjaan_ibu: getExcelVal(row, 'Pekerjaan Ibu'),
-            no_hp_ortu: String(getExcelVal(row, 'No HP Ortu')),
-            alamat: getExcelVal(row, 'Alamat'),
-            status_siswa: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Siswa') || 'Aktif'
+            id_siswa: String(getExcelVal(row, ['ID Siswa', 'id_siswa'])),
+            nisn: String(getExcelVal(row, ['NISN', 'nisn'])),
+            nis: String(getExcelVal(row, ['NIS', 'nis'])),
+            nama_siswa: getExcelVal(row, ['Nama Siswa', 'nama_siswa']),
+            jenis_kelamin: getExcelVal(row, ['JK', 'Jenis Kelamin', 'jenis_kelamin']) || 'L',
+            id_kelas: getExcelVal(row, ['Kelas', 'ID Kelas', 'id_kelas']),
+            nama_ayah: getExcelVal(row, ['Ayah', 'Nama Ayah', 'nama_ayah']),
+            pekerjaan_ayah: getExcelVal(row, ['Pekerjaan Ayah', 'pekerjaan_ayah']),
+            nama_ibu: getExcelVal(row, ['Ibu', 'Nama Ibu', 'nama_ibu']),
+            pekerjaan_ibu: getExcelVal(row, ['Pekerjaan Ibu', 'pekerjaan_ibu']),
+            no_hp_ortu: String(getExcelVal(row, ['No HP Ortu', 'no_hp_ortu'])),
+            alamat: getExcelVal(row, ['Alamat', 'alamat']),
+            status_siswa: getExcelVal(row, ['Status', 'Status Siswa', 'status_siswa']) || 'Aktif'
         })
     },
     Guru: {
         headers: ['ID Guru', 'NIP/NIK', 'Nama Lengkap', 'JK', 'No HP', 'Email', 'Jabatan', 'Status'],
         map: (row) => ({
-            id_guru: String(getExcelVal(row, 'ID Guru')),
-            nip_nik: String(getExcelVal(row, 'NIP/NIK')),
-            nama_lengkap: getExcelVal(row, 'Nama Lengkap'),
-            jenis_kelamin: getExcelVal(row, 'JK') || getExcelVal(row, 'Jenis Kelamin') || 'L',
-            no_hp: String(getExcelVal(row, 'No HP')),
-            email: getExcelVal(row, 'Email'),
-            jabatan: getExcelVal(row, 'Jabatan'),
-            status_karyawan: getExcelVal(row, 'Status') || getExcelVal(row, 'Status Karyawan') || 'Tetap'
+            id_guru: String(getExcelVal(row, ['ID Guru', 'id_guru'])),
+            nip_nik: String(getExcelVal(row, ['NIP/NIK', 'nip_nik'])),
+            nama_lengkap: getExcelVal(row, ['Nama Lengkap', 'nama_lengkap']),
+            jenis_kelamin: getExcelVal(row, ['JK', 'Jenis Kelamin', 'jenis_kelamin']) || 'L',
+            no_hp: String(getExcelVal(row, ['No HP', 'no_hp'])),
+            email: getExcelVal(row, ['Email', 'email']),
+            jabatan: getExcelVal(row, ['Jabatan', 'jabatan']),
+            status_karyawan: getExcelVal(row, ['Status', 'Status Karyawan', 'status_karyawan']) || 'Tetap'
         })
     },
     Users: {
         headers: ['ID User', 'Username', 'ID Guru', 'Role', 'Status', 'Wali Kelas', 'Wakur', 'T2Q', 'BPI', 'Ekstra'],
         map: (row) => ({
-            id_user: String(getExcelVal(row, 'ID User')),
-            username: getExcelVal(row, 'Username'),
-            id_guru: getExcelVal(row, 'ID Guru'),
-            role: getExcelVal(row, 'Role') || 'Guru',
-            status: getExcelVal(row, 'Status') || 'Aktif',
-            wali_kelas: getExcelVal(row, 'Wali Kelas') || 'Tidak',
-            wakur: getExcelVal(row, 'Wakur') || 'Tidak',
-            t2q: getExcelVal(row, 'T2Q') || 'Tidak',
-            bpi: getExcelVal(row, 'BPI') || 'Tidak',
-            ekstra: getExcelVal(row, 'Ekstra') || 'Tidak'
+            id_user: String(getExcelVal(row, ['ID User', 'id_user'])),
+            username: getExcelVal(row, ['Username', 'username']),
+            id_guru: getExcelVal(row, ['ID Guru', 'id_guru']),
+            role: getExcelVal(row, ['Role', 'role']) || 'Guru',
+            status: getExcelVal(row, ['Status', 'status']) || 'Aktif',
+            wali_kelas: getExcelVal(row, ['Wali Kelas', 'wali_kelas']) || 'Tidak',
+            wakur: getExcelVal(row, ['Wakur', 'wakur']) || 'Tidak',
+            t2q: getExcelVal(row, ['T2Q', 't2q']) || 'Tidak',
+            bpi: getExcelVal(row, ['BPI', 'bpi']) || 'Tidak',
+            ekstra: getExcelVal(row, ['Ekstra', 'ekstra']) || 'Tidak'
         })
     },
     Kelas: {
         headers: ['ID Kelas', 'Nama Kelas', 'Tingkat', 'Wali Kelas'],
         map: (row) => ({
-            id_kelas: String(getExcelVal(row, 'ID Kelas')),
-            nama_kelas: getExcelVal(row, 'Nama Kelas'),
-            tingkat: getExcelVal(row, 'Tingkat'),
-            wali_kelas: getExcelVal(row, 'Wali Kelas')
+            id_kelas: String(getExcelVal(row, ['ID Kelas', 'id_kelas'])),
+            nama_kelas: getExcelVal(row, ['Nama Kelas', 'nama_kelas']),
+            tingkat: getExcelVal(row, ['Tingkat', 'tingkat']),
+            wali_kelas: getExcelVal(row, ['Wali Kelas', 'wali_kelas'])
         })
     },
     Mapel: {
         headers: ['ID Mapel', 'Kode', 'Nama Mata Pelajaran', 'Kategori'],
         map: (row) => ({
-            id_mapel: String(getExcelVal(row, 'ID Mapel')),
-            kode: getExcelVal(row, 'Kode'),
-            nama_mapel: getExcelVal(row, 'Nama Mata Pelajaran'),
-            kategori: getExcelVal(row, 'Kategori') || 'Umum'
+            id_mapel: String(getExcelVal(row, ['ID Mapel', 'id_mapel'])),
+            kode: getExcelVal(row, ['Kode', 'kode']),
+            nama_mapel: getExcelVal(row, ['Nama Mata Pelajaran', 'nama_mapel']),
+            kategori: getExcelVal(row, ['Kategori', 'kategori']) || 'Umum'
         })
     },
     Jadwal: {
         headers: ['ID Jadwal', 'Hari', 'Jam Ke', 'Kelas', 'Mapel', 'Guru', 'Tahun Ajaran', 'Semester'],
-        map: (row) => ({
-            id_jadwal: String(getExcelVal(row, 'ID Jadwal') || getExcelVal(row, 'id_jadwal')),
-            hari: getExcelVal(row, 'Hari') || getExcelVal(row, 'hari'),
-            jam_ke: getExcelVal(row, 'Jam Ke') || getExcelVal(row, 'jam_ke'),
-            // Mengembalikan nama key yang persis sama dengan nama kolom di database Google Sheets
-            id_kelas: String(getExcelVal(row, 'Kelas') || getExcelVal(row, 'ID Kelas') || getExcelVal(row, 'id_kelas')),
-            id_mapel: String(getExcelVal(row, 'Mapel') || getExcelVal(row, 'ID Mapel') || getExcelVal(row, 'id_mapel')),
-            id_guru: String(getExcelVal(row, 'Guru') || getExcelVal(row, 'ID Guru') || getExcelVal(row, 'id_guru') || getExcelVal(row, 'id_g')),
-            tahun_ajaran: String(getExcelVal(row, 'Tahun Ajaran') || getExcelVal(row, 'tahun_ajaran')),
-            semester: String(getExcelVal(row, 'Semester') || getExcelVal(row, 'semester'))
-        })
+        map: (row) => {
+            const valIdJadwal = getExcelVal(row, ['ID Jadwal', 'id_jadwal', 'jadwal']);
+            const valHari = getExcelVal(row, ['Hari', 'hari']);
+            const valJamKe = getExcelVal(row, ['Jam Ke', 'jam_ke', 'jam']);
+            const valKelas = getExcelVal(row, ['Kelas', 'ID Kelas', 'id_kelas', 'id_ke', 'kelas']);
+            const valMapel = getExcelVal(row, ['Mapel', 'ID Mapel', 'id_mapel', 'id_ma', 'mapel']);
+            const valGuru = getExcelVal(row, ['Guru', 'ID Guru', 'id_guru', 'id_g', 'guru']);
+            const valTA = getExcelVal(row, ['Tahun Ajaran', 'Tahun Aja', 'tahun_ajaran', 'tahun_aja']);
+            const valSem = getExcelVal(row, ['Semester', 'semester', 'semes']);
+
+            // Mengirimkan SEMUA variasi kunci agar kompatibel 100% dengan database Google Sheets
+            return {
+                id_jadwal: valIdJadwal,
+                jadwal: valIdJadwal,
+
+                hari: valHari,
+
+                jam_ke: valJamKe,
+                jam: valJamKe,
+
+                id_kelas: valKelas,
+                id_ke: valKelas,
+                kelas: valKelas,
+
+                id_mapel: valMapel,
+                id_ma: valMapel,
+                mapel: valMapel,
+
+                id_guru: valGuru,
+                id_g: valGuru,
+                guru: valGuru,
+
+                tahun_ajaran: valTA,
+                tahun_aja: valTA,
+
+                semester: valSem,
+                semes: valSem
+            };
+        }
     }
 };
 
