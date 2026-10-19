@@ -34,9 +34,14 @@ function renderJadwalTable() {
     (localData.Guru || []).forEach(g => { mapGuru[g.id_guru] = g.nama_lengkap; });
 
     tbody.innerHTML = info.data.map(row => {
-        const kelasDisplay = mapKelas[row.id_kelas] || row.id_kelas || '-';
-        const mapelDisplay = mapMapel[row.id_mapel] || row.id_mapel || '-';
-        const guruDisplay = mapGuru[row.id_guru] || row.id_guru || '-';
+        // Toleran terhadap kemungkinan variasi penamaan properti data
+        const idKelasVal = row.id_kelas || row.kelas || '';
+        const idMapelVal = row.id_mapel || row.mapel || '';
+        const idGuruVal = row.id_guru || row.guru || row.id_g || '';
+
+        const kelasDisplay = mapKelas[idKelasVal] || idKelasVal || '-';
+        const mapelDisplay = mapMapel[idMapelVal] || idMapelVal || '-';
+        const guruDisplay = mapGuru[idGuruVal] || idGuruVal || '-';
 
         return `
             <tr>
@@ -76,6 +81,9 @@ function openModalGridJadwal() {
     selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
         (localData.Kelas || []).map(k => `<option value="${k.id_kelas}">${k.nama_kelas}</option>`).join('');
 
+    // Pasang event listener otomatis jika belum
+    selectKelas.onchange = renderGridJadwal;
+
     // Reset grid ke tampilan kosong
     document.getElementById('tbody-grid-jadwal').innerHTML = `
         <tr>
@@ -114,10 +122,12 @@ function renderGridJadwal() {
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
     const maxJam = 10; // 10 Jam Pelajaran per Hari
 
-    // Ambil data jadwal yang sudah ada untuk kelas ini (jika pernah diinput sebelumnya)
+    // Ambil data jadwal yang sudah ada untuk kelas ini
     const existingJadwal = {};
     (localData.Jadwal || []).forEach(j => {
-        if (String(j.id_kelas) === String(idKelas)) {
+        const itemKelas = j.id_kelas || j.kelas || '';
+        // Pencocokan fleksibel: jika id_kelas sama ATAU jika id_kelas kosong (kasus impor lama)
+        if (String(itemKelas) === String(idKelas) || (!itemKelas && j.id_jadwal)) {
             existingJadwal[`${j.hari}_${j.jam_ke}`] = j;
         }
     });
@@ -170,8 +180,12 @@ function renderGridJadwal() {
             if (existingData) {
                 const mapelSel = tbody.querySelector(`.grid-mapel-select[data-hari="${hari}"][data-jam="${jam}"]`);
                 const guruSel = tbody.querySelector(`.grid-guru-select[data-hari="${hari}"][data-jam="${jam}"]`);
-                if (mapelSel && existingData.id_mapel) mapelSel.value = existingData.id_mapel;
-                if (guruSel && existingData.id_guru) guruSel.value = existingData.id_guru;
+                
+                const valMapel = existingData.id_mapel || existingData.mapel || '';
+                const valGuru = existingData.id_guru || existingData.guru || existingData.id_g || '';
+
+                if (mapelSel && valMapel) mapelSel.value = valMapel;
+                if (guruSel && valGuru) guruSel.value = valGuru;
             }
         });
     }
@@ -179,12 +193,17 @@ function renderGridJadwal() {
 
 /**
  * Mengumpulkan semua data dari Grid Matriks dan mengirimkannya secara Batch/Massal ke Google Sheets Backend
- * Mempertahankan id_jadwal jika slot tersebut sudah ada sebelumnya.
+ * Mempertahankan id_jadwal jika slot tersebut sudah ada sebelumnya (mencegah duplikasi).
  */
 async function simpanBatchJadwal() {
-    const idKelas = document.getElementById('grid-select-kelas').value;
-    const tahunAjaran = document.getElementById('grid-tahun-ajaran').value;
-    const semester = document.getElementById('grid-semester').value;
+    const selectKelas = document.getElementById('grid-select-kelas');
+    const idKelas = selectKelas ? selectKelas.value : '';
+    
+    const elTA = document.getElementById('grid-tahun-ajaran');
+    const elSem = document.getElementById('grid-semester');
+
+    const tahunAjaran = elTA ? elTA.value : '2026/2027';
+    const semester = elSem ? elSem.value : 'Genap';
 
     if (!idKelas) {
         return Swal.fire('Peringatan', 'Silakan pilih kelas terlebih dahulu!', 'warning');
@@ -193,7 +212,8 @@ async function simpanBatchJadwal() {
     // Mapping jadwal eksis untuk mempertahankan id_jadwal lama
     const existingJadwal = {};
     (localData.Jadwal || []).forEach(j => {
-        if (String(j.id_kelas) === String(idKelas)) {
+        const itemKelas = j.id_kelas || j.kelas || '';
+        if (String(itemKelas) === String(idKelas) || (!itemKelas && j.id_jadwal)) {
             existingJadwal[`${j.hari}_${j.jam_ke}`] = j;
         }
     });
@@ -215,7 +235,7 @@ async function simpanBatchJadwal() {
                 const existing = existingJadwal[`${hari}_${jam}`];
                 
                 batchData.push({
-                    id_jadwal: existing ? (existing.id_jadwal || existing['ID Jadwal'] || '') : '', // Tetapkan ID lama jika ada
+                    id_jadwal: existing ? (existing.id_jadwal || existing['ID Jadwal'] || '') : '', // Tetapkan ID lama jika ada agar di-UPDATE
                     hari: hari,
                     jam_ke: jam,
                     id_kelas: idKelas,
@@ -295,17 +315,23 @@ function exportJadwalExcel() {
     const mapGuru = {};
     (localData.Guru || []).forEach(g => { mapGuru[g.id_guru] = g.nama_lengkap; });
 
-    const formattedData = data.map((item, index) => ({
-        'No': index + 1,
-        'ID Jadwal': item.id_jadwal || '-',
-        'Hari': item.hari || '-',
-        'Jam Ke': item.jam_ke ? `Jam ke-${item.jam_ke}` : '-',
-        'Kelas': mapKelas[item.id_kelas] || item.id_kelas || '-',
-        'Mata Pelajaran': mapMapel[item.id_mapel] || item.id_mapel || '-',
-        'Guru Pengajar': mapGuru[item.id_guru] || item.id_guru || '-',
-        'Tahun Ajaran': item.tahun_ajaran || '-',
-        'Semester': item.semester || '-'
-    }));
+    const formattedData = data.map((item, index) => {
+        const idKelasVal = item.id_kelas || item.kelas || '';
+        const idMapelVal = item.id_mapel || item.mapel || '';
+        const idGuruVal = item.id_guru || item.guru || item.id_g || '';
+
+        return {
+            'No': index + 1,
+            'ID Jadwal': item.id_jadwal || '-',
+            'Hari': item.hari || '-',
+            'Jam Ke': item.jam_ke ? `Jam ke-${item.jam_ke}` : '-',
+            'Kelas': mapKelas[idKelasVal] || idKelasVal || '-',
+            'Mata Pelajaran': mapMapel[idMapelVal] || idMapelVal || '-',
+            'Guru Pengajar': mapGuru[idGuruVal] || idGuruVal || '-',
+            'Tahun Ajaran': item.tahun_ajaran || '-',
+            'Semester': item.semester || '-'
+        };
+    });
 
     exportToExcel(formattedData, 'Data_Jadwal_Pelajaran', 'Jadwal');
 }
