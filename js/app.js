@@ -72,6 +72,7 @@ function showSection(sectionId, element) {
         jadwal: 'Master Jadwal Pelajaran',
         t2q: 'Master Halaqoh T2Q',
         bpi: 'Master Halaqoh BPI',
+        hari_efektif: 'Input Hari Efektif',
         settings: 'Pengaturan Koneksi API'
     };
     const titleEl = document.getElementById('page-title');
@@ -126,7 +127,7 @@ function renderAllModules() {
     if (typeof renderJadwalTable === 'function') renderJadwalTable();
     if (typeof renderT2QTable === 'function') renderT2QTable();
     if (typeof renderBPITable === 'function') renderBPITable();
-    
+    if (typeof renderHariEfektifTable === 'function') renderHariEfektifTable();
 
     // Terapkan batasan hak akses role pengguna pada komponen yang di-render
     if (typeof applyRolePermissions === 'function') {
