@@ -247,7 +247,15 @@ function getTableSchema(table) {
     },
     { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
     { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
-]
+],
+
+        Hari_Efektif: [
+            { name: 'id_efektif', label: 'ID Efektif', type: 'text', primaryKey: true },
+            { name: 'tanggal', label: 'Tanggal', type: 'text', required: true },
+            { name: 'bulan_tahun', label: 'Bulan / Tahun', type: 'text' },
+            { name: 'status', label: 'Status (1/0)', type: 'select', options: ['1', '0'] },
+            { name: 'keterangan', label: 'Keterangan', type: 'text' }
+        ]
     };
 
     return schemas[table] || [];
