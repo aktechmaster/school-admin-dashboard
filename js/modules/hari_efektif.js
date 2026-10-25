@@ -9,7 +9,6 @@ function renderHariEfektifTable() {
     const monthInput = document.getElementById('filter-bulan-efektif');
     if (!monthInput) return;
 
-    // Default bulan berjalan jika belum dipilih
     if (!monthInput.value) {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -19,17 +18,22 @@ function renderHariEfektifTable() {
 
     const [yearStr, monthStr] = monthInput.value.split('-');
     const year = parseInt(yearStr, 10);
-    const month = parseInt(monthStr, 10) - 1; // 0-index
+    const month = parseInt(monthStr, 10) - 1;
 
     const totalDays = new Date(year, month + 1, 0).getDate();
     const tbody = document.getElementById('tbody-hari-efektif');
     if (!tbody) return;
 
-    // Petakan data lokal Hari_Efektif jika sudah pernah disimpan di DB_Administrasi
+    // Normalisasi pencocokan tanggal (Handling YYYY-MM-DD & ISO strings)
     const existingMap = {};
     (localData.Hari_Efektif || []).forEach(item => {
-        if (item.tanggal) {
-            existingMap[item.tanggal] = item;
+        let tgl = item.tanggal;
+        if (tgl) {
+            tgl = String(tgl).trim();
+            if (tgl.includes('T')) {
+                tgl = tgl.split('T')[0];
+            }
+            existingMap[tgl] = item;
         }
     });
 
@@ -42,10 +46,9 @@ function renderHariEfektifTable() {
         const yyyy = year;
         const mm = String(month + 1).padStart(2, '0');
         const dd = String(day).padStart(2, '0');
-        const dateIso = `${yyyy}-${mm}-${dd}`; // 2026-07-01
-        const dateLabel = `${day} ${NAMA_BULAN_IND[month]} ${year}`; // 1 Juli 2026
+        const dateIso = `${yyyy}-${mm}-${dd}`;
+        const dateLabel = `${day} ${NAMA_BULAN_IND[month]} ${year}`;
 
-        // Cek nilai dari database lokal atau tetapkan default (Sabtu/Minggu = 0, Senin-Jumat = 1)
         let savedStatus = existingMap[dateIso] ? existingMap[dateIso].status : null;
         if (savedStatus === null || savedStatus === undefined || savedStatus === '') {
             savedStatus = (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) ? 0 : 1;
@@ -113,7 +116,7 @@ async function simpanHariEfektif() {
         return Swal.fire('Peringatan', 'Silakan pilih bulan terlebih dahulu.', 'warning');
     }
 
-    const bulanTahun = monthInput.value; // Contoh: "2026-07"
+    const bulanTahun = monthInput.value;
     const rows = document.querySelectorAll('#tbody-hari-efektif tr');
     const payloadData = [];
 
