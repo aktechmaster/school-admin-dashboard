@@ -5,7 +5,6 @@
 const NAMA_HARI_IND = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const NAMA_BULAN_IND = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-// Menyesuaikan daftar 12 bulan sesuai Tahun Pelajaran terpilih (Juli N s.d. Juni N+1)
 function updateDropdownBulanEfektif() {
     const taSelect = document.getElementById('select-ta-efektif');
     const monthSelect = document.getElementById('filter-bulan-efektif');
@@ -35,7 +34,6 @@ function updateDropdownBulanEfektif() {
         `<option value="${b.value}" ${prevVal === b.value ? 'selected' : ''}>${b.label}</option>`
     ).join('');
 
-    // Set default ke bulan berjalan jika cocok, atau ke Juli (bulan pertama TP)
     if (!monthSelect.value) {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -53,7 +51,6 @@ function renderHariEfektifTable() {
     const monthSelect = document.getElementById('filter-bulan-efektif');
     if (!monthSelect) return;
 
-    // Jika dropdown bulan belum terisi, inisialisasi terlebih dahulu
     if (!monthSelect.options || monthSelect.options.length === 0) {
         updateDropdownBulanEfektif();
         return;
@@ -67,8 +64,10 @@ function renderHariEfektifTable() {
     const tbody = document.getElementById('tbody-hari-efektif');
     if (!tbody) return;
 
-    // Normalisasi pencocokan tanggal dari localData
+    // Check data dari localData.Hari_Efektif yang berasal dari DB Spreadsheet
     const existingMap = {};
+    let isMonthSavedInDb = false;
+
     (localData.Hari_Efektif || []).forEach(item => {
         let tgl = item.tanggal;
         if (tgl) {
@@ -77,8 +76,23 @@ function renderHariEfektifTable() {
                 tgl = tgl.split('T')[0];
             }
             existingMap[tgl] = item;
+            if (tgl.startsWith(monthSelect.value)) {
+                isMonthSavedInDb = true;
+            }
         }
     });
+
+    // Update Badge Status Bulan di Atas Tabel
+    const statusBulanEl = document.getElementById('status-bulan-efektif-badge');
+    if (statusBulanEl) {
+        if (isMonthSavedInDb) {
+            statusBulanEl.className = 'badge bg-success py-2 px-3';
+            statusBulanEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> Data Bulan Ini Sudah Tersimpan di Spreadsheet';
+        } else {
+            statusBulanEl.className = 'badge bg-warning text-dark py-2 px-3';
+            statusBulanEl.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i> Data Bulan Ini Belum Disimpan di Spreadsheet';
+        }
+    }
 
     let rowsHtml = '';
     for (let day = 1; day <= totalDays; day++) {
@@ -92,6 +106,7 @@ function renderHariEfektifTable() {
         const dateIso = `${yyyy}-${mm}-${dd}`;
         const dateLabel = `${day} ${NAMA_BULAN_IND[month]} ${year}`;
 
+        const isSavedInDb = !!existingMap[dateIso];
         let savedStatus = existingMap[dateIso] ? existingMap[dateIso].status : null;
         if (savedStatus === null || savedStatus === undefined || savedStatus === '') {
             savedStatus = (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) ? 0 : 1;
@@ -101,6 +116,15 @@ function renderHariEfektifTable() {
 
         const isWeekend = (dayOfWeekIndex === 0 || dayOfWeekIndex === 6);
         const bgRow = isWeekend ? 'table-warning' : '';
+
+        // Label Keterangan & Badge Status Database
+        const dbBadge = isSavedInDb 
+            ? '<span class="badge bg-success ms-2"><i class="fas fa-database me-1"></i>Tersimpan di Spreadsheet</span>'
+            : '<span class="badge bg-secondary ms-2"><i class="fas fa-clock me-1"></i>Belum Disimpan</span>';
+
+        const ketText = Number(savedStatus) === 1 
+            ? '<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>Hari Efektif KBM</span>' 
+            : '<span class="text-muted"><i class="fas fa-times-circle me-1"></i>Libur / Tidak Efektif</span>';
 
         rowsHtml += `
             <tr class="${bgRow}" data-date="${dateIso}" data-date-label="${dateLabel}">
@@ -114,7 +138,7 @@ function renderHariEfektifTable() {
                     </select>
                 </td>
                 <td class="ket-text text-start">
-                    ${Number(savedStatus) === 1 ? '<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>Hari Efektif KBM</span>' : '<span class="text-muted"><i class="fas fa-times-circle me-1"></i>Libur / Tidak Efektif</span>'}
+                    ${ketText} ${dbBadge}
                 </td>
             </tr>
         `;
@@ -126,11 +150,15 @@ function renderHariEfektifTable() {
 function updateRowKeterangan(selectEl) {
     const tr = selectEl.closest('tr');
     const ketTd = tr.querySelector('.ket-text');
-    if (selectEl.value === '1') {
-        ketTd.innerHTML = '<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>Hari Efektif KBM</span>';
-    } else {
-        ketTd.innerHTML = '<span class="text-muted"><i class="fas fa-times-circle me-1"></i>Libur / Tidak Efektif</span>';
-    }
+    const statusVal = selectEl.value;
+
+    const ketText = statusVal === '1' 
+        ? '<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>Hari Efektif KBM</span>' 
+        : '<span class="text-muted"><i class="fas fa-times-circle me-1"></i>Libur / Tidak Efektif</span>';
+
+    const changeBadge = '<span class="badge bg-warning text-dark ms-2"><i class="fas fa-pen me-1"></i>Belum Disimpan (Ada Perubahan)</span>';
+
+    ketTd.innerHTML = `${ketText} ${changeBadge}`;
 }
 
 function setPresetHariEfektif(type) {
