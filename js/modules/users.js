@@ -2,6 +2,11 @@
 // MODUL USER MANAGEMENT (PENGGUNA)
 // ==========================================
 
+// Helper pengecekan boolean ketat (mencegah string "FALSE" / "false" terbaca truthy)
+function isTrueValue(val) {
+    return val === true || val === 'TRUE' || val === 'true' || val === 1 || val === '1';
+}
+
 function renderUsersTable() {
     const tbody = document.querySelector('#table-users tbody');
     if (!tbody) return;
@@ -29,22 +34,28 @@ function renderUsersTable() {
         const namaGuruDisplay = row.id_guru 
             ? (mapGuru[row.id_guru] ? `${mapGuru[row.id_guru]} <small class="text-muted">(${row.id_guru})</small>` : row.id_guru) 
             : '-';
-        const statusBadge = row.status_aktif 
+            
+        // Pengecekan boolean ketat untuk badge status & role
+        const statusBadge = isTrueValue(row.status_aktif) 
             ? '<span class="badge bg-success">Aktif</span>' 
             : '<span class="badge bg-danger">Nonaktif</span>';
+
+        const parseText = (val) => isTrueValue(val) 
+            ? '<span class="badge bg-success">Ya</span>' 
+            : '<span class="badge bg-secondary opacity-50">Tidak</span>';
 
         return `
             <tr>
                 <td><b>${row.id_user || ''}</b></td>
                 <td>${row.username || ''}</td>
                 <td>${namaGuruDisplay}</td>
-                <td><span class="badge bg-info">${row.role || ''}</span></td>
+                <td><span class="badge bg-info text-dark">${row.role || ''}</span></td>
                 <td>${statusBadge}</td>
-                <td>${row.is_wali_kelas ? 'Ya' : 'Tidak'}</td>
-                <td>${row.is_wakur ? 'Ya' : 'Tidak'}</td>
-                <td>${row.is_t2q ? 'Ya' : 'Tidak'}</td>
-                <td>${row.is_bpi ? 'Ya' : 'Tidak'}</td>
-                <td>${row.is_ekstra ? 'Ya' : 'Tidak'}</td>
+                <td>${parseText(row.is_wali_kelas)}</td>
+                <td>${parseText(row.is_wakur)}</td>
+                <td>${parseText(row.is_t2q)}</td>
+                <td>${parseText(row.is_bpi)}</td>
+                <td>${parseText(row.is_ekstra)}</td>
                 <td>${renderActionButtons('Users', row.id_user)}</td>
             </tr>
         `;
@@ -72,12 +83,12 @@ function exportUsersExcel() {
         'Username': item.username || '-',
         'Guru Terkait': mapGuru[item.id_guru] || item.id_guru || '-',
         'Role': item.role || '-',
-        'Status': item.status_aktif ? 'Aktif' : 'Nonaktif',
-        'Wali Kelas': item.is_wali_kelas ? 'Ya' : 'Tidak',
-        'Wakur': item.is_wakur ? 'Ya' : 'Tidak',
-        'T2Q': item.is_t2q ? 'Ya' : 'Tidak',
-        'BPI': item.is_bpi ? 'Ya' : 'Tidak',
-        'Ekstra': item.is_ekstra ? 'Ya' : 'Tidak'
+        'Status': isTrueValue(item.status_aktif) ? 'Aktif' : 'Nonaktif',
+        'Wali Kelas': isTrueValue(item.is_wali_kelas) ? 'Ya' : 'Tidak',
+        'Wakur': isTrueValue(item.is_wakur) ? 'Ya' : 'Tidak',
+        'T2Q': isTrueValue(item.is_t2q) ? 'Ya' : 'Tidak',
+        'BPI': isTrueValue(item.is_bpi) ? 'Ya' : 'Tidak',
+        'Ekstra': isTrueValue(item.is_ekstra) ? 'Ya' : 'Tidak'
     }));
 
     exportToExcel(formattedData, 'Data_User_Pengguna', 'Users');
