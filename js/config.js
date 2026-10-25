@@ -1,5 +1,5 @@
-// Konfigurasi Utama & State Data
 let GAS_URL = localStorage.getItem('SDIT_GAS_URL') || 'https://script.google.com/macros/s/AKfycbyvPJwCpToLpXk0kNoJb67dV5Rm4ajZBLzxpJVJrTsQhQKa4qcYjyfIHZsimseDcdEL/exec';
+let DB_JURNAL_ID = localStorage.getItem('SDIT_DB_JURNAL_ID') || '';
 
 let localData = {
     Users: [],
@@ -10,10 +10,10 @@ let localData = {
     Jadwal: [],
     Tim_Pengajar: [],
     Halaqoh_T2Q: [],
-    Halaqoh_BPI: []
+    Halaqoh_BPI: [],
+    Hari_Efektif: []
 };
 
-// Penampung state pencarian, filter, & paginasi per tabel
 const tableStates = {};
 
 function getTableState(tableName) {
