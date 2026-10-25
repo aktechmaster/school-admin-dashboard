@@ -5,18 +5,61 @@
 const NAMA_HARI_IND = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const NAMA_BULAN_IND = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-function renderHariEfektifTable() {
-    const monthInput = document.getElementById('filter-bulan-efektif');
-    if (!monthInput) return;
+// Menyesuaikan daftar 12 bulan sesuai Tahun Pelajaran terpilih (Juli N s.d. Juni N+1)
+function updateDropdownBulanEfektif() {
+    const taSelect = document.getElementById('select-ta-efektif');
+    const monthSelect = document.getElementById('filter-bulan-efektif');
+    if (!taSelect || !monthSelect) return;
 
-    if (!monthInput.value) {
+    const [startYearStr, endYearStr] = taSelect.value.split('/');
+    const startYear = parseInt(startYearStr, 10);
+    const endYear = parseInt(endYearStr, 10);
+
+    const bulanTP = [
+        { label: `Juli ${startYear}`, value: `${startYear}-07` },
+        { label: `Agustus ${startYear}`, value: `${startYear}-08` },
+        { label: `September ${startYear}`, value: `${startYear}-09` },
+        { label: `Oktober ${startYear}`, value: `${startYear}-10` },
+        { label: `November ${startYear}`, value: `${startYear}-11` },
+        { label: `Desember ${startYear}`, value: `${startYear}-12` },
+        { label: `Januari ${endYear}`, value: `${endYear}-01` },
+        { label: `Februari ${endYear}`, value: `${endYear}-02` },
+        { label: `Maret ${endYear}`, value: `${endYear}-03` },
+        { label: `April ${endYear}`, value: `${endYear}-04` },
+        { label: `Mei ${endYear}`, value: `${endYear}-05` },
+        { label: `Juni ${endYear}`, value: `${endYear}-06` }
+    ];
+
+    const prevVal = monthSelect.value;
+    monthSelect.innerHTML = bulanTP.map(b => 
+        `<option value="${b.value}" ${prevVal === b.value ? 'selected' : ''}>${b.label}</option>`
+    ).join('');
+
+    // Set default ke bulan berjalan jika cocok, atau ke Juli (bulan pertama TP)
+    if (!monthSelect.value) {
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
-        monthInput.value = `${yyyy}-${mm}`;
+        const currentIsoMonth = `${yyyy}-${mm}`;
+
+        const match = bulanTP.find(b => b.value === currentIsoMonth);
+        monthSelect.value = match ? match.value : bulanTP[0].value;
     }
 
-    const [yearStr, monthStr] = monthInput.value.split('-');
+    renderHariEfektifTable();
+}
+
+function renderHariEfektifTable() {
+    const monthSelect = document.getElementById('filter-bulan-efektif');
+    if (!monthSelect) return;
+
+    // Jika dropdown bulan belum terisi, inisialisasi terlebih dahulu
+    if (!monthSelect.options || monthSelect.options.length === 0) {
+        updateDropdownBulanEfektif();
+        return;
+    }
+
+    const [yearStr, monthStr] = monthSelect.value.split('-');
     const year = parseInt(yearStr, 10);
     const month = parseInt(monthStr, 10) - 1;
 
@@ -24,7 +67,7 @@ function renderHariEfektifTable() {
     const tbody = document.getElementById('tbody-hari-efektif');
     if (!tbody) return;
 
-    // Normalisasi pencocokan tanggal (Handling YYYY-MM-DD & ISO strings)
+    // Normalisasi pencocokan tanggal dari localData
     const existingMap = {};
     (localData.Hari_Efektif || []).forEach(item => {
         let tgl = item.tanggal;
@@ -111,12 +154,12 @@ function setPresetHariEfektif(type) {
 }
 
 async function simpanHariEfektif() {
-    const monthInput = document.getElementById('filter-bulan-efektif');
-    if (!monthInput || !monthInput.value) {
+    const monthSelect = document.getElementById('filter-bulan-efektif');
+    if (!monthSelect || !monthSelect.value) {
         return Swal.fire('Peringatan', 'Silakan pilih bulan terlebih dahulu.', 'warning');
     }
 
-    const bulanTahun = monthInput.value;
+    const bulanTahun = monthSelect.value;
     const rows = document.querySelectorAll('#tbody-hari-efektif tr');
     const payloadData = [];
 
