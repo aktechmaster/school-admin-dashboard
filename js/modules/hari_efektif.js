@@ -1,9 +1,22 @@
 // ==========================================
-// MODUL INPUT HARI EFEKTIF
+// MODUL INPUT HARI EFEKTIF (HAK AKSES ADMIN & WAKUR)
 // ==========================================
 
 const NAMA_HARI_IND = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const NAMA_BULAN_IND = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+// Helper Pengecekan Hak Akses (Hanya Admin atau Wakur)
+function canManageHariEfektif() {
+    if (typeof currentUser === 'undefined' || !currentUser) return false;
+    const role = String(currentUser.role || '').trim().toLowerCase();
+    const isAdmin = role === 'admin';
+    const isWakur = role === 'wakur' || 
+                    currentUser.is_wakur === true || 
+                    currentUser.is_wakur === 'TRUE' || 
+                    currentUser.is_wakur === 'true' || 
+                    currentUser.is_wakur == 1;
+    return isAdmin || isWakur;
+}
 
 function updateDropdownBulanEfektif() {
     const taSelect = document.getElementById('select-ta-efektif');
@@ -56,6 +69,15 @@ function renderHariEfektifTable() {
         return;
     }
 
+    const canEdit = canManageHariEfektif();
+
+    // Sembunyikan atau Tampilkan kontrol edit sesuai hak akses
+    const btnSimpan = document.getElementById('btn-simpan-efektif');
+    const wrapperPreset = document.getElementById('wrapper-preset-efektif');
+
+    if (btnSimpan) btnSimpan.style.display = canEdit ? 'inline-block' : 'none';
+    if (wrapperPreset) wrapperPreset.style.display = canEdit ? 'flex' : 'none';
+
     const [yearStr, monthStr] = monthSelect.value.split('-');
     const year = parseInt(yearStr, 10);
     const month = parseInt(monthStr, 10) - 1;
@@ -64,7 +86,7 @@ function renderHariEfektifTable() {
     const tbody = document.getElementById('tbody-hari-efektif');
     if (!tbody) return;
 
-    // Check data dari localData.Hari_Efektif yang berasal dari DB Spreadsheet
+    // Check data dari localData.Hari_Efektif
     const existingMap = {};
     let isMonthSavedInDb = false;
 
@@ -85,7 +107,10 @@ function renderHariEfektifTable() {
     // Update Badge Status Bulan di Atas Tabel
     const statusBulanEl = document.getElementById('status-bulan-efektif-badge');
     if (statusBulanEl) {
-        if (isMonthSavedInDb) {
+        if (!canEdit) {
+            statusBulanEl.className = 'badge bg-secondary py-2 px-3';
+            statusBulanEl.innerHTML = '<i class="fas fa-lock me-1"></i> Mode Read-Only (Hanya Admin/Wakur yang dapat mengubah)';
+        } else if (isMonthSavedInDb) {
             statusBulanEl.className = 'badge bg-success py-2 px-3';
             statusBulanEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> Data Bulan Ini Sudah Tersimpan di Spreadsheet';
         } else {
@@ -117,7 +142,6 @@ function renderHariEfektifTable() {
         const isWeekend = (dayOfWeekIndex === 0 || dayOfWeekIndex === 6);
         const bgRow = isWeekend ? 'table-warning' : '';
 
-        // Label Keterangan & Badge Status Database
         const dbBadge = isSavedInDb 
             ? '<span class="badge bg-success ms-2"><i class="fas fa-database me-1"></i>Tersimpan di Spreadsheet</span>'
             : '<span class="badge bg-secondary ms-2"><i class="fas fa-clock me-1"></i>Belum Disimpan</span>';
@@ -132,7 +156,7 @@ function renderHariEfektifTable() {
                 <td><b>${dateIso}</b></td>
                 <td><span class="badge ${isWeekend ? 'bg-danger' : 'bg-secondary'}">${dayName}</span></td>
                 <td>
-                    <select class="form-select form-select-sm text-center fw-bold status-efektif-select" onchange="updateRowKeterangan(this)">
+                    <select class="form-select form-select-sm text-center fw-bold status-efektif-select" ${canEdit ? '' : 'disabled'} onchange="updateRowKeterangan(this)">
                         <option value="1" ${Number(savedStatus) === 1 ? 'selected' : ''}>1 (Efektif)</option>
                         <option value="0" ${Number(savedStatus) === 0 ? 'selected' : ''}>0 (Tidak Efektif)</option>
                     </select>
@@ -148,6 +172,8 @@ function renderHariEfektifTable() {
 }
 
 function updateRowKeterangan(selectEl) {
+    if (!canManageHariEfektif()) return;
+
     const tr = selectEl.closest('tr');
     const ketTd = tr.querySelector('.ket-text');
     const statusVal = selectEl.value;
@@ -162,6 +188,10 @@ function updateRowKeterangan(selectEl) {
 }
 
 function setPresetHariEfektif(type) {
+    if (!canManageHariEfektif()) {
+        return Swal.fire('Akses Ditolak', 'Hanya Admin dan Wakur yang memiliki hak akses untuk mengubah Hari Efektif.', 'warning');
+    }
+
     const rows = document.querySelectorAll('#tbody-hari-efektif tr');
     rows.forEach(tr => {
         const dateIso = tr.getAttribute('data-date');
@@ -182,6 +212,10 @@ function setPresetHariEfektif(type) {
 }
 
 async function simpanHariEfektif() {
+    if (!canManageHariEfektif()) {
+        return Swal.fire('Akses Ditolak', 'Hanya Admin dan Wakur yang memiliki hak akses untuk mengubah Hari Efektif.', 'warning');
+    }
+
     const monthSelect = document.getElementById('filter-bulan-efektif');
     if (!monthSelect || !monthSelect.value) {
         return Swal.fire('Peringatan', 'Silakan pilih bulan terlebih dahulu.', 'warning');
