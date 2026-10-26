@@ -141,23 +141,30 @@ function logout() {
 }
 
 /**
- * Mengatur Tampilan Elemen Navigasi dan Akses Berdasarkan Role
+ * Mengatur Tampilan Elemen Navigasi dan Akses Berdasarkan Role (Admin & Wakur)
  */
 function applyRolePermissions() {
     if (!currentUser) return;
 
     const role = currentUser.role;
+    const isWakur = role === 'Wakur' || 
+                    currentUser.is_wakur === true || 
+                    currentUser.is_wakur === 1 || 
+                    String(currentUser.is_wakur || '').trim().toUpperCase() === 'TRUE';
+    const isAdmin = role === 'Admin';
 
     const menuMap = {
         dashboard: true,
-        users: role === 'Admin',
-        guru: ['Admin', 'Kepsek'].includes(role),
-        siswa: ['Admin', 'Kepsek', 'WaliKelas'].includes(role) || currentUser.is_wali_kelas,
-        kelas: ['Admin', 'Kepsek'].includes(role),
-        mapel: ['Admin', 'Kepsek', 'Guru'].includes(role),
-        jadwal: ['Admin', 'Kepsek', 'Guru', 'WaliKelas'].includes(role),
+        users: isAdmin,
+        guru: ['Admin', 'Kepsek'].includes(role) || isWakur,
+        siswa: ['Admin', 'Kepsek', 'WaliKelas'].includes(role) || currentUser.is_wali_kelas || isWakur,
+        kelas: ['Admin', 'Kepsek'].includes(role) || isWakur,
+        mapel: ['Admin', 'Kepsek', 'Guru'].includes(role) || isWakur,
+        jadwal: ['Admin', 'Kepsek', 'Guru', 'WaliKelas'].includes(role) || isWakur,
+        t2q: true,
+        bpi: true,
         hari_efektif: true,
-        settings: role === 'Admin'
+        settings: isAdmin
     };
 
     Object.keys(menuMap).forEach(sectionKey => {
@@ -172,12 +179,30 @@ function applyRolePermissions() {
         }
     });
 
-    const addButtons = document.querySelectorAll('button[onclick^="openModal"]');
-    addButtons.forEach(btn => {
-        if (role === 'Admin') {
-            btn.classList.remove('d-none');
-        } else {
-            btn.classList.add('d-none');
+    // Kontrol Visibilitas Tombol Header (Tambah Data / Input Massal) per Section
+    const sectionPermissions = {
+        'sec-users': isAdmin,
+        'sec-guru': isAdmin,
+        'sec-siswa': isAdmin,
+        'sec-kelas': isAdmin,
+        'sec-mapel': isAdmin || isWakur,
+        'sec-jadwal': isAdmin || isWakur,
+        'sec-t2q': isAdmin || isWakur,
+        'sec-bpi': isAdmin || isWakur
+    };
+
+    Object.keys(sectionPermissions).forEach(secId => {
+        const secEl = document.getElementById(secId);
+        if (secEl) {
+            const canEditSec = sectionPermissions[secId];
+            const actionBtns = secEl.querySelectorAll('.section-header-controls button');
+            actionBtns.forEach(btn => {
+                if (canEditSec) {
+                    btn.classList.remove('d-none');
+                } else {
+                    btn.classList.add('d-none');
+                }
+            });
         }
     });
 
