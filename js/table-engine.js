@@ -641,10 +641,25 @@ function changeTablePage(table, newPage, callback) {
 }
 
 /**
- * Pembantu Pembatasan Tombol Aksi berdasarkan Role
+ * Pembantu Pembatasan Tombol Aksi berdasarkan Role (Admin & Wakur)
  */
 function renderActionButtons(tableName, primaryKeyValue) {
-    if (!currentUser || currentUser.role !== 'Admin') {
+    if (!currentUser) {
+        return `<span class="badge bg-light text-muted"><i class="fas fa-lock me-1"></i>Read Only</span>`;
+    }
+
+    const isAdmin = currentUser.role === 'Admin';
+    const isWakur = currentUser.role === 'Wakur' || 
+                    currentUser.is_wakur === true || 
+                    currentUser.is_wakur === 1 || 
+                    String(currentUser.is_wakur || '').trim().toUpperCase() === 'TRUE';
+
+    // Daftar tabel yang diizinkan untuk dikelola (CRUD) oleh Wakur
+    const wakurAllowedTables = ['Mapel', 'Jadwal', 'Halaqoh_T2Q', 'Halaqoh_BPI', 'Hari_Efektif'];
+    
+    const canEdit = isAdmin || (isWakur && wakurAllowedTables.includes(tableName));
+
+    if (!canEdit) {
         return `<span class="badge bg-light text-muted"><i class="fas fa-lock me-1"></i>Read Only</span>`;
     }
 
