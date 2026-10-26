@@ -62,6 +62,11 @@ function showSection(sectionId, element) {
         if (activeNav) activeNav.classList.add('active');
     }
 
+    // Pemicu Re-render Otomatis Saat Menu Hari Efektif Diklik
+    if (sectionId === 'hari_efektif' && typeof renderHariEfektifTable === 'function') {
+        renderHariEfektifTable();
+    }
+
     const titles = {
         dashboard: 'Dashboard Overview',
         users: 'Master Users',
