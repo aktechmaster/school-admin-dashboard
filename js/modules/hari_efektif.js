@@ -5,17 +5,24 @@
 const NAMA_HARI_IND = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const NAMA_BULAN_IND = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-// Helper Pengecekan Hak Akses (Hanya Admin atau Wakur)
+// Helper Pengecekan Hak Akses Ketat (Hanya Admin atau Wakur)
 function canManageHariEfektif() {
     if (typeof currentUser === 'undefined' || !currentUser) return false;
+    
+    // 1. Cek Role Utama (Admin / Wakur)
     const role = String(currentUser.role || '').trim().toLowerCase();
-    const isAdmin = role === 'admin';
-    const isWakur = role === 'wakur' || 
-                    currentUser.is_wakur === true || 
-                    currentUser.is_wakur === 'TRUE' || 
-                    currentUser.is_wakur === 'true' || 
-                    currentUser.is_wakur == 1;
-    return isAdmin || isWakur;
+    if (role === 'admin' || role === 'wakur') return true;
+
+    // 2. Cek Flag is_wakur (Tolak tegas jika nilainya "FALSE", "false", 0, "0", false, null)
+    const valWakur = currentUser.is_wakur;
+    const isWakurActive = (
+        valWakur === true || 
+        valWakur === 1 || 
+        String(valWakur).trim().toUpperCase() === 'TRUE' || 
+        String(valWakur).trim() === '1'
+    );
+
+    return isWakurActive;
 }
 
 function updateDropdownBulanEfektif() {
