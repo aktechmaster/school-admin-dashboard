@@ -1,6 +1,16 @@
 // State Sesi Pengguna saat ini
 let currentUser = null;
 
+// Helper konversi boolean ketat (mencegah string "FALSE"/"0" dikonversi jadi true oleh Boolean())
+function toBool(val) {
+    if (val === true || val === 1) return true;
+    if (typeof val === 'string') {
+        const s = val.trim().toUpperCase();
+        return s === 'TRUE' || s === '1';
+    }
+    return false;
+}
+
 /**
  * Inisialisasi Sesi saat Aplikasi (Dashboard) Pertama Dimuat
  */
@@ -8,25 +18,33 @@ function initSession() {
     const savedUser = localStorage.getItem('SDIT_USER_SESSION');
     if (savedUser) {
         try {
-            currentUser = JSON.parse(savedUser);
+            const parsed = JSON.parse(savedUser);
+            // Sanitasi ulang data boolean dari localStorage
+            currentUser = {
+                ...parsed,
+                is_wali_kelas: toBool(parsed.is_wali_kelas),
+                is_wakur: toBool(parsed.is_wakur),
+                is_t2q: toBool(parsed.is_t2q),
+                is_bpi: toBool(parsed.is_bpi),
+                is_ekstra: toBool(parsed.is_ekstra)
+            };
             renderUserProfile();
             applyRolePermissions();
         } catch (e) {
             logout();
         }
     } else {
-        // Jika tidak ada sesi di dashboard, tendang ke halaman login
         window.location.replace('login.html');
     }
 }
 
 /**
- * Inisialisasi khusus untuk halaman Login (mencegah user login lagi jika sudah login)
+ * Inisialisasi khusus untuk halaman Login
  */
 function initLoginPage() {
     const savedUser = localStorage.getItem('SDIT_USER_SESSION');
     if (savedUser) {
-        window.location.replace('index.html'); // Langsung ke dashboard
+        window.location.replace('index.html');
     }
 }
 
@@ -45,7 +63,6 @@ async function processLogin(event) {
 
     Swal.fire({ title: 'Verifikasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-    // Ambil data users dari GAS jika belum ada
     if (!localData.Users || localData.Users.length === 0) {
         try {
             const response = await fetch(`${GAS_URL}?action=readAllMaster`);
@@ -58,7 +75,6 @@ async function processLogin(event) {
         }
     }
 
-    // Pencarian user
     const user = (localData.Users || []).find(u => 
         String(u.username).toLowerCase() === usernameInput.toLowerCase() && 
         String(u.password_hash) === passwordInput
@@ -68,7 +84,8 @@ async function processLogin(event) {
         return Swal.fire('Gagal Login', 'Username atau Password salah!', 'error');
     }
 
-    if (!user.status_aktif) {
+    const isUserActive = toBool(user.status_aktif);
+    if (!isUserActive) {
         return Swal.fire('Akun Nonaktif', 'Akun Anda telah dinonaktifkan. Hubungi Administrator.', 'error');
     }
 
@@ -83,14 +100,13 @@ async function processLogin(event) {
         role: user.role,
         id_guru: user.id_guru || null,
         nama_lengkap: detailGuru ? detailGuru.nama_lengkap : user.username,
-        is_wali_kelas: Boolean(user.is_wali_kelas),
-        is_wakur: Boolean(user.is_wakur),
-        is_t2q: Boolean(user.is_t2q),
-        is_bpi: Boolean(user.is_bpi),
-        is_ekstra: Boolean(user.is_ekstra)
+        is_wali_kelas: toBool(user.is_wali_kelas),
+        is_wakur: toBool(user.is_wakur),
+        is_t2q: toBool(user.is_t2q),
+        is_bpi: toBool(user.is_bpi),
+        is_ekstra: toBool(user.is_ekstra)
     };
 
-    // Simpan sesi
     localStorage.setItem('SDIT_USER_SESSION', JSON.stringify(currentUser));
     
     Swal.fire({
@@ -100,7 +116,6 @@ async function processLogin(event) {
         timer: 1500,
         showConfirmButton: false
     }).then(() => {
-        // Alihkan ke Dashboard setelah login sukses
         window.location.replace('index.html');
     });
 }
@@ -120,7 +135,6 @@ function logout() {
         if (res.isConfirmed) {
             localStorage.removeItem('SDIT_USER_SESSION');
             currentUser = null;
-            // Tendang ke halaman login
             window.location.replace('login.html');
         }
     });
@@ -142,6 +156,7 @@ function applyRolePermissions() {
         kelas: ['Admin', 'Kepsek'].includes(role),
         mapel: ['Admin', 'Kepsek', 'Guru'].includes(role),
         jadwal: ['Admin', 'Kepsek', 'Guru', 'WaliKelas'].includes(role),
+        hari_efektif: true,
         settings: role === 'Admin'
     };
 
