@@ -457,9 +457,17 @@
                 <div id="sec-lap_jurnal_umum" class="content-section d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5><i class="fas fa-file-alt text-primary me-2"></i>Laporan Jurnal Umum (Rekap Bulanan & Juli-Juni)</h5>
-                        <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('Umum', true)">
-                            <i class="fas fa-sync-alt me-1"></i> Reload Laporan
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-success btn-sm" onclick="exportLaporanExcel('Umum')">
+                                <i class="fas fa-file-excel me-1"></i> Download Excel
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="exportLaporanPDF('Umum')">
+                                <i class="fas fa-file-pdf me-1"></i> Download PDF
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('Umum', true)">
+                                <i class="fas fa-sync-alt me-1"></i> Reload Laporan
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive p-3 rounded shadow-sm bg-white" id="container-lap-umum">
                         <p class="text-muted">Memuat data laporan...</p>
@@ -470,9 +478,17 @@
                 <div id="sec-lap_jurnal_t2q" class="content-section d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5><i class="fas fa-quran text-success me-2"></i>Laporan Jurnal T2Q (Rekap Bulanan & Juli-Juni)</h5>
-                        <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('T2Q', true)">
-                            <i class="fas fa-sync-alt me-1"></i> Reload Laporan
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-success btn-sm" onclick="exportLaporanExcel('T2Q')">
+                                <i class="fas fa-file-excel me-1"></i> Download Excel
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="exportLaporanPDF('T2Q')">
+                                <i class="fas fa-file-pdf me-1"></i> Download PDF
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('T2Q', true)">
+                                <i class="fas fa-sync-alt me-1"></i> Reload Laporan
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive p-3 rounded shadow-sm bg-white" id="container-lap-t2q">
                         <p class="text-muted">Memuat data laporan...</p>
