@@ -1,11 +1,11 @@
-// Variable cache menyimpan data laporan harian
+// Cache penyimpanan data harian
 let harianDataCache = { umum: null, t2q: null };
 
 /**
- * Memuat persentase dan detail harian untuk Dashboard
+ * 1. Fungsi Memanggil Persentase Jurnal dari Google Apps Script
  */
 async function loadDashboardLaporanData() {
-    if (!GAS_URL) return;
+    if (typeof GAS_URL === 'undefined' || !GAS_URL) return;
     try {
         const response = await fetch(`${GAS_URL}?action=getDashboardLaporan`);
         const result = await response.json();
@@ -17,8 +17,8 @@ async function loadDashboardLaporanData() {
             const elUmum = document.getElementById('kpi-persen-umum');
             const elT2q = document.getElementById('kpi-persen-t2q');
 
-            if (elUmum) elUmum.innerText = result.umum.percentage;
-            if (elT2q) elT2q.innerText = result.t2q.percentage;
+            if (elUmum) elUmum.innerText = result.umum.percentage || '0%';
+            if (elT2q) elT2q.innerText = result.t2q.percentage || '0%';
         }
     } catch (err) {
         console.error('Gagal memuat persentase jurnal:', err);
@@ -26,7 +26,7 @@ async function loadDashboardLaporanData() {
 }
 
 /**
- * Membuka Modal Detail Harian (Hanya Kolom A, B, D, E, H)
+ * 2. Fungsi Tombol "Lihat detail" untuk Membuka Modal
  */
 function openModalDetailHarian(type) {
     const titleEl = document.getElementById('titleModalHarian');
@@ -56,31 +56,32 @@ function openModalDetailHarian(type) {
 
     const modalEl = document.getElementById('modalDetailHarian');
     if (modalEl && typeof bootstrap !== 'undefined') {
-        const modal = new bootstrap.Modal(modalEl);
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
     }
 }
 
 /**
- * Memuat Rekap Laporan Bulanan/Tahunan ke Halaman Laporan
+ * 3. Fungsi Memuat Laporan Bulanan/Tahunan untuk Menu Sidebar
  */
 async function loadLaporanJurnal(type) {
     const containerId = type === 'T2Q' ? 'container-lap-t2q' : 'container-lap-umum';
     const container = document.getElementById(containerId);
-    if (!container || !GAS_URL) return;
+    if (!container || typeof GAS_URL === 'undefined' || !GAS_URL) return;
 
-    container.innerHTML = '<p class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Memuat data laporan...</p>';
+    container.innerHTML = '<div class="p-3 text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Memuat data laporan dari server...</div>';
 
     try {
         const response = await fetch(`${GAS_URL}?action=getLaporanJurnal&type=${type}`);
         const result = await response.json();
 
         if (result.status === 'success' && result.data && result.data.length > 0) {
-            let tableHtml = '<table class="table table-bordered table-striped table-hover align-middle text-center" style="font-size:0.8rem;"><tbody>';
+            let tableHtml = '<table class="table table-bordered table-striped table-hover align-middle text-center mb-0" style="font-size:0.8rem;"><tbody>';
             
             result.data.forEach((row, idx) => {
-                const tag = idx < 2 ? 'th' : 'td'; // Baris 1 & 2 sebagai header
-                const bgClass = idx < 2 ? 'class="table-dark"' : '';
+                const isHeader = idx < 2; // Baris 1 & 2 spreadsheet adalah Header
+                const tag = isHeader ? 'th' : 'td';
+                const bgClass = isHeader ? 'class="table-dark align-middle"' : '';
                 
                 tableHtml += `<tr ${bgClass}>`;
                 row.forEach(cell => {
@@ -92,9 +93,9 @@ async function loadLaporanJurnal(type) {
             tableHtml += '</tbody></table>';
             container.innerHTML = tableHtml;
         } else {
-            container.innerHTML = '<p class="text-danger">Gagal atau tidak ada data laporan.</p>';
+            container.innerHTML = '<div class="p-3 text-danger">Data laporan tidak ditemukan atau gagal diproses.</div>';
         }
     } catch (err) {
-        container.innerHTML = `<p class="text-danger">Error: ${err.message}</p>`;
+        container.innerHTML = `<div class="p-3 text-danger">Error memuat data: ${err.message}</div>`;
     }
 }
