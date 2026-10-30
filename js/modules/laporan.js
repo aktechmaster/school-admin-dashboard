@@ -10,6 +10,10 @@ async function loadDashboardLaporanData() {
     try {
         const response = await fetch(`${GAS_URL}?action=getDashboardLaporan`);
         const result = await response.json();
+
+        // --- TAMBAHKAN DUA BARIS INI UNTUK CEK RESPON GAS ---
+        console.log("=== RESPON DARI GAS ===", result);
+        console.log("Data Absensi:", result.absensi);
         
         if (result.status === 'success') {
             harianDataCache.umum = result.umum;
