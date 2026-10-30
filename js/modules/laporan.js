@@ -76,16 +76,41 @@ async function loadLaporanJurnal(type) {
         const result = await response.json();
 
         if (result.status === 'success' && result.data && result.data.length > 0) {
+            // Deteksi kolom mana saja yang merupakan kolom PERSENTASE berdasarkan judul header
+            const percentColIndices = new Set();
+            result.data.forEach((row, idx) => {
+                if (idx < 2) { // Mengecek baris header (Baris 1 & 2)
+                    row.forEach((cell, cIdx) => {
+                        if (cell && String(cell).toUpperCase().trim().includes('PERSENTASE')) {
+                            percentColIndices.add(cIdx);
+                        }
+                    });
+                }
+            });
+
             let tableHtml = '<table class="table table-bordered table-striped table-hover align-middle text-center mb-0" style="font-size:0.8rem;"><tbody>';
-            
+
             result.data.forEach((row, idx) => {
                 const isHeader = idx < 2; // Baris 1 & 2 spreadsheet adalah Header
                 const tag = isHeader ? 'th' : 'td';
                 const bgClass = isHeader ? 'class="table-dark align-middle"' : '';
-                
+
                 tableHtml += `<tr ${bgClass}>`;
-                row.forEach(cell => {
-                    tableHtml += `<${tag}>${cell !== undefined ? cell : ''}</${tag}>`;
+                row.forEach((cell, cIdx) => {
+                    let displayValue = (cell !== undefined && cell !== null) ? cell : '';
+
+                    // Format khusus untuk kolom PERSENTASE pada baris isi data
+                    if (!isHeader && percentColIndices.has(cIdx)) {
+                        if (displayValue !== '' && displayValue !== null && displayValue !== undefined) {
+                            const num = Number(displayValue);
+                            if (!isNaN(num)) {
+                                // Mengubah desimal 0.8 menjadi 80,00% dan 0.833333... menjadi 83,33%
+                                displayValue = (num * 100).toFixed(2).replace('.', ',') + '%';
+                            }
+                        }
+                    }
+
+                    tableHtml += `<${tag}>${displayValue}</${tag}>`;
                 });
                 tableHtml += `</tr>`;
             });
