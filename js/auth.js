@@ -152,7 +152,30 @@ function applyRolePermissions() {
                     currentUser.is_wakur === 1 || 
                     String(currentUser.is_wakur || '').trim().toUpperCase() === 'TRUE';
     const isAdmin = role === 'Admin';
+    const isKepsek = role === 'Kepsek';
 
+    // ===== HAK AKSES KHUSUS MENU LAPORAN & WIDGET (Admin, Kepsek, Wakur) =====
+    const canAccessLaporan = isAdmin || isKepsek || isWakur;
+
+    // Sembunyikan/Tampilkan Group Menu Laporan di Sidebar
+    document.querySelectorAll('.nav-laporan-group').forEach(el => {
+        if (canAccessLaporan) {
+            el.classList.remove('d-none');
+        } else {
+            el.classList.add('d-none');
+        }
+    });
+
+    // Sembunyikan/Tampilkan Kartu Persentase Jurnal di Dashboard
+    document.querySelectorAll('.card-kpi-jurnal').forEach(el => {
+        if (canAccessLaporan) {
+            el.classList.remove('d-none');
+        } else {
+            el.classList.add('d-none');
+        }
+    });
+
+    // Pemetaan menu navigasi standar
     const menuMap = {
         dashboard: true,
         users: isAdmin,
@@ -164,6 +187,8 @@ function applyRolePermissions() {
         t2q: true,
         bpi: true,
         hari_efektif: true,
+        lap_jurnal_umum: canAccessLaporan,
+        lap_jurnal_t2q: canAccessLaporan,
         settings: isAdmin
     };
 
