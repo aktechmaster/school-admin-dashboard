@@ -67,6 +67,13 @@ function showSection(sectionId, element) {
         renderHariEfektifTable();
     }
 
+    // Pemicu Auto-Load Data Laporan Saat Menu Laporan Diklik (BARU)
+    if (sectionId === 'lap_jurnal_umum' && typeof loadLaporanJurnal === 'function') {
+        loadLaporanJurnal('Umum');
+    } else if (sectionId === 'lap_jurnal_t2q' && typeof loadLaporanJurnal === 'function') {
+        loadLaporanJurnal('T2Q');
+    }
+
     const titles = {
         dashboard: 'Dashboard Overview',
         users: 'Master Users',
@@ -78,6 +85,8 @@ function showSection(sectionId, element) {
         t2q: 'Master Halaqoh T2Q',
         bpi: 'Master Halaqoh BPI',
         hari_efektif: 'Input Hari Efektif',
+        lap_jurnal_umum: 'Laporan Jurnal Umum',  // BARU
+        lap_jurnal_t2q: 'Laporan Jurnal T2Q',    // BARU
         settings: 'Pengaturan Koneksi API'
     };
     const titleEl = document.getElementById('page-title');
@@ -124,6 +133,10 @@ function renderAllModules() {
     document.querySelectorAll('[id^="controls-"]').forEach(el => el.remove());
 
     if (typeof updateDashboardKPI === 'function') updateDashboardKPI();
+    
+    // Panggil pemuatan persentase jurnal di dashboard (BARU)
+    if (typeof loadDashboardLaporanData === 'function') loadDashboardLaporanData();
+
     if (typeof renderUsersTable === 'function') renderUsersTable();
     if (typeof renderGuruTable === 'function') renderGuruTable();
     if (typeof renderSiswaTable === 'function') renderSiswaTable();
