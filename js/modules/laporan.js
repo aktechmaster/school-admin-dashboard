@@ -1,9 +1,9 @@
 // Cache penyimpanan data
-let harianDataCache = { umum: null, t2q: null };
-let laporanJurnalCache = { Umum: null, T2Q: null }; // Cache khusus Laporan Bulanan/Tahunan
+let harianDataCache = { umum: null, t2q: null, absensi: null };
+let laporanJurnalCache = { Umum: null, T2Q: null };
 
 /**
- * 1. Fungsi Memanggil Persentase Jurnal dari Google Apps Script
+ * 1. Fungsi Memanggil Persentase Jurnal & Kehadiran dari Google Apps Script
  */
 async function loadDashboardLaporanData() {
     if (typeof GAS_URL === 'undefined' || !GAS_URL) return;
@@ -14,15 +14,18 @@ async function loadDashboardLaporanData() {
         if (result.status === 'success') {
             harianDataCache.umum = result.umum;
             harianDataCache.t2q = result.t2q;
+            harianDataCache.absensi = result.absensi;
 
             const elUmum = document.getElementById('kpi-persen-umum');
             const elT2q = document.getElementById('kpi-persen-t2q');
+            const elAbsensi = document.getElementById('kpi-persen-absensi');
 
-            if (elUmum) elUmum.innerText = result.umum.percentage || '0%';
-            if (elT2q) elT2q.innerText = result.t2q.percentage || '0%';
+            if (elUmum) elUmum.innerText = result.umum ? result.umum.percentage || '0%' : '0%';
+            if (elT2q) elT2q.innerText = result.t2q ? result.t2q.percentage || '0%' : '0%';
+            if (elAbsensi) elAbsensi.innerText = result.absensi ? result.absensi.percentage || '0%' : '0%';
         }
     } catch (err) {
-        console.error('Gagal memuat persentase jurnal:', err);
+        console.error('Gagal memuat persentase jurnal & kehadiran:', err);
     }
 }
 
@@ -373,4 +376,45 @@ function exportLaporanPDF(type) {
 
     printWindow.document.write(htmlContent);
     printWindow.document.close();
+}
+
+/**
+ * Fungsi Tombol "Lihat detail" untuk Membuka Modal Detail Kehadiran Guru & Karyawan
+ */
+function openModalDetailAbsensi() {
+    const tbody = document.getElementById('tbody-detail-absensi');
+    const dataObj = harianDataCache.absensi;
+
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!dataObj || !dataObj.rows || dataObj.rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-muted py-3">Data kehadiran harian tidak tersedia.</td></tr>`;
+    } else {
+        dataObj.rows.forEach(r => {
+            const isHadir = String(r.today).trim() === '1';
+            const statusBadge = isHadir 
+                ? `<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Hadir</span>`
+                : `<span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Absen</span>`;
+
+            tbody.insertAdjacentHTML('beforeend', `
+                <tr class="${!isHadir ? 'table-danger' : ''}">
+                    <td class="fw-bold">${r.no}</td>
+                    <td class="text-start fw-semibold">${r.nama}</td>
+                    <td><span class="badge bg-secondary">${r.total1Th}</span></td>
+                    <td>${r.izin > 0 ? `<span class="badge bg-warning text-dark">${r.izin}</span>` : '0'}</td>
+                    <td>${r.sakit > 0 ? `<span class="badge bg-info text-dark">${r.sakit}</span>` : '0'}</td>
+                    <td>${r.alfa > 0 ? `<span class="badge bg-danger">${r.alfa}</span>` : '0'}</td>
+                    <td>${r.dinasLuar > 0 ? `<span class="badge bg-primary">${r.dinasLuar}</span>` : '0'}</td>
+                    <td>${statusBadge}</td>
+                </tr>
+            `);
+        });
+    }
+
+    const modalEl = document.getElementById('modalDetailAbsensi');
+    if (modalEl && typeof bootstrap !== 'undefined') {
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    }
 }
