@@ -189,7 +189,7 @@ function exportLaporanExcel(type) {
 }
 
 /**
- * 5. Fungsi Ekspor Laporan ke PDF via Mode Cetak Browser (Rapi & Tidak Terpotong)
+ * 5. Fungsi Ekspor Laporan ke PDF via Mode Cetak Browser (A3 Landscape - Full 12 Bulan)
  */
 function exportLaporanPDF(type) {
     const rawData = laporanJurnalCache[type];
@@ -214,29 +214,37 @@ function exportLaporanPDF(type) {
             <title>Laporan Jurnal ${type} - SDIT Al-Kautsar</title>
             <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
             <style>
+                /* Set Kertas A3 Landscape agar 12 Bulan (Juli - Juni) muat utuh */
                 @page { 
-                    size: landscape; 
-                    margin: 8mm; 
+                    size: A3 landscape; 
+                    margin: 5mm; 
                 }
                 body { 
                     font-family: Arial, sans-serif; 
                     font-size: 8px; 
-                    padding: 10px; 
+                    padding: 5px; 
                     background: white;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
                 }
                 .report-header { 
                     text-align: center; 
-                    margin-bottom: 15px; 
+                    margin-bottom: 10px; 
                 }
                 .report-header h4 { 
                     font-weight: bold; 
                     margin: 0; 
-                    font-size: 14px; 
+                    font-size: 15px; 
                 }
                 .report-header h6 { 
                     color: #444; 
-                    margin-top: 4px; 
+                    margin-top: 3px; 
                     font-size: 11px; 
+                }
+                /* Penskalaan otomatis agar tabel pas di halaman */
+                .table-print-wrapper {
+                    width: 100%;
+                    zoom: 0.82; 
                 }
                 table { 
                     width: 100% !important; 
@@ -244,8 +252,8 @@ function exportLaporanPDF(type) {
                     font-size: 7.5px !important; 
                 }
                 th, td { 
-                    border: 1px solid #333 !important; 
-                    padding: 3px 2px !important; 
+                    border: 1px solid #000 !important; 
+                    padding: 3px 1px !important; 
                     text-align: center !important; 
                     white-space: nowrap !important; 
                 }
@@ -253,11 +261,9 @@ function exportLaporanPDF(type) {
                     background-color: #212529 !important; 
                     color: white !important; 
                     font-weight: bold !important; 
-                    -webkit-print-color-adjust: exact; 
                 }
                 tr:nth-child(even) td { 
                     background-color: #f8f9fa !important; 
-                    -webkit-print-color-adjust: exact; 
                 }
             </style>
         </head>
@@ -266,7 +272,9 @@ function exportLaporanPDF(type) {
                 <h4>SDIT AL-KAUTSAR</h4>
                 <h6>REKAP LAPORAN JURNAL ${type.toUpperCase()} (JULI - JUNI)</h6>
             </div>
-            ${tableElement.innerHTML}
+            <div class="table-print-wrapper">
+                ${tableElement.innerHTML}
+            </div>
             <script>
                 window.onload = function() {
                     setTimeout(function() {
