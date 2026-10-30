@@ -99,9 +99,15 @@ async function loadLaporanJurnal(type, forceReload = false) {
 }
 
 /**
- * Helper internal untuk merender elemen HTML tabel laporan
+ * Helper internal untuk merender elemen HTML tabel laporan dengan Freeze Header
  */
 function renderTableLaporan(container, data) {
+    if (!data || data.length === 0) {
+        container.innerHTML = '<div class="p-3 text-muted">Data laporan kosong.</div>';
+        return;
+    }
+
+    // Deteksi indeks kolom PERSENTASE
     const percentColIndices = new Set();
     data.forEach((row, idx) => {
         if (idx < 2) {
@@ -113,32 +119,53 @@ function renderTableLaporan(container, data) {
         }
     });
 
-    let tableHtml = '<table class="table table-bordered table-striped table-hover align-middle text-center mb-0" style="font-size:0.8rem;"><tbody>';
+    // Wrapper scrollable untuk mengunci header saat scroll vertikal & horizontal
+    let tableHtml = `
+        <div class="table-responsive-laporan" style="max-height: 70vh; overflow: auto; border: 1px solid #dee2e6;">
+            <table class="table table-bordered table-striped table-hover align-middle text-center mb-0" style="font-size:0.8rem; border-collapse: separate; border-spacing: 0;">
+                <thead>
+    `;
 
+    // Render Baris Header (Baris 0 dan 1)
     data.forEach((row, idx) => {
-        const isHeader = idx < 2;
-        const tag = isHeader ? 'th' : 'td';
-        const bgClass = isHeader ? 'class="table-dark align-middle"' : '';
+        if (idx < 2) {
+            const trClass = idx === 0 ? 'header-row-1' : 'header-row-2';
+            tableHtml += `<tr class="${trClass}">`;
+            row.forEach(cell => {
+                const displayValue = (cell !== undefined && cell !== null) ? cell : '';
+                tableHtml += `<th class="bg-dark text-white align-middle">${displayValue}</th>`;
+            });
+            tableHtml += '</tr>';
+            
+            // Tutup <thead> dan buka <tbody> setelah baris header kedua
+            if (idx === 1) {
+                tableHtml += '</thead><tbody>';
+            }
+        } else {
+            // Render Baris Data
+            tableHtml += '<tr>';
+            row.forEach((cell, cIdx) => {
+                let displayValue = (cell !== undefined && cell !== null) ? cell : '';
 
-        tableHtml += `<tr ${bgClass}>`;
-        row.forEach((cell, cIdx) => {
-            let displayValue = (cell !== undefined && cell !== null) ? cell : '';
-
-            if (!isHeader && percentColIndices.has(cIdx)) {
-                if (displayValue !== '' && displayValue !== null && displayValue !== undefined) {
+                if (percentColIndices.has(cIdx) && displayValue !== '' && displayValue !== null) {
                     const num = Number(displayValue);
                     if (!isNaN(num)) {
                         displayValue = (num * 100).toFixed(2).replace('.', ',') + '%';
                     }
                 }
-            }
 
-            tableHtml += `<${tag}>${displayValue}</${tag}>`;
-        });
-        tableHtml += '</tr>';
+                tableHtml += `<td>${displayValue}</td>`;
+            });
+            tableHtml += '</tr>';
+        }
     });
 
-    tableHtml += '</tbody></table>';
+    tableHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
     container.innerHTML = tableHtml;
 }
 
