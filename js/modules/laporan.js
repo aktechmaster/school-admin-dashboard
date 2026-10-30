@@ -43,16 +43,24 @@ function openModalDetailHarian(type) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-muted py-3">Data harian tidak tersedia.</td></tr>`;
     } else {
         dataObj.rows.forEach(r => {
-            tbody.insertAdjacentHTML('beforeend', `
-                <tr>
-                    <td class="fw-bold">${r.no}</td>
-                    <td class="text-start">${r.nama}</td>
-                    <td><span class="badge bg-secondary">${r.harusDiisi}</span></td>
-                    <td><span class="badge bg-success">${r.realisasi}</span></td>
-                    <td class="fw-bold text-primary">${r.totalGuru}</td>
-                </tr>
-            `);
-        });
+    // Konversi nilai realisasi ke angka
+    const realisasiVal = Number(r.realisasi) || 0;
+    
+    // Jika lebih dari 0 diberi badge hijau, jika 0 atau kosong ditampilkan tanpa warna/badge
+    const realisasiHtml = realisasiVal > 0 
+        ? `<span class="badge bg-success">${r.realisasi}</span>` 
+        : `<span class="text-muted">${r.realisasi || 0}</span>`;
+
+    tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+            <td class="fw-bold">${r.no}</td>
+            <td class="text-start">${r.nama}</td>
+            <td><span class="badge bg-secondary">${r.harusDiisi}</span></td>
+            <td>${realisasiHtml}</td>
+            <td class="fw-bold text-primary">${r.totalGuru}</td>
+        </tr>
+    `);
+});
     }
 
     const modalEl = document.getElementById('modalDetailHarian');
