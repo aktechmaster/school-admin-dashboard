@@ -189,7 +189,7 @@ function exportLaporanExcel(type) {
 }
 
 /**
- * 5. Fungsi Ekspor Laporan ke Format PDF (.pdf)
+ * 5. Fungsi Ekspor Laporan ke PDF via Mode Cetak Browser (Rapi & Tidak Terpotong)
  */
 function exportLaporanPDF(type) {
     const rawData = laporanJurnalCache[type];
@@ -198,55 +198,87 @@ function exportLaporanPDF(type) {
         return;
     }
 
-    if (typeof window.jspdf === 'undefined') {
-        Swal.fire('Error', 'Library PDF belum siap dimuat.', 'error');
-        return;
-    }
+    const containerId = type === 'T2Q' ? 'container-lap-t2q' : 'container-lap-umum';
+    const tableElement = document.getElementById(containerId);
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('landscape', 'pt', 'a4'); // Format Landscape untuk tabel lebar
+    if (!tableElement) return;
 
-    // Judul Dokumen PDF
-    doc.setFontSize(13);
-    doc.text(`LAPORAN REKAP JURNAL ${type.toUpperCase()} - SDIT AL-KAUTSAR`, 40, 35);
-
-    // Deteksi Kolom Persentase
-    const percentColIndices = new Set();
-    rawData.forEach((row, idx) => {
-        if (idx < 2) {
-            row.forEach((cell, cIdx) => {
-                if (cell && String(cell).toUpperCase().trim().includes('PERSENTASE')) {
-                    percentColIndices.add(cIdx);
+    // Buat jendela cetak baru yang terisolasi dan rapi
+    const printWindow = window.open('', '_blank');
+    
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <title>Laporan Jurnal ${type} - SDIT Al-Kautsar</title>
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                @page { 
+                    size: landscape; 
+                    margin: 8mm; 
                 }
-            });
-        }
-    });
-
-    // Pemisahan Header dan Body Tabel
-    const head = [rawData[0] || [], rawData[1] || []];
-    const body = rawData.slice(2).map(row => {
-        return row.map((cell, cIdx) => {
-            if (percentColIndices.has(cIdx) && cell !== '' && cell !== null && cell !== undefined) {
-                const num = Number(cell);
-                if (!isNaN(num)) {
-                    return (num * 100).toFixed(2).replace('.', ',') + '%';
+                body { 
+                    font-family: Arial, sans-serif; 
+                    font-size: 8px; 
+                    padding: 10px; 
+                    background: white;
                 }
-            }
-            return cell !== undefined && cell !== null ? cell : '';
-        });
-    });
+                .report-header { 
+                    text-align: center; 
+                    margin-bottom: 15px; 
+                }
+                .report-header h4 { 
+                    font-weight: bold; 
+                    margin: 0; 
+                    font-size: 14px; 
+                }
+                .report-header h6 { 
+                    color: #444; 
+                    margin-top: 4px; 
+                    font-size: 11px; 
+                }
+                table { 
+                    width: 100% !important; 
+                    border-collapse: collapse !important; 
+                    font-size: 7.5px !important; 
+                }
+                th, td { 
+                    border: 1px solid #333 !important; 
+                    padding: 3px 2px !important; 
+                    text-align: center !important; 
+                    white-space: nowrap !important; 
+                }
+                th { 
+                    background-color: #212529 !important; 
+                    color: white !important; 
+                    font-weight: bold !important; 
+                    -webkit-print-color-adjust: exact; 
+                }
+                tr:nth-child(even) td { 
+                    background-color: #f8f9fa !important; 
+                    -webkit-print-color-adjust: exact; 
+                }
+            </style>
+        </head>
+        <body>
+            <div class="report-header">
+                <h4>SDIT AL-KAUTSAR</h4>
+                <h6>REKAP LAPORAN JURNAL ${type.toUpperCase()} (JULI - JUNI)</h6>
+            </div>
+            ${tableElement.innerHTML}
+            <script>
+                window.onload = function() {
+                    setTimeout(function() {
+                        window.print();
+                        window.close();
+                    }, 400);
+                };
+            <\/script>
+        </body>
+        </html>
+    `;
 
-    // Generate Tabel Autotable PDF
-    doc.autoTable({
-        head: head,
-        body: body,
-        startY: 50,
-        theme: 'grid',
-        styles: { fontSize: 6.5, cellPadding: 2, halign: 'center', overflow: 'linebreak' },
-        headStyles: { fillColor: [33, 37, 41], textColor: 255, fontStyle: 'bold' },
-        margin: { top: 40, left: 20, right: 20, bottom: 20 }
-    });
-
-    // Unduh File
-    doc.save(`Laporan_Jurnal_${type}_SDIT_AlKautsar.pdf`);
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
 }
