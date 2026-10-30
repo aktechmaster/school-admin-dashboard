@@ -189,12 +189,12 @@ function exportLaporanExcel(type) {
 }
 
 /**
- * 5. Fungsi Ekspor Laporan ke PDF via Mode Cetak Browser (A3 Landscape - Full 12 Bulan)
+ * 5. Fungsi Ekspor Laporan ke PDF (Dipecah per Semester agar Muat Utuh & Rapi)
  */
 function exportLaporanPDF(type) {
     const rawData = laporanJurnalCache[type];
     if (!rawData || rawData.length === 0) {
-        Swal.fire('Perhatian', 'Data laporan belum dimuat atau kosong. Silakan tunggu hingga tabel muncul.', 'warning');
+        Swal.fire('Perhatian', 'Data laporan belum dimuat atau kosong.', 'warning');
         return;
     }
 
@@ -203,7 +203,35 @@ function exportLaporanPDF(type) {
 
     if (!tableElement) return;
 
-    // Buat jendela cetak baru yang terisolasi dan rapi
+    // Ambil elemen tabel dari DOM
+    const origTable = tableElement.querySelector('table');
+    if (!origTable) return;
+
+    // Clone tabel untuk memanipulasi kolom
+    const tableSem1 = origTable.cloneNode(true);
+    const tableSem2 = origTable.cloneNode(true);
+
+    // Indeks Kolom: 
+    // 0: No, 1: Nama
+    // Juli-Desember (Sem 1): Kolom 2 s/d 19
+    // Januari-Juni (Sem 2): Kolom 20 s/d 37
+    
+    // Potong kolom untuk Semester 1 (Hapus kolom Januari-Juni)
+    tableSem1.querySelectorAll('tr').forEach(tr => {
+        const cells = Array.from(tr.children);
+        for (let i = cells.length - 1; i >= 20; i--) {
+            if (cells[i]) cells[i].remove();
+        }
+    });
+
+    // Potong kolom untuk Semester 2 (Simpan No, Nama, & Kolom Januari-Juni)
+    tableSem2.querySelectorAll('tr').forEach(tr => {
+        const cells = Array.from(tr.children);
+        for (let i = 19; i >= 2; i--) {
+            if (cells[i]) cells[i].remove();
+        }
+    });
+
     const printWindow = window.open('', '_blank');
     
     const htmlContent = `
@@ -214,14 +242,13 @@ function exportLaporanPDF(type) {
             <title>Laporan Jurnal ${type} - SDIT Al-Kautsar</title>
             <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
             <style>
-                /* Set Kertas A3 Landscape agar 12 Bulan (Juli - Juni) muat utuh */
                 @page { 
-                    size: A3 landscape; 
-                    margin: 5mm; 
+                    size: A4 landscape; 
+                    margin: 10mm; 
                 }
                 body { 
                     font-family: Arial, sans-serif; 
-                    font-size: 8px; 
+                    font-size: 9px; 
                     padding: 5px; 
                     background: white;
                     -webkit-print-color-adjust: exact !important;
@@ -229,31 +256,36 @@ function exportLaporanPDF(type) {
                 }
                 .report-header { 
                     text-align: center; 
-                    margin-bottom: 10px; 
+                    margin-bottom: 12px; 
                 }
                 .report-header h4 { 
                     font-weight: bold; 
                     margin: 0; 
-                    font-size: 15px; 
+                    font-size: 14px; 
                 }
                 .report-header h6 { 
-                    color: #444; 
-                    margin-top: 3px; 
+                    color: #333; 
+                    margin-top: 2px; 
                     font-size: 11px; 
                 }
-                /* Penskalaan otomatis agar tabel pas di halaman */
-                .table-print-wrapper {
-                    width: 100%;
-                    zoom: 0.82; 
+                .section-title {
+                    font-size: 11px;
+                    font-weight: bold;
+                    margin-top: 15px;
+                    margin-bottom: 5px;
+                    color: #0d6efd;
+                    border-bottom: 2px solid #0d6efd;
+                    padding-bottom: 2px;
                 }
                 table { 
                     width: 100% !important; 
                     border-collapse: collapse !important; 
-                    font-size: 7.5px !important; 
+                    font-size: 8px !important; 
+                    margin-bottom: 10px;
                 }
                 th, td { 
-                    border: 1px solid #000 !important; 
-                    padding: 3px 1px !important; 
+                    border: 1px solid #333 !important; 
+                    padding: 4px 2px !important; 
                     text-align: center !important; 
                     white-space: nowrap !important; 
                 }
@@ -265,16 +297,33 @@ function exportLaporanPDF(type) {
                 tr:nth-child(even) td { 
                     background-color: #f8f9fa !important; 
                 }
+                .page-break {
+                    page-break-before: always;
+                }
             </style>
         </head>
         <body>
             <div class="report-header">
                 <h4>SDIT AL-KAUTSAR</h4>
-                <h6>REKAP LAPORAN JURNAL ${type.toUpperCase()} (JULI - JUNI)</h6>
+                <h6>REKAP LAPORAN JURNAL ${type.toUpperCase()}</h6>
             </div>
-            <div class="table-print-wrapper">
-                ${tableElement.innerHTML}
+
+            <!-- BAGIAN SEMESTER 1 -->
+            <div class="section-title">SEMESTER 1 (JULI - DESEMBER)</div>
+            ${tableSem1.outerHTML}
+
+            <!-- BREAK KE HALAMAN BARU UNTUK SEMESTER 2 -->
+            <div class="page-break"></div>
+
+            <div class="report-header">
+                <h4>SDIT AL-KAUTSAR</h4>
+                <h6>REKAP LAPORAN JURNAL ${type.toUpperCase()}</h6>
             </div>
+
+            <!-- BAGIAN SEMESTER 2 -->
+            <div class="section-title">SEMESTER 2 (JANUARI - JUNI)</div>
+            ${tableSem2.outerHTML}
+
             <script>
                 window.onload = function() {
                     setTimeout(function() {
