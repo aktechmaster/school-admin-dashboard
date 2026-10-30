@@ -1,5 +1,6 @@
-// Cache penyimpanan data harian
+// Cache penyimpanan data
 let harianDataCache = { umum: null, t2q: null };
+let laporanJurnalCache = { Umum: null, T2Q: null }; // Cache khusus Laporan Bulanan/Tahunan
 
 /**
  * 1. Fungsi Memanggil Persentase Jurnal dari Google Apps Script
@@ -62,13 +63,22 @@ function openModalDetailHarian(type) {
 }
 
 /**
- * 3. Fungsi Memuat Laporan Bulanan/Tahunan untuk Menu Sidebar
+ * 3. Fungsi Memuat Laporan Bulanan/Tahunan (Dengan Sistem Cache)
+ * @param {string} type - 'Umum' atau 'T2Q'
+ * @param {boolean} forceReload - Set true jika ingin memaksa ambil data baru dari server
  */
-async function loadLaporanJurnal(type) {
+async function loadLaporanJurnal(type, forceReload = false) {
     const containerId = type === 'T2Q' ? 'container-lap-t2q' : 'container-lap-umum';
     const container = document.getElementById(containerId);
     if (!container || typeof GAS_URL === 'undefined' || !GAS_URL) return;
 
+    // A. Jika TIDAK force reload & data sudah ada di cache -> Render LANGSUNG tanpa loading!
+    if (!forceReload && laporanJurnalCache[type]) {
+        renderTableLaporan(container, laporanJurnalCache[type]);
+        return;
+    }
+
+    // B. Jika cache kosong ATAU tombol Reload diklik -> Ambil dari server
     container.innerHTML = '<div class="p-3 text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Memuat data laporan dari server...</div>';
 
     try {
@@ -76,51 +86,58 @@ async function loadLaporanJurnal(type) {
         const result = await response.json();
 
         if (result.status === 'success' && result.data && result.data.length > 0) {
-            // Deteksi kolom mana saja yang merupakan kolom PERSENTASE berdasarkan judul header
-            const percentColIndices = new Set();
-            result.data.forEach((row, idx) => {
-                if (idx < 2) { // Mengecek baris header (Baris 1 & 2)
-                    row.forEach((cell, cIdx) => {
-                        if (cell && String(cell).toUpperCase().trim().includes('PERSENTASE')) {
-                            percentColIndices.add(cIdx);
-                        }
-                    });
-                }
-            });
-
-            let tableHtml = '<table class="table table-bordered table-striped table-hover align-middle text-center mb-0" style="font-size:0.8rem;"><tbody>';
-
-            result.data.forEach((row, idx) => {
-                const isHeader = idx < 2; // Baris 1 & 2 spreadsheet adalah Header
-                const tag = isHeader ? 'th' : 'td';
-                const bgClass = isHeader ? 'class="table-dark align-middle"' : '';
-
-                tableHtml += `<tr ${bgClass}>`;
-                row.forEach((cell, cIdx) => {
-                    let displayValue = (cell !== undefined && cell !== null) ? cell : '';
-
-                    // Format khusus untuk kolom PERSENTASE pada baris isi data
-                    if (!isHeader && percentColIndices.has(cIdx)) {
-                        if (displayValue !== '' && displayValue !== null && displayValue !== undefined) {
-                            const num = Number(displayValue);
-                            if (!isNaN(num)) {
-                                // Mengubah desimal 0.8 menjadi 80,00% dan 0.833333... menjadi 83,33%
-                                displayValue = (num * 100).toFixed(2).replace('.', ',') + '%';
-                            }
-                        }
-                    }
-
-                    tableHtml += `<${tag}>${displayValue}</${tag}>`;
-                });
-                tableHtml += `</tr>`;
-            });
-
-            tableHtml += '</tbody></table>';
-            container.innerHTML = tableHtml;
+            // Simpan hasil ke cache
+            laporanJurnalCache[type] = result.data;
+            // Render tabel
+            renderTableLaporan(container, result.data);
         } else {
             container.innerHTML = '<div class="p-3 text-danger">Data laporan tidak ditemukan atau gagal diproses.</div>';
         }
     } catch (err) {
         container.innerHTML = `<div class="p-3 text-danger">Error memuat data: ${err.message}</div>`;
     }
+}
+
+/**
+ * Helper internal untuk merender elemen HTML tabel laporan
+ */
+function renderTableLaporan(container, data) {
+    const percentColIndices = new Set();
+    data.forEach((row, idx) => {
+        if (idx < 2) {
+            row.forEach((cell, cIdx) => {
+                if (cell && String(cell).toUpperCase().trim().includes('PERSENTASE')) {
+                    percentColIndices.add(cIdx);
+                }
+            });
+        }
+    });
+
+    let tableHtml = '<table class="table table-bordered table-striped table-hover align-middle text-center mb-0" style="font-size:0.8rem;"><tbody>';
+
+    data.forEach((row, idx) => {
+        const isHeader = idx < 2;
+        const tag = isHeader ? 'th' : 'td';
+        const bgClass = isHeader ? 'class="table-dark align-middle"' : '';
+
+        tableHtml += `<tr ${bgClass}>`;
+        row.forEach((cell, cIdx) => {
+            let displayValue = (cell !== undefined && cell !== null) ? cell : '';
+
+            if (!isHeader && percentColIndices.has(cIdx)) {
+                if (displayValue !== '' && displayValue !== null && displayValue !== undefined) {
+                    const num = Number(displayValue);
+                    if (!isNaN(num)) {
+                        displayValue = (num * 100).toFixed(2).replace('.', ',') + '%';
+                    }
+                }
+            }
+
+            tableHtml += `<${tag}>${displayValue}</${tag}>`;
+        });
+        tableHtml += '</tr>';
+    });
+
+    tableHtml += '</tbody></table>';
+    container.innerHTML = tableHtml;
 }
