@@ -11,7 +11,6 @@
     
     <!-- Custom Layout CSS -->
     <link rel="stylesheet" href="CSS/style.css">
-
     <!-- JS Bootstrap & SweetAlert2 (Cloudflare CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.8/sweetalert2.all.min.js"></script>
@@ -67,26 +66,24 @@
                         <i class="fas fa-hands-helping me-2"></i>Master Halaqoh BPI
                     </a>
                 </li>
-
                 <li>
                     <a href="#" class="nav-link" onclick="showSection('hari_efektif', this)">
                         <i class="fas fa-calendar-check me-2"></i>Hari Efektif
                     </a>
                 </li>
-
                 <li class="mt-3 border-top pt-3 nav-laporan-group">
-                        <small class="text-white-50 px-3 fw-bold d-block mb-2">MENU LAPORAN</small>
-                    </li>
-                    <li class="nav-laporan-group">
-                        <a href="#" class="nav-link text-info" onclick="showSection('lap_jurnal_umum', this)">
-                            <i class="fas fa-file-alt me-2"></i>Laporan Jurnal Umum
-                        </a>
-                    </li>
-                    <li class="nav-laporan-group">
-                        <a href="#" class="nav-link text-info" onclick="showSection('lap_jurnal_t2q', this)">
-                            <i class="fas fa-quran me-2"></i>Laporan Jurnal T2Q
-                        </a>
-                    </li>
+                    <small class="text-white-50 px-3 fw-bold d-block mb-2">MENU LAPORAN</small>
+                </li>
+                <li class="nav-laporan-group">
+                    <a href="#" class="nav-link text-info" onclick="showSection('lap_jurnal_umum', this)">
+                        <i class="fas fa-file-alt me-2"></i>Laporan Jurnal Umum
+                    </a>
+                </li>
+                <li class="nav-laporan-group">
+                    <a href="#" class="nav-link text-info" onclick="showSection('lap_jurnal_t2q', this)">
+                        <i class="fas fa-quran me-2"></i>Laporan Jurnal T2Q
+                    </a>
+                </li>
                 
                 <li class="mt-3 border-top pt-3">
                     <a href="#" class="nav-link text-warning" onclick="showSection('settings', this)">
@@ -95,7 +92,7 @@
                 </li>
             </ul>
         </nav>
-
+        
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Navbar -->
@@ -106,117 +103,116 @@
                     </button>
                     <h5 class="ms-3 mb-0" id="page-title">Dashboard Overview</h5>
                 </div>
-
                 <div class="d-flex align-items-center gap-3">
                     <button class="btn btn-sm btn-outline-primary" onclick="loadAllMasterData()">
                         <i class="fas fa-sync-alt me-1"></i> Refresh Data
                     </button>
-
                     <div class="text-end d-none d-md-block border-start ps-3">
                         <div id="user-profile-name" class="fw-bold">User</div>
                         <small id="user-profile-role" class="text-muted">Role</small>
                     </div>
-
                     <button class="btn btn-outline-danger btn-sm" onclick="logout()" title="Keluar Aplikasi">
                         <i class="fas fa-sign-out-alt me-1"></i> Logout
                     </button>
                 </div>
             </nav>
 
-           <!-- Section: Dashboard -->
-            <div id="sec-dashboard" class="content-section">
-                <!-- Row 1: Statistik Utama Bawaan -->
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <div class="card bg-primary text-white p-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-0">Total Siswa</h6>
-                                    <h2 class="mb-0 mt-2" id="kpi-siswa">0</h2>
+            <!-- Content Area Wrapper -->
+            <div class="content-area-wrapper p-3">
+                <!-- Section: Dashboard -->
+                <div id="sec-dashboard" class="content-section">
+                    <!-- Row 1: Statistik Utama -->
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Total Siswa</h6>
+                                        <h2 class="mb-0 mt-2" id="kpi-siswa">0</h2>
+                                    </div>
+                                    <i class="fas fa-user-graduate fa-2x opacity-50"></i>
                                 </div>
-                                <i class="fas fa-user-graduate fa-2x opacity-50"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Total Guru</h6>
+                                        <h2 class="mb-0 mt-2" id="kpi-guru">0</h2>
+                                    </div>
+                                    <i class="fas fa-chalkboard-teacher fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Total Kelas</h6>
+                                        <h2 class="mb-0 mt-2" id="kpi-kelas">0</h2>
+                                    </div>
+                                    <i class="fas fa-door-open fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Total Mapel</h6>
+                                        <h2 class="mb-0 mt-2" id="kpi-mapel">0</h2>
+                                    </div>
+                                    <i class="fas fa-book fa-2x opacity-50"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card bg-success text-white p-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-0">Total Guru</h6>
-                                    <h2 class="mb-0 mt-2" id="kpi-guru">0</h2>
+                
+                    <!-- Row Widget Persentase Jurnal Harian -->
+                    <div class="row g-3 mt-1 card-kpi-jurnal">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-primary text-white p-3 shadow-sm border-0">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div>
+                                        <small class="text-white-50 fw-bold d-block">Jurnal Harian Umum</small>
+                                        <h3 class="mb-0 mt-1 fw-bold" id="kpi-persen-umum">0%</h3>
+                                    </div>
+                                    <i class="fas fa-chart-line fa-2x opacity-50"></i>
                                 </div>
-                                <i class="fas fa-chalkboard-teacher fa-2x opacity-50"></i>
+                                <div class="border-top border-white-50 pt-2 mt-2 text-end">
+                                    <a href="javascript:void(0)" class="text-white text-decoration-none fw-bold small" onclick="openModalDetailHarian('Umum')">
+                                        Lihat detail <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-success text-white p-3 shadow-sm border-0">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div>
+                                        <small class="text-white-50 fw-bold d-block">Jurnal Harian T2Q</small>
+                                        <h3 class="mb-0 mt-1 fw-bold" id="kpi-persen-t2q">0%</h3>
+                                    </div>
+                                    <i class="fas fa-book-reader fa-2x opacity-50"></i>
+                                </div>
+                                <div class="border-top border-white-50 pt-2 mt-2 text-end">
+                                    <a href="javascript:void(0)" class="text-white text-decoration-none fw-bold small" onclick="openModalDetailHarian('T2Q')">
+                                        Lihat detail <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card bg-warning text-white p-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-0">Total Kelas</h6>
-                                    <h2 class="mb-0 mt-2" id="kpi-kelas">0</h2>
-                                </div>
-                                <i class="fas fa-door-open fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-info text-white p-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-0">Total Mapel</h6>
-                                    <h2 class="mb-0 mt-2" id="kpi-mapel">0</h2>
-                                </div>
-                                <i class="fas fa-book fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Row Widget Persentase Jurnal Harian (Ukuran disesuaikan col-md-3) -->
-                <div class="row g-3 mt-1 card-kpi-jurnal">
-                    <div class="col-md-3 col-sm-6">
-                        <div class="card bg-primary text-white p-3 shadow-sm border-0">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <div>
-                                    <small class="text-white-50 fw-bold d-block">Jurnal Harian Umum</small>
-                                    <h3 class="mb-0 mt-1 fw-bold" id="kpi-persen-umum">0%</h3>
-                                </div>
-                                <i class="fas fa-chart-line fa-2x opacity-50"></i>
-                            </div>
-                            <div class="border-top border-white-50 pt-2 mt-2 text-end">
-                                <a href="javascript:void(0)" class="text-white text-decoration-none fw-bold small" onclick="openModalDetailHarian('Umum')">
-                                    Lihat detail <i class="fas fa-arrow-right ms-1"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="card bg-success text-white p-3 shadow-sm border-0">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <div>
-                                    <small class="text-white-50 fw-bold d-block">Jurnal Harian T2Q</small>
-                                    <h3 class="mb-0 mt-1 fw-bold" id="kpi-persen-t2q">0%</h3>
-                                </div>
-                                <i class="fas fa-book-reader fa-2x opacity-50"></i>
-                            </div>
-                            <div class="border-top border-white-50 pt-2 mt-2 text-end">
-                                <a href="javascript:void(0)" class="text-white text-decoration-none fw-bold small" onclick="openModalDetailHarian('T2Q')">
-                                    Lihat detail <i class="fas fa-arrow-right ms-1"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 </div>
 
                 <!-- Section: Guru -->
                 <div id="sec-guru" class="content-section d-none">
-                    <div class="d-flex justify-content-between section-header-controls">
+                    <div class="d-flex justify-content-between section-header-controls mb-3">
                         <h5>Data Master Guru</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Guru')"><i class="fas fa-plus me-1"></i>Tambah Guru</button>
                     </div>
-                    <div class="table-responsive p-3 rounded shadow-sm">
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
                         <table class="table table-hover align-middle" id="table-guru">
                             <thead>
                                 <tr>
@@ -231,11 +227,11 @@
 
                 <!-- Section: Users -->
                 <div id="sec-users" class="content-section d-none">
-                    <div class="d-flex justify-content-between section-header-controls">
+                    <div class="d-flex justify-content-between section-header-controls mb-3">
                         <h5>Data Master Users</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Users')"><i class="fas fa-plus me-1"></i>Tambah User</button>
                     </div>
-                    <div class="table-responsive p-3 rounded shadow-sm">
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
                         <table class="table table-hover align-middle" id="table-users">
                             <thead>
                                 <tr>
@@ -250,11 +246,11 @@
 
                 <!-- Section: Siswa -->
                 <div id="sec-siswa" class="content-section d-none">
-                    <div class="d-flex justify-content-between section-header-controls">
+                    <div class="d-flex justify-content-between section-header-controls mb-3">
                         <h5>Data Master Siswa</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Siswa')"><i class="fas fa-plus me-1"></i>Tambah Siswa</button>
                     </div>
-                    <div class="table-responsive p-3 rounded shadow-sm">
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
                         <table class="table table-hover align-middle" id="table-siswa">
                             <thead>
                                 <tr>
@@ -269,11 +265,11 @@
 
                 <!-- Section: Kelas -->
                 <div id="sec-kelas" class="content-section d-none">
-                    <div class="d-flex justify-content-between section-header-controls">
+                    <div class="d-flex justify-content-between section-header-controls mb-3">
                         <h5>Data Master Kelas</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Kelas')"><i class="fas fa-plus me-1"></i>Tambah Kelas</button>
                     </div>
-                    <div class="table-responsive p-3 rounded shadow-sm">
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
                         <table class="table table-hover align-middle" id="table-kelas">
                             <thead>
                                 <tr>
@@ -287,11 +283,11 @@
 
                 <!-- Section: Mapel -->
                 <div id="sec-mapel" class="content-section d-none">
-                    <div class="d-flex justify-content-between section-header-controls">
+                    <div class="d-flex justify-content-between section-header-controls mb-3">
                         <h5>Data Master Mapel</h5>
                         <button class="btn btn-primary btn-sm" onclick="openModal('Mapel')"><i class="fas fa-plus me-1"></i>Tambah Mapel</button>
                     </div>
-                    <div class="table-responsive p-3 rounded shadow-sm">
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
                         <table class="table table-hover align-middle" id="table-mapel">
                             <thead>
                                 <tr>
@@ -305,7 +301,7 @@
 
                 <!-- Section: Jadwal -->
                 <div id="sec-jadwal" class="content-section d-none">
-                    <div class="d-flex justify-content-between align-items-center section-header-controls">
+                    <div class="d-flex justify-content-between align-items-center section-header-controls mb-3">
                         <h5>Data Master Jadwal</h5>
                         <div class="d-flex gap-2">
                             <button class="btn btn-success btn-sm" onclick="openModalGridJadwal()">
@@ -316,7 +312,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="table-responsive p-3 rounded shadow-sm">
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
                         <table class="table table-hover align-middle" id="table-jadwal">
                             <thead>
                                 <tr>
@@ -342,7 +338,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="table-responsive p-3 rounded shadow-sm">
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
                         <table class="table table-hover align-middle" id="table-halaqoh_t2q">
                             <thead>
                                 <tr>
@@ -374,7 +370,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="table-responsive p-3 rounded shadow-sm">
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
                         <table class="table table-hover align-middle" id="table-halaqoh_bpi">
                             <thead>
                                 <tr>
@@ -394,80 +390,98 @@
                 </div>
 
                 <!-- Section: Hari Efektif -->
-<div id="sec-hari_efektif" class="content-section d-none">
-    <div class="d-flex justify-content-between align-items-center section-header-controls mb-3">
-        <h5><i class="fas fa-calendar-check text-primary me-2"></i>Input Hari Efektif</h5>
-        <div class="d-flex gap-2 align-items-center flex-wrap">
-            <label class="fw-bold small mb-0">Tahun Ajaran:</label>
-            <select id="select-ta-efektif" class="form-select form-select-sm" style="width: 130px;" onchange="updateDropdownBulanEfektif()">
-                <option value="2025/2026">2025/2026</option>
-                <option value="2026/2027" selected>2026/2027</option>
-                <option value="2027/2028">2027/2028</option>
-            </select>
-            
-            <label class="fw-bold small mb-0 ms-1">Bulan:</label>
-            <select id="filter-bulan-efektif" class="form-select form-select-sm" style="width: 170px;" onchange="renderHariEfektifTable()">
-                <!-- Opsi bulan dideretkan otomatis oleh JS -->
-            </select>
+                <div id="sec-hari_efektif" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center section-header-controls mb-3">
+                        <h5><i class="fas fa-calendar-check text-primary me-2"></i>Input Hari Efektif</h5>
+                        <div class="d-flex gap-2 align-items-center flex-wrap">
+                            <label class="fw-bold small mb-0">Tahun Ajaran:</label>
+                            <select id="select-ta-efektif" class="form-select form-select-sm" style="width: 130px;" onchange="updateDropdownBulanEfektif()">
+                                <option value="2025/2026">2025/2026</option>
+                                <option value="2026/2027" selected>2026/2027</option>
+                                <option value="2027/2028">2027/2028</option>
+                            </select>
+                            
+                            <label class="fw-bold small mb-0 ms-1">Bulan:</label>
+                            <select id="filter-bulan-efektif" class="form-select form-select-sm" style="width: 170px;" onchange="renderHariEfektifTable()">
+                            </select>
+                            <button id="btn-simpan-efektif" class="btn btn-primary btn-sm ms-2" onclick="simpanHariEfektif()">
+                                <i class="fas fa-save me-1"></i> Simpan Hari Efektif
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span id="status-bulan-efektif-badge" class="badge bg-secondary py-2 px-3">
+                                    <i class="fas fa-spinner fa-spin me-1"></i> Memeriksa Status DB...
+                                </span>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1 text-info"></i> Isikan <strong>1</strong> (Hari Efektif KBM) atau <strong>0</strong> (Libur).
+                                </small>
+                            </div>
+                            
+                            <div id="wrapper-preset-efektif" class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="setPresetHariEfektif('kerja')">
+                                    <i class="fas fa-check-double me-1"></i> Set Senin-Jumat = 1
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPresetHariEfektif('libur_akhir_pekan')">
+                                    <i class="fas fa-calendar-minus me-1"></i> Set Sabtu-Minggu = 0
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="setPresetHariEfektif('semua_1')">
+                                    Set Semua 1
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white">
+                        <table class="table table-hover align-middle text-center" id="table-hari_efektif">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 60px;">No</th>
+                                    <th>Tanggal</th>
+                                    <th>Hari</th>
+                                    <th style="width: 180px;">Status Hari Efektif</th>
+                                    <th>Keterangan Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-hari-efektif">
+                                <tr>
+                                    <td colspan="5" class="text-muted py-3">Silakan pilih bulan di atas.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-            <!-- Tombol Simpan Hari Efektif (Akses dikontrol oleh JS) -->
-            <button id="btn-simpan-efektif" class="btn btn-primary btn-sm ms-2" onclick="simpanHariEfektif()">
-                <i class="fas fa-save me-1"></i> Simpan Hari Efektif
-            </button>
-        </div>
-    </div>
-
-    <!-- Preset & Informasi Toolbar -->
-    <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span id="status-bulan-efektif-badge" class="badge bg-secondary py-2 px-3">
-                    <i class="fas fa-spinner fa-spin me-1"></i> Memeriksa Status DB...
-                </span>
-                <small class="text-muted">
-                    <i class="fas fa-info-circle me-1 text-info"></i> Isikan <strong>1</strong> (Hari Efektif KBM) atau <strong>0</strong> (Libur).
-                </small>
-            </div>
-            
-            <!-- Wadah Preset Buttons (Akses dikontrol oleh JS) -->
-            <div id="wrapper-preset-efektif" class="d-flex gap-2">
-                <button type="button" class="btn btn-outline-success btn-sm" onclick="setPresetHariEfektif('kerja')">
-                    <i class="fas fa-check-double me-1"></i> Set Senin-Jumat = 1
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPresetHariEfektif('libur_akhir_pekan')">
-                    <i class="fas fa-calendar-minus me-1"></i> Set Sabtu-Minggu = 0
-                </button>
-                <button type="button" class="btn btn-outline-primary btn-sm" onclick="setPresetHariEfektif('semua_1')">
-                    Set Semua 1
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabel Input Hari Efektif -->
-    <div class="table-responsive p-3 rounded shadow-sm bg-white">
-        <table class="table table-hover align-middle text-center" id="table-hari_efektif">
-            <thead class="table-dark">
-                <tr>
-                    <th style="width: 60px;">No</th>
-                    <th>Tanggal</th>
-                    <th>Hari</th>
-                    <th style="width: 180px;">Status Hari Efektif</th>
-                    <th>Keterangan Status</th>
-                </tr>
-            </thead>
-            <tbody id="tbody-hari-efektif">
-                <tr>
-                    <td colspan="5" class="text-muted py-3">Silakan pilih bulan di atas.</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+                <!-- Section: Laporan Jurnal Umum -->
+                <div id="sec-lap_jurnal_umum" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5><i class="fas fa-file-alt text-primary me-2"></i>Laporan Jurnal Umum (Rekap Bulanan & Juli-Juni)</h5>
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('Umum')">
+                            <i class="fas fa-sync-alt me-1"></i> Reload Laporan
+                        </button>
+                    </div>
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white" id="container-lap-umum">
+                        <p class="text-muted">Memuat data laporan...</p>
+                    </div>
+                </div>
+                
+                <!-- Section: Laporan Jurnal T2Q -->
+                <div id="sec-lap_jurnal_t2q" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5><i class="fas fa-quran text-success me-2"></i>Laporan Jurnal T2Q (Rekap Bulanan & Juli-Juni)</h5>
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('T2Q')">
+                            <i class="fas fa-sync-alt me-1"></i> Reload Laporan
+                        </button>
+                    </div>
+                    <div class="table-responsive p-3 rounded shadow-sm bg-white" id="container-lap-t2q">
+                        <p class="text-muted">Memuat data laporan...</p>
+                    </div>
+                </div>
 
                 <!-- Section: Settings -->
                 <div id="sec-settings" class="content-section d-none">
-                    <div class="card p-4 max-w-600">
+                    <div class="card p-4 max-w-600 shadow-sm">
                         <h5>Pengaturan API Google Apps Script</h5>
                         <p class="text-muted small">URL berikut digunakan sebagai endpoint utama data master.</p>
                         <div class="mb-3">
@@ -480,9 +494,10 @@
                         <button class="btn btn-primary" onclick="saveGasUrl()"><i class="fas fa-save me-1"></i> Simpan URL Baru</button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+
+            </div> <!-- Penutup content-area-wrapper -->
+        </div> <!-- Penutup main-content -->
+    </div> <!-- Penutup app-container -->
 
     <!-- Modal Dynamic CRUD (Single Record) -->
     <div class="modal fade" id="crudModal" tabindex="-1" aria-hidden="true">
@@ -537,11 +552,9 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="alert alert-info py-2 small mb-3">
                         <i class="fas fa-info-circle me-1"></i> Pilih <strong>Kelas</strong> terlebih dahulu. Setiap sel berisi pilihan Mata Pelajaran dan Guru Pengajar. Isian akan otomatis tersimpan sekaligus.
                     </div>
-
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle text-center" id="table-grid-jadwal" style="font-size: 0.82rem;">
                             <thead class="table-dark">
@@ -572,205 +585,193 @@
         </div>
     </div>
 
-        <!-- Modal Input Massal Halaqoh T2Q Lintas Kelas per Tingkat -->
-<div class="modal fade" id="modalMassalT2Q" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="fas fa-quran me-2"></i>Input Massal Halaqoh T2Q Lintas Kelas</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Panel Parameter Utama -->
-                <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold small mb-1">1. Pilih Tingkat Kelas <span class="text-danger">*</span></label>
-                            <select id="massal-t2q-tingkat" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
-                                <option value="">-- Pilih Tingkat --</option>
-                                <option value="1">Tingkat 1</option>
-                                <option value="2">Tingkat 2</option>
-                                <option value="3">Tingkat 3</option>
-                                <option value="4">Tingkat 4</option>
-                                <option value="5">Tingkat 5</option>
-                                <option value="6">Tingkat 6</option>
-                                <option value="7">Tingkat 7</option>
-                                <option value="8">Tingkat 8</option>
-                                <option value="9">Tingkat 9</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold small mb-1">2. Pilih Pengajar T2Q <span class="text-danger">*</span></label>
-                            <select id="massal-t2q-guru" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
-                                <option value="">-- Pilih Pengajar T2Q --</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold small mb-1">Tahun Ajaran <span class="text-danger">*</span></label>
-                            <input type="text" id="massal-t2q-ta" class="form-control form-control-sm" value="2026/2027" onchange="renderFormMassalT2Q()">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold small mb-1">Semester <span class="text-danger">*</span></label>
-                            <select id="massal-t2q-semester" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
-                                <option value="Ganjil">Ganjil</option>
-                                <option value="Genap">Genap</option>
-                            </select>
-                        </div>
-                    </div>
+    <!-- Modal Input Massal Halaqoh T2Q Lintas Kelas per Tingkat -->
+    <div class="modal fade" id="modalMassalT2Q" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-quran me-2"></i>Input Massal Halaqoh T2Q Lintas Kelas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <div class="alert alert-info py-2 small mb-3">
-                    <i class="fas fa-info-circle me-1"></i> Pilih <strong>Tingkat Kelas</strong> dan <strong>Pengajar T2Q</strong>. Sistem akan menampilkan seluruh siswa dari semua kelas pada tingkat tersebut. Centang siswa yang akan dialokasikan ke Pengajar ini.
-                </div>
-
-                <!-- Detail Input Nama Halaqoh & Daftar Siswa -->
-                <div id="wrapper-input-t2q" class="d-none">
-                    <div class="card p-3 mb-3 border">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small mb-1">Nama Kelompok Halaqoh <span class="text-danger">*</span></label>
-                                <input type="text" id="massal-t2q-nama-halaqoh" class="form-control form-control-sm" placeholder="Contoh: Halaqoh Ustadz A">
+                <div class="modal-body">
+                    <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1">1. Pilih Tingkat Kelas <span class="text-danger">*</span></label>
+                                <select id="massal-t2q-tingkat" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
+                                    <option value="">-- Pilih Tingkat --</option>
+                                    <option value="1">Tingkat 1</option>
+                                    <option value="2">Tingkat 2</option>
+                                    <option value="3">Tingkat 3</option>
+                                    <option value="4">Tingkat 4</option>
+                                    <option value="5">Tingkat 5</option>
+                                    <option value="6">Tingkat 6</option>
+                                    <option value="7">Tingkat 7</option>
+                                    <option value="8">Tingkat 8</option>
+                                    <option value="9">Tingkat 9</option>
+                                </select>
                             </div>
-                            <div class="col-md-6 text-end">
-                                <span class="badge bg-primary fs-6" id="badge-total-terpilih-t2q">0 Siswa Terpilih</span>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1">2. Pilih Pengajar T2Q <span class="text-danger">*</span></label>
+                                <select id="massal-t2q-guru" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
+                                    <option value="">-- Pilih Pengajar T2Q --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1">Tahun Ajaran <span class="text-danger">*</span></label>
+                                <input type="text" id="massal-t2q-ta" class="form-control form-control-sm" value="2026/2027" onchange="renderFormMassalT2Q()">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1">Semester <span class="text-danger">*</span></label>
+                                <select id="massal-t2q-semester" class="form-select form-select-sm" onchange="renderFormMassalT2Q()">
+                                    <option value="Ganjil">Ganjil</option>
+                                    <option value="Genap">Genap</option>
+                                </select>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Toolbar Pencarian Siswa & Filter Kelas -->
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="fw-bold mb-0 text-success"><i class="fas fa-user-check me-1"></i> Daftar Siswa Lintas Kelas</h6>
-                        <div class="d-flex gap-2">
-                            <input type="text" id="search-siswa-t2q" class="form-control form-control-sm" placeholder="Cari nama siswa..." oninput="filterListSiswaT2Q()">
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="fas fa-info-circle me-1"></i> Pilih <strong>Tingkat Kelas</strong> dan <strong>Pengajar T2Q</strong>. Sistem akan menampilkan seluruh siswa dari semua kelas pada tingkat tersebut.
+                    </div>
+                    <div id="wrapper-input-t2q" class="d-none">
+                        <div class="card p-3 mb-3 border">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small mb-1">Nama Kelompok Halaqoh <span class="text-danger">*</span></label>
+                                    <input type="text" id="massal-t2q-nama-halaqoh" class="form-control form-control-sm" placeholder="Contoh: Halaqoh Ustadz A">
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <span class="badge bg-primary fs-6" id="badge-total-terpilih-t2q">0 Siswa Terpilih</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0 text-success"><i class="fas fa-user-check me-1"></i> Daftar Siswa Lintas Kelas</h6>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="search-siswa-t2q" class="form-control form-control-sm" placeholder="Cari nama siswa..." oninput="filterListSiswaT2Q()">
+                            </div>
+                        </div>
+                        <div class="table-responsive border rounded bg-white" style="max-height: 380px;">
+                            <table class="table table-hover align-middle mb-0" id="table-checklist-t2q">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th style="width: 40px;" class="text-center">#</th>
+                                        <th>Pilih</th>
+                                        <th>Nama Siswa</th>
+                                        <th>Kelas Asal</th>
+                                        <th>Status Halaqoh Saat Ini</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-siswa-t2q"></tbody>
+                            </table>
                         </div>
                     </div>
-
-                    <!-- Checklist Container Siswa -->
-                    <div class="table-responsive border rounded bg-white" style="max-height: 380px;">
-                        <table class="table table-hover align-middle mb-0" id="table-checklist-t2q">
-                            <thead class="table-light sticky-top">
-                                <tr>
-                                    <th style="width: 40px;" class="text-center">#</th>
-                                    <th>Pilih</th>
-                                    <th>Nama Siswa</th>
-                                    <th>Kelas Asal</th>
-                                    <th>Status Halaqoh Saat Ini</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-siswa-t2q"></tbody>
-                        </table>
-                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-success" onclick="simpanBatchMassalT2Q()">
-                    <i class="fas fa-save me-1"></i> Simpan Kelompok Halaqoh
-                </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success" onclick="simpanBatchMassalT2Q()">
+                        <i class="fas fa-save me-1"></i> Simpan Kelompok Halaqoh
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Modal Input Massal Halaqoh BPI Lintas Kelas per Tingkat -->
-            <div class="modal fade" id="modalMassalBPI" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-                <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title"><i class="fas fa-hands-helping me-2"></i>Input Massal Halaqoh BPI Lintas Kelas</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="modalMassalBPI" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-hands-helping me-2"></i>Input Massal Halaqoh BPI Lintas Kelas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1">1. Pilih Tingkat Kelas <span class="text-danger">*</span></label>
+                                <select id="massal-bpi-tingkat" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
+                                    <option value="">-- Pilih Tingkat --</option>
+                                    <option value="1">Tingkat 1</option>
+                                    <option value="2">Tingkat 2</option>
+                                    <option value="3">Tingkat 3</option>
+                                    <option value="4">Tingkat 4</option>
+                                    <option value="5">Tingkat 5</option>
+                                    <option value="6">Tingkat 6</option>
+                                    <option value="7">Tingkat 7</option>
+                                    <option value="8">Tingkat 8</option>
+                                    <option value="9">Tingkat 9</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1">2. Pilih Pembina BPI <span class="text-danger">*</span></label>
+                                <select id="massal-bpi-guru" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
+                                    <option value="">-- Pilih Pembina BPI --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1">Tahun Ajaran <span class="text-danger">*</span></label>
+                                <input type="text" id="massal-bpi-ta" class="form-control form-control-sm" value="2026/2027" onchange="renderFormMassalBPI()">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1">Semester <span class="text-danger">*</span></label>
+                                <select id="massal-bpi-semester" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
+                                    <option value="Ganjil">Ganjil</option>
+                                    <option value="Genap">Genap</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            <!-- Panel Parameter Utama -->
-                            <div class="card p-3 mb-3 bg-light border-0 shadow-sm">
-                                <div class="row g-3 align-items-center">
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold small mb-1">1. Pilih Tingkat Kelas <span class="text-danger">*</span></label>
-                                        <select id="massal-bpi-tingkat" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
-                                            <option value="">-- Pilih Tingkat --</option>
-                                            <option value="1">Tingkat 1</option>
-                                            <option value="2">Tingkat 2</option>
-                                            <option value="3">Tingkat 3</option>
-                                            <option value="4">Tingkat 4</option>
-                                            <option value="5">Tingkat 5</option>
-                                            <option value="6">Tingkat 6</option>
-                                            <option value="7">Tingkat 7</option>
-                                            <option value="8">Tingkat 8</option>
-                                            <option value="9">Tingkat 9</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold small mb-1">2. Pilih Pembina BPI <span class="text-danger">*</span></label>
-                                        <select id="massal-bpi-guru" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
-                                            <option value="">-- Pilih Pembina BPI --</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold small mb-1">Tahun Ajaran <span class="text-danger">*</span></label>
-                                        <input type="text" id="massal-bpi-ta" class="form-control form-control-sm" value="2026/2027" onchange="renderFormMassalBPI()">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold small mb-1">Semester <span class="text-danger">*</span></label>
-                                        <select id="massal-bpi-semester" class="form-select form-select-sm" onchange="renderFormMassalBPI()">
-                                            <option value="Ganjil">Ganjil</option>
-                                            <option value="Genap">Genap</option>
-                                        </select>
-                                    </div>
+                    </div>
+
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="fas fa-info-circle me-1"></i> Pilih <strong>Tingkat Kelas</strong> dan <strong>Pembina BPI</strong>. Sistem akan menampilkan seluruh siswa dari semua kelas pada tingkat tersebut.
+                    </div>
+
+                    <div id="wrapper-input-bpi" class="d-none">
+                        <div class="card p-3 mb-3 border">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small mb-1">Nama Kelompok Halaqoh BPI <span class="text-danger">*</span></label>
+                                    <input type="text" id="massal-bpi-nama-halaqoh" class="form-control form-control-sm" placeholder="Contoh: Halaqoh BPI Ustadz A">
                                 </div>
-                            </div>
-            
-                            <div class="alert alert-info py-2 small mb-3">
-                                <i class="fas fa-info-circle me-1"></i> Pilih <strong>Tingkat Kelas</strong> dan <strong>Pembina BPI</strong>. Sistem akan menampilkan seluruh siswa dari semua kelas pada tingkat tersebut. Centang siswa yang akan dialokasikan ke Pembina ini.
-                            </div>
-            
-                            <!-- Detail Input Nama Halaqoh & Daftar Siswa -->
-                            <div id="wrapper-input-bpi" class="d-none">
-                                <div class="card p-3 mb-3 border">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold small mb-1">Nama Kelompok Halaqoh BPI <span class="text-danger">*</span></label>
-                                            <input type="text" id="massal-bpi-nama-halaqoh" class="form-control form-control-sm" placeholder="Contoh: Halaqoh BPI Ustadz A">
-                                        </div>
-                                        <div class="col-md-6 text-end">
-                                            <span class="badge bg-primary fs-6" id="badge-total-terpilih-bpi">0 Siswa Terpilih</span>
-                                        </div>
-                                    </div>
-                                </div>
-            
-                                <!-- Toolbar Pencarian Siswa -->
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="fw-bold mb-0 text-primary"><i class="fas fa-user-check me-1"></i> Daftar Siswa Lintas Kelas</h6>
-                                    <div class="d-flex gap-2">
-                                        <input type="text" id="search-siswa-bpi" class="form-control form-control-sm" placeholder="Cari nama siswa..." oninput="filterListSiswaBPI()">
-                                    </div>
-                                </div>
-            
-                                <!-- Checklist Container Siswa -->
-                                <div class="table-responsive border rounded bg-white" style="max-height: 380px;">
-                                    <table class="table table-hover align-middle mb-0" id="table-checklist-bpi">
-                                        <thead class="table-light sticky-top">
-                                            <tr>
-                                                <th style="width: 40px;" class="text-center">#</th>
-                                                <th>Pilih</th>
-                                                <th>Nama Siswa</th>
-                                                <th>Kelas Asal</th>
-                                                <th>Status Halaqoh BPI Saat Ini</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tbody-siswa-bpi"></tbody>
-                                    </table>
+                                <div class="col-md-6 text-end">
+                                    <span class="badge bg-primary fs-6" id="badge-total-terpilih-bpi">0 Siswa Terpilih</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="button" class="btn btn-primary" onclick="simpanBatchMassalBPI()">
-                                <i class="fas fa-save me-1"></i> Simpan Kelompok BPI
-                            </button>
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0 text-primary"><i class="fas fa-user-check me-1"></i> Daftar Siswa Lintas Kelas</h6>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="search-siswa-bpi" class="form-control form-control-sm" placeholder="Cari nama siswa..." oninput="filterListSiswaBPI()">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive border rounded bg-white" style="max-height: 380px;">
+                            <table class="table table-hover align-middle mb-0" id="table-checklist-bpi">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th style="width: 40px;" class="text-center">#</th>
+                                        <th>Pilih</th>
+                                        <th>Nama Siswa</th>
+                                        <th>Kelas Asal</th>
+                                        <th>Status Halaqoh BPI Saat Ini</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-siswa-bpi"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="simpanBatchMassalBPI()">
+                        <i class="fas fa-save me-1"></i> Simpan Kelompok BPI
+                    </button>
+                </div>
             </div>
+        </div>
+    </div>
 
     <!-- Modal Import Excel -->
     <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
@@ -798,33 +799,7 @@
         </div>
     </div>
 
-    <!-- Section: Laporan Jurnal Umum -->
-    <div id="sec-lap_jurnal_umum" class="content-section d-none">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5><i class="fas fa-file-alt text-primary me-2"></i>Laporan Jurnal Umum (Rekap Bulanan & Juli-Juni)</h5>
-            <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('Umum')">
-                <i class="fas fa-sync-alt me-1"></i> Reload Laporan
-            </button>
-        </div>
-        <div class="table-responsive p-3 rounded shadow-sm bg-white" id="container-lap-umum">
-            <p class="text-muted">Memuat data laporan...</p>
-        </div>
-    </div>
-    
-    <!-- Section: Laporan Jurnal T2Q -->
-    <div id="sec-lap_jurnal_t2q" class="content-section d-none">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5><i class="fas fa-quran text-success me-2"></i>Laporan Jurnal T2Q (Rekap Bulanan & Juli-Juni)</h5>
-            <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('T2Q')">
-                <i class="fas fa-sync-alt me-1"></i> Reload Laporan
-            </button>
-        </div>
-        <div class="table-responsive p-3 rounded shadow-sm bg-white" id="container-lap-t2q">
-            <p class="text-muted">Memuat data laporan...</p>
-        </div>
-    </div>
-    
-    <!-- Modal Detail Jurnal Harian (5 Kolom: A, B, D, E, H) -->
+    <!-- Modal Detail Jurnal Harian -->
     <div class="modal fade" id="modalDetailHarian" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
@@ -859,7 +834,6 @@
     <script src="js/config.js"></script>
     <script src="js/table-engine.js"></script>
     <script src="js/export-engine.js"></script>
-
     <!-- 2. Modul Komponen -->
     <script src="js/modules/beranda.js"></script>
     <script src="js/modules/users.js"></script>
@@ -873,17 +847,13 @@
     <script src="js/auth.js"></script>
     <script src="js/modules/hari_efektif.js"></script>
     <script src="js/modules/laporan.js"></script>
-
     <!-- 3. App Controller Utama -->
     <script src="js/app.js"></script>
-
     <!-- CDN untuk Export & Import Excel (SheetJS / XLSX) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
     <!-- CDN untuk Export PDF (jsPDF + AutoTable) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
     <!-- Script Engine Import -->
     <script src="js/import-engine.js"></script>
     
