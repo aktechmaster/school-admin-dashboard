@@ -1,5 +1,5 @@
 let GAS_URL = localStorage.getItem('SDIT_GAS_URL') || 'https://script.google.com/macros/s/AKfycbyvPJwCpToLpXk0kNoJb67dV5Rm4ajZBLzxpJVJrTsQhQKa4qcYjyfIHZsimseDcdEL/exec';
-let DB_JURNAL_ID = localStorage.getItem('SDIT_DB_JURNAL_ID') || '';
+let DB_JURNAL_ID = localStorage.getItem('https://script.google.com/macros/s/AKfycbwacJYBs_bQ3TG88mK-0nzyhpv83fXZBeN49jzT4dEC48vEHQLWnGRfWk8n3itJcwcF/exec') || '';
 
 let localData = {
     Users: [],
