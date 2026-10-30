@@ -123,57 +123,92 @@
                 </div>
             </nav>
 
-            <!-- Dynamic Content Area -->
-            <div class="content-area-wrapper">
-                <!-- Section: Dashboard -->
-                <div id="sec-dashboard" class="content-section">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="card bg-primary text-white p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">Total Siswa</h6>
-                                        <h2 class="mb-0 mt-2" id="kpi-siswa">0</h2>
-                                    </div>
-                                    <i class="fas fa-user-graduate fa-2x opacity-50"></i>
+           <!-- Section: Dashboard -->
+            <div id="sec-dashboard" class="content-section">
+                <!-- Row 1: Statistik Utama Bawaan -->
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Total Siswa</h6>
+                                    <h2 class="mb-0 mt-2" id="kpi-siswa">0</h2>
                                 </div>
+                                <i class="fas fa-user-graduate fa-2x opacity-50"></i>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card bg-success text-white p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">Total Guru</h6>
-                                        <h2 class="mb-0 mt-2" id="kpi-guru">0</h2>
-                                    </div>
-                                    <i class="fas fa-chalkboard-teacher fa-2x opacity-50"></i>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Total Guru</h6>
+                                    <h2 class="mb-0 mt-2" id="kpi-guru">0</h2>
                                 </div>
+                                <i class="fas fa-chalkboard-teacher fa-2x opacity-50"></i>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card bg-warning text-white p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">Total Kelas</h6>
-                                        <h2 class="mb-0 mt-2" id="kpi-kelas">0</h2>
-                                    </div>
-                                    <i class="fas fa-door-open fa-2x opacity-50"></i>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Total Kelas</h6>
+                                    <h2 class="mb-0 mt-2" id="kpi-kelas">0</h2>
                                 </div>
+                                <i class="fas fa-door-open fa-2x opacity-50"></i>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card bg-info text-white p-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0">Total Mapel</h6>
-                                        <h2 class="mb-0 mt-2" id="kpi-mapel">0</h2>
-                                    </div>
-                                    <i class="fas fa-book fa-2x opacity-50"></i>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Total Mapel</h6>
+                                    <h2 class="mb-0 mt-2" id="kpi-mapel">0</h2>
                                 </div>
+                                <i class="fas fa-book fa-2x opacity-50"></i>
                             </div>
                         </div>
                     </div>
                 </div>
+            
+                <!-- Row 2: Widget Persentase Jurnal Harian (Baru Ditambahkan) -->
+                <div class="row g-3 mt-2 card-kpi-jurnal">
+                    <div class="col-md-6">
+                        <div class="card bg-primary text-white p-3 shadow-sm border-0 position-relative" style="background: linear-gradient(45deg, #4e73df, #224abe);">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <h6 class="mb-0 text-white-50">Persentase Jurnal Harian Umum</h6>
+                                    <h2 class="mb-0 mt-2 fw-bold" id="kpi-persen-umum">0%</h2>
+                                </div>
+                                <i class="fas fa-chart-line fa-3x opacity-25"></i>
+                            </div>
+                            <div class="border-top border-white-50 pt-2 mt-2 text-end">
+                                <a href="#" class="text-white text-decoration-none fw-bold small" onclick="openModalDetailHarian('Umum')">
+                                    Lihat detail <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-success text-white p-3 shadow-sm border-0 position-relative" style="background: linear-gradient(45deg, #1cc88a, #13855c);">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <h6 class="mb-0 text-white-50">Persentase Jurnal Harian T2Q</h6>
+                                    <h2 class="mb-0 mt-2 fw-bold" id="kpi-persen-t2q">0%</h2>
+                                </div>
+                                <i class="fas fa-book-reader fa-3x opacity-25"></i>
+                            </div>
+                            <div class="border-top border-white-50 pt-2 mt-2 text-end">
+                                <a href="#" class="text-white text-decoration-none fw-bold small" onclick="openModalDetailHarian('T2Q')">
+                                    Lihat detail <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
                 <!-- Section: Guru -->
                 <div id="sec-guru" class="content-section d-none">
@@ -758,6 +793,63 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="button" class="btn btn-success" onclick="processImportExcel()">Proses Impor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section: Laporan Jurnal Umum -->
+    <div id="sec-lap_jurnal_umum" class="content-section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5><i class="fas fa-file-alt text-primary me-2"></i>Laporan Jurnal Umum (Rekap Bulanan & Juli-Juni)</h5>
+            <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('Umum')">
+                <i class="fas fa-sync-alt me-1"></i> Reload Laporan
+            </button>
+        </div>
+        <div class="table-responsive p-3 rounded shadow-sm bg-white" id="container-lap-umum">
+            <p class="text-muted">Memuat data laporan...</p>
+        </div>
+    </div>
+    
+    <!-- Section: Laporan Jurnal T2Q -->
+    <div id="sec-lap_jurnal_t2q" class="content-section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5><i class="fas fa-quran text-success me-2"></i>Laporan Jurnal T2Q (Rekap Bulanan & Juli-Juni)</h5>
+            <button class="btn btn-outline-primary btn-sm" onclick="loadLaporanJurnal('T2Q')">
+                <i class="fas fa-sync-alt me-1"></i> Reload Laporan
+            </button>
+        </div>
+        <div class="table-responsive p-3 rounded shadow-sm bg-white" id="container-lap-t2q">
+            <p class="text-muted">Memuat data laporan...</p>
+        </div>
+    </div>
+    
+    <!-- Modal Detail Jurnal Harian (5 Kolom: A, B, D, E, H) -->
+    <div class="modal fade" id="modalDetailHarian" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="titleModalHarian">Detail Jurnal Harian</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle mb-0 text-center" style="font-size: 0.88rem;">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th style="width: 50px;">NO</th>
+                                    <th>NAMA GURU</th>
+                                    <th>YANG HARUS DIISI</th>
+                                    <th>REALISASI</th>
+                                    <th>TOTAL JURNAL GURU</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-detail-harian"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
