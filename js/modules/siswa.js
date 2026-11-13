@@ -16,8 +16,8 @@ function renderSiswaTable() {
     const info = getFilteredAndPaginatedData('Siswa');
 
     if (info.data.length === 0) {
-        // Colspan diubah menjadi 14 sesuai jumlah total kolom tabel Siswa
-        tbody.innerHTML = `<tr><td colspan="14" class="text-center text-muted py-3"><i class="fas fa-info-circle me-1"></i> Data siswa tidak ditemukan.</td></tr>`;
+        // Colspan diubah menjadi 17 sesuai jumlah total kolom tabel Siswa terbaru
+        tbody.innerHTML = `<tr><td colspan="17" class="text-center text-muted py-3"><i class="fas fa-info-circle me-1"></i> Data siswa tidak ditemukan.</td></tr>`;
         renderPaginationControls('Siswa', info, renderSiswaTable);
         return;
     }
@@ -29,12 +29,15 @@ function renderSiswaTable() {
     tbody.innerHTML = info.data.map(row => {
         // Pengecekan fallback serbaguna (Membaca format DB & format impor Excel)
         const jk = row.jenis_kelamin || row.jk || row.JK || '-';
+        const ttl = row.tempat_tanggal_lahir || row.ttl || row['Tempat Tanggal Lahir'] || row['Tempat, Tanggal Lahir'] || '-';
         const kelas = mapKelas[row.id_kelas] || row.kelas || row.Kelas || row.id_kelas || '-';
         const ayah = row.nama_ayah || row.ayah || row.Ayah || '-';
         const pekerjaanAyah = row.pekerjaan_ayah || row['Pekerjaan Ayah'] || '-';
         const ibu = row.nama_ibu || row.ibu || row.Ibu || '-';
         const pekerjaanIbu = row.pekerjaan_ibu || row['Pekerjaan Ibu'] || '-';
         const alamat = row.alamat || row.Alamat || '-';
+        const kelurahan = row.kelurahan_desa || row.kelurahan || row.desa || row['Kelurahan/Desa'] || '-';
+        const kecamatan = row.kecamatan || row['Kecamatan'] || '-';
         const status = row.status_siswa || row.status || row.Status || 'Aktif';
 
         return `
@@ -44,6 +47,7 @@ function renderSiswaTable() {
                 <td>${row.nis || '-'}</td>
                 <td>${row.nama_siswa || ''}</td>
                 <td>${jk}</td>
+                <td>${ttl}</td>
                 <td>${kelas}</td>
                 <td>${ayah}</td>
                 <td>${pekerjaanAyah}</td>
@@ -51,6 +55,8 @@ function renderSiswaTable() {
                 <td>${pekerjaanIbu}</td>
                 <td>${row.no_hp_ortu || row['No HP Ortu'] || '-'}</td>
                 <td>${alamat}</td>
+                <td>${kelurahan}</td>
+                <td>${kecamatan}</td>
                 <td><span class="badge bg-primary">${status}</span></td>
                 <td>${renderActionButtons('Siswa', row.id_siswa)}</td>
             </tr>
@@ -79,6 +85,7 @@ function exportSiswaExcel() {
         'NIS': item.nis || '-',
         'Nama Siswa': item.nama_siswa || '',
         'L/P': item.jenis_kelamin || item.jk || item.JK || '-',
+        'Tempat, Tanggal Lahir': item.tempat_tanggal_lahir || item.ttl || item['Tempat Tanggal Lahir'] || '-',
         'Kelas': mapKelas[item.id_kelas] || item.kelas || item.Kelas || item.id_kelas || '-',
         'Nama Ayah': item.nama_ayah || item.ayah || item.Ayah || '-',
         'Pekerjaan Ayah': item.pekerjaan_ayah || item['Pekerjaan Ayah'] || '-',
@@ -86,6 +93,8 @@ function exportSiswaExcel() {
         'Pekerjaan Ibu': item.pekerjaan_ibu || item['Pekerjaan Ibu'] || '-',
         'No. HP Ortu': item.no_hp_ortu || item['No HP Ortu'] || '-',
         'Alamat': item.alamat || item.Alamat || '-',
+        'Kelurahan/Desa': item.kelurahan_desa || item.kelurahan || item['Kelurahan/Desa'] || '-',
+        'Kecamatan': item.kecamatan || item['Kecamatan'] || '-',
         'Status': item.status_siswa || item.status || item.Status || 'Aktif'
     }));
 
