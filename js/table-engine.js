@@ -111,6 +111,7 @@ function getTableSchema(table) {
             { name: 'nis', label: 'NIS', type: 'text' },
             { name: 'nama_siswa', label: 'Nama Siswa', type: 'text', required: true },
             { name: 'jenis_kelamin', label: 'Jenis Kelamin', type: 'select', options: ['L', 'P'] },
+            { name: 'tempat_tanggal_lahir', label: 'Tempat, Tanggal Lahir', type: 'text', placeholder: 'Contoh: Mukomuko, 12 Mei 2015' },
             { 
                 name: 'id_kelas', 
                 label: 'Kelas', 
@@ -125,7 +126,9 @@ function getTableSchema(table) {
             { name: 'nama_ibu', label: 'Nama Ibu', type: 'text' },
             { name: 'pekerjaan_ibu', label: 'Pekerjaan Ibu', type: 'text' },
             { name: 'no_hp_ortu', label: 'No HP Orang Tua', type: 'text' },
-            { name: 'alamat', label: 'Alamat', type: 'text', placeholder: 'Alamat Lengkap' },
+            { name: 'alamat', label: 'Alamat', type: 'text', placeholder: 'Alamat Lengkap / Jalan / RT-RW' },
+            { name: 'kelurahan_desa', label: 'Kelurahan / Desa', type: 'text', placeholder: 'Nama Kelurahan atau Desa' },
+            { name: 'kecamatan', label: 'Kecamatan', type: 'text', placeholder: 'Nama Kecamatan' },
             { name: 'status_siswa', label: 'Status Siswa', type: 'select', options: ['Aktif', 'Lulus', 'Pindah', 'Keluar'] }
         ],
         Kelas: [
