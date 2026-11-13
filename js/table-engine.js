@@ -3,14 +3,14 @@ let crudModalInstance;
 
 // State Global untuk Filter, Search, dan Pagination per Tabel
 let tableState = {
-    Users: { search: '', filter: {}, page: 1, limit: 10 },
-    Guru: { search: '', filter: {}, page: 1, limit: 10 },
-    Siswa: { search: '', filter: {}, page: 1, limit: 10 },
-    Kelas: { search: '', filter: {}, page: 1, limit: 10 },
-    Mapel: { search: '', filter: {}, page: 1, limit: 10 },
-    Jadwal: { search: '', filter: {}, page: 1, limit: 10 },
-    Halaqoh_T2Q: { search: '', filter: {}, page: 1, limit: 10 },
-    Halaqoh_BPI: { search: '', filter: {}, page: 1, limit: 10 }
+    Users: { search: '', filter: {}, page: 1, limit: 25 },
+    Guru: { search: '', filter: {}, page: 1, limit: 25 },
+    Siswa: { search: '', filter: {}, page: 1, limit: 25 },
+    Kelas: { search: '', filter: {}, page: 1, limit: 25 },
+    Mapel: { search: '', filter: {}, page: 1, limit: 25 },
+    Jadwal: { search: '', filter: {}, page: 1, limit: 25 },
+    Halaqoh_T2Q: { search: '', filter: {}, page: 1, limit: 25 },
+    Halaqoh_BPI: { search: '', filter: {}, page: 1, limit: 25 }
 };
 
 /**
