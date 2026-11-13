@@ -19,51 +19,39 @@ let tableState = {
 function makeModalDraggable(modalId) {
     const modalEl = document.getElementById(modalId);
     if (!modalEl) return;
-
     const modalHeader = modalEl.querySelector('.modal-header');
     const modalDialog = modalEl.querySelector('.modal-dialog');
     if (!modalHeader || !modalDialog) return;
-
     if (modalHeader.dataset.draggableBound === 'true') return;
     modalHeader.dataset.draggableBound = 'true';
-
     modalHeader.style.cursor = 'move';
     modalHeader.style.userSelect = 'none';
-
     let isDragging = false;
     let startX, startY, initialLeft, initialTop;
-
     modalHeader.addEventListener('mousedown', (e) => {
         if (e.target.closest('.btn-close') || e.target.closest('button')) return;
-
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
-
         const rect = modalDialog.getBoundingClientRect();
         initialLeft = rect.left;
         initialTop = rect.top;
-
         modalDialog.style.margin = '0';
         modalDialog.style.position = 'fixed';
         modalDialog.style.left = `${initialLeft}px`;
         modalDialog.style.top = `${initialTop}px`;
-
         const onMouseMove = (moveEvent) => {
             if (!isDragging) return;
             const dx = moveEvent.clientX - startX;
             const dy = moveEvent.clientY - startY;
-
             modalDialog.style.left = `${initialLeft + dx}px`;
             modalDialog.style.top = `${initialTop + dy}px`;
         };
-
         const onMouseUp = () => {
             isDragging = false;
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
         };
-
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
     });
@@ -111,7 +99,7 @@ function getTableSchema(table) {
             { name: 'nis', label: 'NIS', type: 'text' },
             { name: 'nama_siswa', label: 'Nama Siswa', type: 'text', required: true },
             { name: 'jenis_kelamin', label: 'Jenis Kelamin', type: 'select', options: ['L', 'P'] },
-            { name: 'tempat_tanggal_lahir', label: 'Tempat, Tanggal Lahir', type: 'text', placeholder: 'Contoh: Mukomuko, 12 Mei 2015' },
+            { name: 'tempat_tanggal_lahir', label: 'Tempat, Tanggal Lahir', type: 'ttl' },
             { 
                 name: 'id_kelas', 
                 label: 'Kelas', 
@@ -186,72 +174,71 @@ function getTableSchema(table) {
             { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
         ],
         Halaqoh_T2Q: [
-    { name: 'id_halaqoh', label: 'ID Halaqoh', type: 'text', primaryKey: true, placeholder: 'Contoh: HT2Q-001' },
-    { name: 'nama_halaqoh', label: 'Nama / Kelompok Halaqoh', type: 'text', required: true, placeholder: 'Contoh: Halaqoh 1' },
-    { 
-        name: 'id_kelas', 
-        label: 'Kelas', 
-        type: 'select', 
-        options: [
-            { value: '', label: '-- Pilih Kelas --' },
-            ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
-        ] 
-    },
-    { 
-        name: 'id_guru', 
-        label: 'Pengajar T2Q', 
-        type: 'select', 
-        options: [
-            { value: '', label: '-- Pilih Pengajar --' },
-            ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
-        ] 
-    },
-    { 
-        name: 'id_siswa', 
-        label: 'Siswa', 
-        type: 'select', 
-        options: [
-            { value: '', label: '-- Pilih Siswa --' },
-            ...(localData.Siswa || []).map(s => ({ value: s.id_siswa, label: `${s.nama_siswa} (${s.id_siswa})` }))
-        ] 
-    },
-    { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
-    { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
-],
+            { name: 'id_halaqoh', label: 'ID Halaqoh', type: 'text', primaryKey: true, placeholder: 'Contoh: HT2Q-001' },
+            { name: 'nama_halaqoh', label: 'Nama / Kelompok Halaqoh', type: 'text', required: true, placeholder: 'Contoh: Halaqoh 1' },
+            { 
+                name: 'id_kelas', 
+                label: 'Kelas', 
+                type: 'select', 
+                options: [
+                    { value: '', label: '-- Pilih Kelas --' },
+                    ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
+                ] 
+            },
+            { 
+                name: 'id_guru', 
+                label: 'Pengajar T2Q', 
+                type: 'select', 
+                options: [
+                    { value: '', label: '-- Pilih Pengajar --' },
+                    ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+                ] 
+            },
+            { 
+                name: 'id_siswa', 
+                label: 'Siswa', 
+                type: 'select', 
+                options: [
+                    { value: '', label: '-- Pilih Siswa --' },
+                    ...(localData.Siswa || []).map(s => ({ value: s.id_siswa, label: `${s.nama_siswa} (${s.id_siswa})` }))
+                ] 
+            },
+            { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
+            { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
+        ],
         Halaqoh_BPI: [
-    { name: 'id_halaqoh', label: 'ID Halaqoh', type: 'text', primaryKey: true, placeholder: 'Contoh: HBPI-001' },
-    { name: 'nama_halaqoh', label: 'Nama / Kelompok Halaqoh BPI', type: 'text', required: true, placeholder: 'Contoh: Halaqoh BPI 1' },
-    { 
-        name: 'id_kelas', 
-        label: 'Kelas', 
-        type: 'select', 
-        options: [
-            { value: '', label: '-- Pilih Kelas --' },
-            ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
-        ] 
-    },
-    { 
-        name: 'id_guru', 
-        label: 'Pembina BPI', 
-        type: 'select', 
-        options: [
-            { value: '', label: '-- Pilih Pembina --' },
-            ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
-        ] 
-    },
-    { 
-        name: 'id_siswa', 
-        label: 'Siswa', 
-        type: 'select', 
-        options: [
-            { value: '', label: '-- Pilih Siswa --' },
-            ...(localData.Siswa || []).map(s => ({ value: s.id_siswa, label: `${s.nama_siswa} (${s.id_siswa})` }))
-        ] 
-    },
-    { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
-    { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
-],
-
+            { name: 'id_halaqoh', label: 'ID Halaqoh', type: 'text', primaryKey: true, placeholder: 'Contoh: HBPI-001' },
+            { name: 'nama_halaqoh', label: 'Nama / Kelompok Halaqoh BPI', type: 'text', required: true, placeholder: 'Contoh: Halaqoh BPI 1' },
+            { 
+                name: 'id_kelas', 
+                label: 'Kelas', 
+                type: 'select', 
+                options: [
+                    { value: '', label: '-- Pilih Kelas --' },
+                    ...(localData.Kelas || []).map(k => ({ value: k.id_kelas, label: `${k.nama_kelas} (${k.id_kelas})` }))
+                ] 
+            },
+            { 
+                name: 'id_guru', 
+                label: 'Pembina BPI', 
+                type: 'select', 
+                options: [
+                    { value: '', label: '-- Pilih Pembina --' },
+                    ...(localData.Guru || []).map(g => ({ value: g.id_guru, label: `${g.nama_lengkap} (${g.id_guru})` }))
+                ] 
+            },
+            { 
+                name: 'id_siswa', 
+                label: 'Siswa', 
+                type: 'select', 
+                options: [
+                    { value: '', label: '-- Pilih Siswa --' },
+                    ...(localData.Siswa || []).map(s => ({ value: s.id_siswa, label: `${s.nama_siswa} (${s.id_siswa})` }))
+                ] 
+            },
+            { name: 'tahun_ajaran', label: 'Tahun Ajaran', type: 'text', placeholder: '2026/2027' },
+            { name: 'semester', label: 'Semester', type: 'select', options: ['Ganjil', 'Genap'] }
+        ],
         Hari_Efektif: [
             { name: 'id_efektif', label: 'ID Efektif', type: 'text', primaryKey: true },
             { name: 'tanggal', label: 'Tanggal', type: 'text', required: true },
@@ -260,7 +247,6 @@ function getTableSchema(table) {
             { name: 'keterangan', label: 'Keterangan', type: 'text' }
         ]
     };
-
     return schemas[table] || [];
 }
 
@@ -273,7 +259,6 @@ function openModal(table, data = null) {
         modalDialog.style.top = '';
         modalDialog.style.margin = '';
     }
-
     document.getElementById('formTable').value = table;
     document.getElementById('formAction').value = data ? 'update' : 'create';
     document.getElementById('modalTitle').innerText = (data ? 'Edit Data ' : 'Tambah Data ') + table;
@@ -295,7 +280,6 @@ function openModal(table, data = null) {
                 const selected = String(val) === String(optVal) ? 'selected' : '';
                 return `<option value="${optVal}" ${selected}>${optLabel}</option>`;
             }).join('');
-
             fieldHtml = `
                 <div class="${colSize}">
                     <label class="form-label fw-bold">${field.label}</label>
@@ -309,6 +293,53 @@ function openModal(table, data = null) {
                         <input class="form-check-input" type="checkbox" name="${field.name}" ${isChecked ? 'checked' : ''}>
                         <label class="form-check-label fw-bold">${field.label}</label>
                     </div>
+                </div>`;
+        } else if (field.type === 'ttl') {
+            // Pecah data lama "Kota, 12 Mei 2015" saat mode Edit
+            let tempatVal = '';
+            let tanggalVal = '';
+            const strVal = String(val || '').trim();
+            if (strVal && strVal.includes(',')) {
+                const parts = strVal.split(',');
+                tempatVal = parts[0].trim();
+                const tglStr = parts.slice(1).join(',').trim();
+                const bulanMap = {
+                    januari: '01', februari: '02', maret: '03', april: '04',
+                    mei: '05', juni: '06', juli: '07', agustus: '08',
+                    september: '09', oktober: '10', november: '11', desember: '12'
+                };
+                const mText = tglStr.match(/^(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$/);
+                const mNum = tglStr.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+                if (mText && bulanMap[mText[2].toLowerCase()]) {
+                    tanggalVal = `${mText[3]}-${bulanMap[mText[2].toLowerCase()]}-${mText[1].padStart(2, '0')}`;
+                } else if (mNum) {
+                    tanggalVal = `${mNum[3]}-${mNum[2].padStart(2, '0')}-${mNum[1].padStart(2, '0')}`;
+                }
+            } else if (strVal) {
+                tempatVal = strVal;
+            }
+
+            const safeTempat = tempatVal.replace(/"/g, '&quot;');
+            fieldHtml = `
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Tempat Lahir</label>
+                    <input type="text" class="form-control" id="ttl_tempat_${field.name}" list="list_kota_lahir" value="${safeTempat}" placeholder="Pilih / ketik kota...">
+                    <datalist id="list_kota_lahir">
+                        <option value="Mukomuko">
+                        <option value="Bengkulu">
+                        <option value="Padang">
+                        <option value="Painan">
+                        <option value="Sungai Penuh">
+                        <option value="Kerinci">
+                        <option value="Pekanbaru">
+                        <option value="Jambi">
+                        <option value="Palembang">
+                        <option value="Jakarta">
+                    </datalist>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Tanggal Lahir</label>
+                    <input type="date" class="form-control" id="ttl_tanggal_${field.name}" value="${tanggalVal}">
                 </div>`;
         } else {
             const readOnly = (data && field.primaryKey) ? 'readonly' : '';
@@ -328,7 +359,6 @@ function openModal(table, data = null) {
     
     // Inisialisasi fitur geser (draggable)
     makeModalDraggable('crudModal');
-
     if (crudModalInstance) crudModalInstance.show();
 }
 
@@ -336,7 +366,6 @@ function editRow(table, id) {
     const schema = getTableSchema(table);
     const pkField = schema.find(f => f.primaryKey);
     if (!pkField) return;
-
     const pkName = pkField.name;
     const item = (localData[table] || []).find(r => String(r[pkName] || r.id) === String(id));
     if (item) {
@@ -355,19 +384,33 @@ async function submitDynamicForm() {
         table: table,
         data: {}
     };
-
     const schema = getTableSchema(table);
     schema.forEach(field => {
         if (field.type === 'boolean') {
             const el = form.querySelector(`[name="${field.name}"]`);
             payload.data[field.name] = el ? el.checked : false;
+        } else if (field.type === 'ttl') {
+            const tempat = (document.getElementById(`ttl_tempat_${field.name}`)?.value || '').trim();
+            const tglRaw = document.getElementById(`ttl_tanggal_${field.name}`)?.value || '';
+            let tglFormatted = '';
+            if (tglRaw) {
+                const bulanIndo = [
+                    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+                ];
+                const [thn, bln, hri] = tglRaw.split('-');
+                tglFormatted = `${parseInt(hri, 10)} ${bulanIndo[parseInt(bln, 10) - 1]} ${thn}`;
+            }
+            if (tempat && tglFormatted) {
+                payload.data[field.name] = `${tempat}, ${tglFormatted}`;
+            } else {
+                payload.data[field.name] = tempat || tglFormatted || '';
+            }
         } else {
             payload.data[field.name] = formData.get(field.name) || '';
         }
     });
-
     Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
     try {
         const response = await fetch(GAS_URL, {
             method: 'POST',
@@ -375,7 +418,6 @@ async function submitDynamicForm() {
             body: JSON.stringify(payload)
         });
         const res = await response.json();
-
         if (res.status === 'success') {
             if (crudModalInstance) crudModalInstance.hide();
             Swal.fire('Berhasil!', res.message || 'Data berhasil disimpan.', 'success');
@@ -392,7 +434,6 @@ async function deleteRow(table, id) {
     const schema = getTableSchema(table);
     const pkField = schema.find(f => f.primaryKey);
     if (!pkField) return;
-
     const pkName = pkField.name;
     const confirm = await Swal.fire({
         title: 'Hapus Data?',
@@ -403,7 +444,6 @@ async function deleteRow(table, id) {
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Ya, Hapus!'
     });
-
     if (confirm.isConfirmed) {
         Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         try {
@@ -412,14 +452,12 @@ async function deleteRow(table, id) {
                 table: table,
                 data: { [pkName]: id }
             };
-
             const response = await fetch(GAS_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
             const res = await response.json();
-
             if (res.status === 'success') {
                 Swal.fire('Terhapus!', res.message || 'Data berhasil dihapus.', 'success');
                 if (typeof loadAllMasterData === 'function') loadAllMasterData();
@@ -435,7 +473,6 @@ async function deleteRow(table, id) {
 /* ==========================================================================
    ENGINE SEARCH, FILTER & PAGINATION ENGINE
    ========================================================================== */
-
 /**
  * Memproses data localData[table] berdasarkan parameter pencarian, filter, dan pagination
  */
@@ -445,7 +482,6 @@ function getFilteredAndPaginatedData(table) {
     }
     const state = tableState[table];
     let data = [...(localData[table] || [])];
-
     // 1. Pencarian Real-time Global
     if (state.search) {
         const q = state.search.toLowerCase();
@@ -455,7 +491,6 @@ function getFilteredAndPaginatedData(table) {
             );
         });
     }
-
     // 2. Filter Dropdown Spesifik
     Object.keys(state.filter).forEach(key => {
         const filterVal = state.filter[key];
@@ -463,15 +498,11 @@ function getFilteredAndPaginatedData(table) {
             data = data.filter(item => String(item[key]) === String(filterVal));
         }
     });
-
     const totalItems = data.length;
     const totalPages = Math.ceil(totalItems / state.limit) || 1;
-
     if (state.page > totalPages) state.page = 1;
-
     const start = (state.page - 1) * state.limit;
     const paginatedData = data.slice(start, start + state.limit);
-
     return {
         data: paginatedData,
         totalItems,
@@ -489,15 +520,12 @@ function getFilteredAndPaginatedData(table) {
 function renderTableControls(table, filterConfigs = [], renderCallback) {
     const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
     if (!tableEl) return;
-
     // Deteksi apakah tabel berada di dalam pembungkus .table-responsive (scrollable)
     const wrapperEl = tableEl.closest('.table-responsive') || tableEl;
-
     let controlsEl = document.getElementById(`controls-${table.toLowerCase()}`);
     
     // Jika toolbar controls sudah ada di DOM, hentikan agar input/focus tidak ter-reset
     if (controlsEl) return;
-
     controlsEl = document.createElement('div');
     controlsEl.id = `controls-${table.toLowerCase()}`;
     // Memberikan kontainer styling agar terpisah rapi dari area scrollabel tabel
@@ -505,9 +533,7 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
     
     // Menyuntikkan toolbar DI LUAR & SEBELUM wrapper scrollable
     wrapperEl.parentNode.insertBefore(controlsEl, wrapperEl);
-
     const state = tableState[table];
-
     // Buat HTML Dropdown Filter
     const filterHtml = filterConfigs.map(cfg => {
         const optsHtml = cfg.options.map(opt => {
@@ -516,7 +542,6 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
             const selected = String(state.filter[cfg.field] || '') === String(val) ? 'selected' : '';
             return `<option value="${val}" ${selected}>${label}</option>`;
         }).join('');
-
         return `
             <div class="col-md-3 col-6">
                 <select class="form-select form-select-sm" onchange="updateTableFilter('${table}', '${cfg.field}', this.value, ${renderCallback.name})">
@@ -526,7 +551,6 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
             </div>
         `;
     }).join('');
-
     controlsEl.innerHTML = `
         <div class="row g-2 align-items-center">
             <div class="col-md-3 col-12">
@@ -565,10 +589,8 @@ function renderTableControls(table, filterConfigs = [], renderCallback) {
 function renderPaginationControls(table, info, renderCallback) {
     const tableEl = document.querySelector(`#table-${table.toLowerCase()}`);
     if (!tableEl) return;
-
     // Deteksi apakah tabel berada di dalam pembungkus .table-responsive (scrollable)
     const wrapperEl = tableEl.closest('.table-responsive') || tableEl;
-
     let pagEl = document.getElementById(`pagination-${table.toLowerCase()}`);
     if (!pagEl) {
         pagEl = document.createElement('div');
@@ -578,17 +600,14 @@ function renderPaginationControls(table, info, renderCallback) {
         // Menyuntikkan pagination SETELAH wrapper scrollable
         wrapperEl.parentNode.insertBefore(pagEl, wrapperEl.nextSibling);
     }
-
     let buttonsHtml = '';
     const maxPage = info.totalPages;
     const curPage = info.currentPage;
-
     buttonsHtml += `
         <li class="page-item ${curPage === 1 ? 'disabled' : ''}">
             <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${curPage - 1}, ${renderCallback.name})">Prev</button>
         </li>
     `;
-
     for (let i = 1; i <= maxPage; i++) {
         if (i === 1 || i === maxPage || (i >= curPage - 1 && i <= curPage + 1)) {
             buttonsHtml += `
@@ -600,13 +619,11 @@ function renderPaginationControls(table, info, renderCallback) {
             buttonsHtml += `<li class="page-item disabled"><span class="page-link page-link-sm">...</span></li>`;
         }
     }
-
     buttonsHtml += `
         <li class="page-item ${curPage === maxPage || maxPage === 0 ? 'disabled' : ''}">
             <button class="page-link page-link-sm" onclick="changeTablePage('${table}', ${curPage + 1}, ${renderCallback.name})">Next</button>
         </li>
     `;
-
     pagEl.innerHTML = `
         <div class="small text-muted">
             Menampilkan <b>${info.startIndex}</b> - <b>${info.endIndex}</b> dari <b>${info.totalItems}</b> data
@@ -625,19 +642,16 @@ function updateTableSearch(table, val, callback) {
     tableState[table].page = 1;
     if (typeof callback === 'function') callback();
 }
-
 function updateTableFilter(table, field, val, callback) {
     tableState[table].filter[field] = val;
     tableState[table].page = 1;
     if (typeof callback === 'function') callback();
 }
-
 function updateTableLimit(table, val, callback) {
     tableState[table].limit = parseInt(val, 10);
     tableState[table].page = 1;
     if (typeof callback === 'function') callback();
 }
-
 function changeTablePage(table, newPage, callback) {
     tableState[table].page = newPage;
     if (typeof callback === 'function') callback();
@@ -650,22 +664,18 @@ function renderActionButtons(tableName, primaryKeyValue) {
     if (!currentUser) {
         return `<span class="badge bg-light text-muted"><i class="fas fa-lock me-1"></i>Read Only</span>`;
     }
-
     const isAdmin = currentUser.role === 'Admin';
     const isWakur = currentUser.role === 'Wakur' || 
                     currentUser.is_wakur === true || 
                     currentUser.is_wakur === 1 || 
                     String(currentUser.is_wakur || '').trim().toUpperCase() === 'TRUE';
-
     // Daftar tabel yang diizinkan untuk dikelola (CRUD) oleh Wakur
     const wakurAllowedTables = ['Mapel', 'Jadwal', 'Halaqoh_T2Q', 'Halaqoh_BPI', 'Hari_Efektif'];
     
     const canEdit = isAdmin || (isWakur && wakurAllowedTables.includes(tableName));
-
     if (!canEdit) {
         return `<span class="badge bg-light text-muted"><i class="fas fa-lock me-1"></i>Read Only</span>`;
     }
-
     return `
         <button class="btn btn-sm btn-outline-warning me-1" title="Edit Data" onclick="editRow('${tableName}', '${primaryKeyValue}')">
             <i class="fas fa-edit"></i>
@@ -679,7 +689,6 @@ function renderActionButtons(tableName, primaryKeyValue) {
 /* ==========================================================================
    ENGINE IMPORT & EXPORT HANDLER PER TABEL
    ========================================================================== */
-
 function handleTableImportExcel(table) {
     if (typeof openImportModal === 'function') {
         openImportModal(table);
